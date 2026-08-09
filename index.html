@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
 <title>Water Sort Puzzle - 200 Levels</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
     --accent: #4dd0e1;
@@ -15,7 +18,7 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { height: 100%; }
   body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-family: 'Baloo 2', 'Segoe UI', system-ui, -apple-system, sans-serif;
     color: var(--text);
     display: flex; justify-content: center; align-items: flex-start;
     min-height: 100vh; padding: 16px 10px 40px;
@@ -28,7 +31,9 @@
   }
 
   /* ============================ THEMES ============================ */
-  body.theme-dark-moody  { --text:#eef6ff; --muted:#9fb3c8; --glass:rgba(255,255,255,.07); --glass-border:rgba(255,255,255,.28); background:linear-gradient(160deg,#0f1216,#1a1f26,#242a33); }
+  body.theme-dark-moody  { --text:#eef6ff; --muted:#9fb3c8; --glass:rgba(255,255,255,.07); --glass-border:rgba(255,255,255,.28); background:radial-gradient(1000px 650px at 50% -8%, #232c4d 0%, #1a1833 46%, #0d0f22 100%); }
+  body.theme-halloween  { --text:#ffedd6; --muted:#d9b98c; --glass:rgba(255,255,255,.06); --glass-border:rgba(255,150,40,.4); background:radial-gradient(1000px 650px at 50% -8%, #4a1d3a 0%, #2b1030 45%, #140a18 100%); }
+  body.theme-halloween { --accent:#ff9f1c; }
   body.theme-soft-pastel { --text:#4a4453; --muted:#7a7285; --glass:rgba(255,255,255,.35); --glass-border:rgba(80,60,110,.22); background:linear-gradient(160deg,#fde2e4,#fad2e1,#dbe7ff); }
   body.theme-vivid-colorful { --text:#fff; --muted:#e8f3ff; --glass:rgba(255,255,255,.14); --glass-border:rgba(255,255,255,.45); background:linear-gradient(120deg,#f94144,#f3722c,#f9c74f,#43aa8b,#577590); background-size:300% 300%; animation:gradShift 18s ease infinite; }
   body.theme-gradient-sunset { --text:#fff; --muted:#ffe9d6; --glass:rgba(255,255,255,.12); --glass-border:rgba(255,255,255,.4); background:linear-gradient(160deg,#ff5e62,#ff9966,#ffd6a5); }
@@ -80,6 +85,13 @@
   .level-info .par { font-size: 12px; color: var(--muted); }
   .moves { font-size: 15px; color: var(--muted); }
   .moves b { color: var(--text); font-size: 20px; }
+  .hdr-right { display: flex; align-items: center; gap: 10px; }
+  .nh-streak {
+    font-size: 13px; font-weight: 700; color: #ff9f1c;
+    background: rgba(255,159,28,.14); border: 1px solid rgba(255,159,28,.35);
+    padding: 3px 9px; border-radius: 20px;
+  }
+  .nh-streak b { color: #ffd166; }
 
   .btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
   .btns button {
@@ -332,10 +344,11 @@
   .modal.hidden { display: none; }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   .panel {
-    background: linear-gradient(180deg, #1b2f3f, #16232f);
+    background: linear-gradient(180deg, rgba(27,47,63,.92), rgba(22,35,47,.94));
     border: 1px solid var(--glass-border); border-radius: 18px;
     padding: 22px; width: 100%; max-width: 420px; text-align: center;
-    box-shadow: 0 20px 50px rgba(0,0,0,.5);
+    box-shadow: 0 20px 50px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1);
+    backdrop-filter: blur(12px);
     animation: popIn .25s cubic-bezier(.3,1.3,.5,1);
   }
   .panel.wide { max-width: 560px; }
@@ -366,6 +379,22 @@
   .stat .v { font-size: 24px; font-weight: 800; color: var(--accent); }
   .stat .l { font-size: 12px; color: var(--muted); }
   .star { color: #ffd166; font-size: 30px; }
+  .stars { display: flex; justify-content: center; gap: 10px; margin: 6px 0 10px; }
+  .stars .star {
+    display: inline-block; font-size: 38px; line-height: 1;
+    color: rgba(255,255,255,.25); text-shadow: none;
+    transform: scale(.8); opacity: .3;
+    transition: transform .25s cubic-bezier(.3,1.6,.5,1), color .2s, text-shadow .2s, opacity .2s;
+  }
+  .stars .star.on {
+    color: #ffd166; opacity: 1; transform: scale(1);
+    text-shadow: 0 0 16px rgba(255,209,102,.7);
+    animation: starTwinkle .5s ease-in-out infinite;
+  }
+  @keyframes starTwinkle {
+    0%,100% { filter: brightness(1); transform: scale(1); }
+    50% { filter: brightness(1.35); transform: scale(1.12); }
+  }
 
   #levelGrid {
     display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px;
@@ -375,7 +404,10 @@
     aspect-ratio: 1; border-radius: 9px; cursor: pointer; font-size: 13px; font-weight: 700;
     background: var(--glass); border: 1px solid var(--glass-border); color: var(--text);
     transition: transform .1s ease, background .15s;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
   }
+  .lg-stars { font-size: 8px; color: #ffd166; line-height: 1; letter-spacing: .5px; }
+  .lg-n { line-height: 1; }
   #levelGrid button:hover:not(.locked) { background: rgba(255,255,255,.16); transform: scale(1.08); }
   #levelGrid button.current { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(77,208,225,.3); }
   #levelGrid button.done { background: rgba(77,208,225,.16); }
@@ -386,6 +418,38 @@
   #levelGrid button { position: relative; }
   #levelGrid button.locked { opacity: .3; cursor: default; }
   #levelGrid button.boss { border-color: rgba(255,140,66,.55); color: #ffb37a; font-weight: 800; }
+
+  /* ======================= LEVEL MAP ============================ */
+  .map-legend { text-align: center; font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .map-legend .ml-star { color: #ffd166; }
+  .map-legend .ml-lock { font-size: 10px; }
+  #mapScroll {
+    max-height: 62vh; overflow-y: auto; position: relative;
+    border-radius: 14px; background: rgba(0,0,0,.18);
+    border: 1px solid var(--glass-border); margin-bottom: 12px;
+  }
+  #mapCanvas { position: relative; width: 100%; }
+  .map-node {
+    position: absolute; width: 52px; height: 52px; border-radius: 50%; z-index: 2;
+    background: var(--glass); border: 2px solid var(--glass-border); color: var(--text);
+    font-size: 14px; font-weight: 800; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+    transition: transform .12s ease, border-color .15s;
+  }
+  .map-node:active { transform: scale(.9); }
+  .map-node.done { background: rgba(77,208,225,.2); border-color: var(--accent); }
+  .map-node.done .mn-n { line-height: 1; }
+  .map-node.done .mn-st { font-size: 9px; color: #ffd166; line-height: 1; letter-spacing: .5px; }
+  .map-node.current {
+    border-color: #ffd166;
+    background: linear-gradient(145deg, rgba(255,209,102,.32), rgba(255,140,66,.26));
+    animation: nodePulse 1.6s ease-in-out infinite;
+  }
+  @keyframes nodePulse {
+    0%,100% { box-shadow: 0 0 0 3px rgba(255,209,102,.4), 0 0 14px 4px rgba(255,209,102,.4); }
+    50% { box-shadow: 0 0 0 3px rgba(255,209,102,.5), 0 0 30px 10px rgba(255,209,102,.65); }
+  }
+  .map-node.locked { opacity: .45; cursor: default; font-size: 18px; }
 
   /* ======================= PHASE 1 FEATURES ===================== */
   .daily-btn { margin-top: 8px; background: linear-gradient(135deg, #ffb703, #fb8500); color: #2b1500; }
@@ -623,8 +687,11 @@
   @keyframes floatDrop { 0%,100% { transform: translateY(0) rotate(-8deg); } 50% { transform: translateY(-7px) rotate(10deg); } }
   .logo-sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
   .home-card-inner {
-    background: var(--glass); border: 1px solid var(--glass-border);
+    background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
+    border: 1px solid var(--glass-border);
     border-radius: 18px; padding: 16px 18px; margin-bottom: 14px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.12);
+    backdrop-filter: blur(8px);
     animation: cardIn .5s cubic-bezier(.3,1.15,.4,1);
   }
   .home-card-inner:nth-child(3) { animation-delay: .06s; }
@@ -676,14 +743,52 @@
     0%,100% { box-shadow: 0 8px 24px rgba(77,208,225,.35); transform: translateY(0); }
     50% { box-shadow: 0 14px 32px rgba(77,208,225,.55); transform: translateY(-2px); }
   }
-  .home-mini { display: flex; gap: 10px; justify-content: center; margin-top: 14px; }
-  .mini-btn {
-    flex: 1; padding: 12px 8px; border-radius: 12px; cursor: pointer;
+  .bottom-nav { display: flex; gap: 7px; margin-top: 16px; }
+  .nav-btn {
+    flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    min-height: 56px; padding: 6px 2px; border-radius: 14px; cursor: pointer;
     background: var(--glass); border: 1px solid var(--glass-border);
-    color: var(--text); font-size: 14px;
+    color: var(--text);
     transition: transform .12s ease, background .15s;
   }
-  .mini-btn:active { transform: scale(.92); }
+  .nav-btn:active { transform: scale(.92); }
+  .nav-btn .nb-ic { font-size: 20px; line-height: 1; filter: drop-shadow(0 0 6px rgba(255,255,255,.18)); }
+  .nav-btn .nb-lb { font-size: 10px; font-weight: 700; letter-spacing: .3px; white-space: nowrap; }
+
+  /* ==================== MORE SLIDE-UP SHEET ===================== */
+  .sheet-wrap {
+    position: fixed; inset: 0; background: rgba(5,12,18,.55);
+    display: flex; align-items: flex-end; justify-content: center;
+    z-index: 120; animation: fadeIn .18s ease;
+  }
+  .sheet-wrap.hidden { display: none; }
+  .sheet {
+    width: 100%; max-width: 540px;
+    background: linear-gradient(180deg, #1b2f3f, #16232f);
+    border: 1px solid var(--glass-border); border-radius: 20px 20px 0 0;
+    padding: 10px 16px calc(18px + env(safe-area-inset-bottom));
+    box-shadow: 0 -12px 40px rgba(0,0,0,.5);
+    animation: sheetUp .28s cubic-bezier(.3,1.2,.4,1);
+  }
+  @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .sheet-grab { width: 44px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.25); margin: 4px auto 12px; }
+  .sheet-title {
+    text-align: center; font-weight: 800; letter-spacing: 1.4px; margin-bottom: 10px;
+    color: var(--muted); font-size: 12px; text-transform: uppercase;
+  }
+  .sheet-item {
+    width: 100%; display: flex; align-items: center; gap: 12px; padding: 14px 16px; margin-bottom: 8px;
+    border-radius: 12px; cursor: pointer; font-size: 15px; font-weight: 600; color: var(--text); text-align: left;
+    background: var(--glass); border: 1px solid var(--glass-border);
+    transition: transform .12s ease, background .15s;
+  }
+  .sheet-item:hover { background: rgba(255,255,255,.12); }
+  .sheet-item:active { transform: scale(.98); }
+  .sheet-item .si-ic { font-size: 20px; }
+  .sheet-close {
+    width: 100%; padding: 13px; border-radius: 12px; cursor: pointer; font-size: 15px; font-weight: 700;
+    background: rgba(255,255,255,.08); border: 1px solid var(--glass-border); color: var(--text); margin-top: 4px;
+  }
   .xp-line { font-size: 17px; font-weight: 800; color: #7ae582; margin-top: 2px; animation: xpPop .5s cubic-bezier(.3,1.5,.5,1); }
   @keyframes xpPop { from { transform: scale(.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
   .levelup {
@@ -813,6 +918,27 @@
   }
   .custo-tab.active { background: linear-gradient(145deg, #4cc9f0, #3a86ff); color: #fff; border-color: transparent; }
 
+  #themeGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 12px; }
+  .theme-card {
+    position: relative; padding: 10px; border-radius: 14px; cursor: pointer;
+    background: var(--glass); border: 2px solid var(--glass-border); color: var(--text);
+    transition: transform .12s ease, border-color .15s;
+  }
+  .theme-card:active { transform: scale(.95); }
+  .theme-card.active { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(77,208,225,.25); }
+  .theme-card.locked { opacity: .6; }
+  .theme-swatch {
+    height: 54px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    font-size: 26px; margin-bottom: 6px; border: 1px solid rgba(255,255,255,.15);
+  }
+  .th-default { background: radial-gradient(120px 80px at 50% -10%, #232c4d, #0d0f22); }
+  .th-pastel { background: linear-gradient(160deg, #fde2e4, #dbe7ff); }
+  .th-halloween { background: radial-gradient(120px 80px at 50% -10%, #4a1d3a, #140a18); }
+  .th-neon { background: #070a13; box-shadow: 0 0 18px rgba(0,255,255,.4); }
+  .theme-name { font-size: 13px; font-weight: 800; }
+  .theme-lock { font-size: 10px; color: #ffd166; font-weight: 700; }
+  .theme-desc { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.3; }
+
   .tube-preview {
     width: 26px; height: 72px; margin: 6px auto 8px; position: relative;
     border-radius: 10px 10px 8px 8px; border: 3px solid var(--glass-border);
@@ -883,7 +1009,7 @@
     .btns button:hover { transform: translateY(-2px) scale(1.08); }
   }
   @media (pointer: coarse) {
-    .menu-item, .btns button, .mini-btn, .btn-primary, .btn-ghost, .set-toggle, .mode-tab { touch-action: manipulation; }
+    .menu-item, .btns button, .nav-btn, .sheet-item, .btn-primary, .btn-ghost, .set-toggle, .mode-tab, .map-node { touch-action: manipulation; }
   }
 </style>
 </head>
@@ -926,18 +1052,27 @@
       </div>
       <div class="mode-desc" id="modeDesc"></div>
 
-      <div class="home-mini">
-        <button class="mini-btn" id="btnHomeSound">&#x1F50A; Sound</button>
-        <button class="mini-btn" id="btnHomeHelp">&#x2753; Help</button>
-        <button class="mini-btn" id="btnHomeLevels">&#x1F5FA;&#xFE0F; Levels</button>
-        <button class="mini-btn" id="btnHomeAch">&#x1F3C6; Awards</button>
-        <button class="mini-btn" id="btnHomeShop">&#x1F6D2; Shop</button>
-        <button class="mini-btn" id="btnHomeSkins">&#x1F3A8; Customize</button>
-        <button class="mini-btn" id="btnHomeStats">&#x1F4CA; Stats</button>
-        <button class="mini-btn" id="btnHomeBoard">&#x1F3C5; Best Times</button>
-        <button class="mini-btn" id="btnHomeSocial">&#x1F91D; Friends</button>
-        <button class="mini-btn" id="btnHomeSettings">&#x2699;&#xFE0F; Settings</button>
+      <div class="bottom-nav">
+        <button class="nav-btn" id="btnHomeLevels"><span class="nb-ic">&#x1F5FA;&#xFE0F;</span><span class="nb-lb">Levels</span></button>
+        <button class="nav-btn" id="btnHomeShop"><span class="nb-ic">&#x1F6D2;</span><span class="nb-lb">Shop</span></button>
+        <button class="nav-btn" id="btnHomeSkins"><span class="nb-ic">&#x1F3A8;</span><span class="nb-lb">Customize</span></button>
+        <button class="nav-btn" id="btnHomeStats"><span class="nb-ic">&#x1F4CA;</span><span class="nb-lb">Stats</span></button>
+        <button class="nav-btn" id="btnHomeSettings"><span class="nb-ic">&#x2699;&#xFE0F;</span><span class="nb-lb">Settings</span></button>
+        <button class="nav-btn" id="btnMore"><span class="nb-ic">&#x22EE;</span><span class="nb-lb">More</span></button>
       </div>
+    </div>
+  </div>
+
+  <div class="sheet-wrap hidden" id="moreWrap">
+    <div class="sheet" id="moreSheet">
+      <div class="sheet-grab"></div>
+      <div class="sheet-title">More</div>
+      <button class="sheet-item" id="btnHomeSound"><span class="si-ic">&#x1F50A;</span><span>Sound</span></button>
+      <button class="sheet-item" id="btnHomeHelp"><span class="si-ic">&#x2753;</span><span>How to Play</span></button>
+      <button class="sheet-item" id="btnHomeAch"><span class="si-ic">&#x1F3C6;</span><span>Awards</span></button>
+      <button class="sheet-item" id="btnHomeBoard"><span class="si-ic">&#x1F3C5;</span><span>Best Times</span></button>
+      <button class="sheet-item" id="btnHomeSocial"><span class="si-ic">&#x1F91D;</span><span>Friends</span></button>
+      <button class="sheet-close" id="btnCloseMore">Close</button>
     </div>
   </div>
 
@@ -945,7 +1080,10 @@
     <header>
       <div class="hdr-top">
         <div class="logo-title"><span class="lg-drop">&#x1F4A7;</span><span class="lg-text">WATER SORT</span></div>
-        <span class="moves">Moves <b id="movesNum">0</b></span>
+        <div class="hdr-right">
+          <span class="nh-streak hidden" id="nhStreak">&#x1F525; <b>0</b></span>
+          <span class="moves">Moves <b id="movesNum">0</b></span>
+        </div>
       </div>
       <div class="hdr-bottom">
         <div class="level-info">
@@ -1016,7 +1154,11 @@
 
   <div class="modal hidden" id="winModal">
     <div class="panel">
-      <div class="star" id="winStar"></div>
+      <div class="stars" id="winStars">
+        <span class="star" data-n="1">&#x2605;</span>
+        <span class="star" data-n="2">&#x2605;</span>
+        <span class="star" data-n="3">&#x2605;</span>
+      </div>
       <div class="boss-victory hidden" id="bossVictory">&#x1F451; BOSS DEFEATED! &#x1F451;</div>
       <h2>Level Complete!</h2>
       <div class="stat-row">
@@ -1045,6 +1187,22 @@
     </div>
   </div>
 
+  <div class="modal hidden" id="mapModal">
+    <div class="panel wide">
+      <div class="panel-head">
+        <h2>&#x1F5FA;&#xFE0F; Level Map</h2>
+        <button id="btnCloseMap">&times;</button>
+      </div>
+      <div class="map-legend"><span class="ml-star">&#x2605;</span> stars earned &middot; <span class="ml-lock">&#x1F512;</span> locked &middot; glowing node = your current level</div>
+      <div id="mapScroll">
+        <div id="mapCanvas"></div>
+      </div>
+      <div class="win-row">
+        <button class="btn-ghost" id="btnMapGrid">Grid View</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal hidden" id="achModal">
     <div class="panel wide">
       <div class="panel-head">
@@ -1064,9 +1222,11 @@
       <div class="custo-tabs">
         <button class="custo-tab active" id="tabPalettes">Liquid Palettes</button>
         <button class="custo-tab" id="tabTubes">Tube Themes</button>
+        <button class="custo-tab" id="tabThemes">Page Themes</button>
       </div>
       <div id="skinGrid"></div>
       <div id="tubeGrid" class="hidden"></div>
+      <div id="themeGrid" class="hidden"></div>
       <div class="skin-hint">Unlock new looks by completing levels.</div>
     </div>
   </div>
@@ -1111,9 +1271,11 @@
         <button id="btnCloseStats">&times;</button>
       </div>
       <div class="stat-grid">
+        <div class="stat-box"><div class="v" id="statStars">0</div><div class="l">Total Stars</div></div>
         <div class="stat-box"><div class="v" id="statWins">0</div><div class="l">Total Wins</div></div>
         <div class="stat-box"><div class="v" id="statLevels">0</div><div class="l">Levels Done</div></div>
         <div class="stat-box"><div class="v" id="statStreak">0</div><div class="l">Best Streak</div></div>
+        <div class="stat-box"><div class="v" id="statCurStreak">0</div><div class="l">Current Streak</div></div>
         <div class="stat-box"><div class="v" id="statDaily">0</div><div class="l">Daily Wins</div></div>
         <div class="stat-box"><div class="v" id="statAvg">0</div><div class="l">Avg Moves</div></div>
         <div class="stat-box"><div class="v" id="statPerfect">0</div><div class="l">Perfect Wins</div></div>
@@ -1338,6 +1500,49 @@ function shapeForLevel(level) {
   return SHAPES[(level - 1) % SHAPES.length];
 }
 
+/* ==================== PAGE THEMES (global look) ================= */
+const PAGE_THEMES = [
+  { id: 'default',   name: 'Glossy Dark',  desc: 'Navy & purple, premium glass',  icon: '\uD83D\uDC8E', unlock: 0 },
+  { id: 'pastel',    name: 'Pastel',       desc: 'Soft, gentle pastel tones',     icon: '\uD83C\uDF38', unlock: 0 },
+  { id: 'halloween', name: 'Halloween',    desc: 'Pumpkins & spooky purple glow', icon: '\uD83C\uDF83', unlock: 5 },
+  { id: 'neon',      name: 'Neon',         desc: 'Electric cyber glow',           icon: '\uD83D\uDCA1', unlock: 10 }
+];
+function pageThemeBody(level) {
+  if (level > 0 && isBossLevel(level)) return 'theme-boss-danger';
+  const pt = app.save.pageTheme || 'default';
+  if (pt !== 'default') return 'theme-' + pt;
+  return 'theme-dark-moody';
+}
+function applyPageTheme() {
+  document.body.className = pageThemeBody(app.level || 1);
+  document.body.dataset.tube = String(app.save.tubeTheme || 0);
+}
+function renderThemes() {
+  const grid = document.getElementById('themeGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  const pl = playerLevelFromXp(app.save.xp).level;
+  PAGE_THEMES.forEach(t => {
+    const locked = pl < t.unlock;
+    const div = document.createElement('button');
+    div.className = 'theme-card' + (app.save.pageTheme === t.id ? ' active' : '') + (locked ? ' locked' : '');
+    div.innerHTML =
+      '<div class="theme-swatch th-' + t.id + '">' + t.icon + '</div>' +
+      '<div class="theme-name">' + t.name + (locked ? ' <span class="theme-lock">\uD83D\uDD12 Lv ' + t.unlock + '</span>' : '') + '</div>' +
+      '<div class="theme-desc">' + t.desc + '</div>';
+    div.addEventListener('click', () => {
+      if (locked) { toast('Unlocks at Player Level ' + t.unlock); return; }
+      app.save.pageTheme = t.id;
+      Store.save(app.save);
+      renderThemes();
+      applyPageTheme();
+      AudioSys.play('plink');
+      toast('Theme: ' + t.name);
+    });
+    grid.appendChild(div);
+  });
+}
+
 /* ==================== IMMUTABLE GAME ENGINE ======================
    All methods are pure: they read state and return NEW frozen states.
    In strict mode, any accidental mutation of a frozen state throws. */
@@ -1552,7 +1757,7 @@ function sanitizeSave(raw) {
     energy: ENERGY_MAX, lastEnergy: Date.now(), chestDay: 0, chestDate: '', bossWins: 0, chests: 0,
     boosters: { shuffle: 1, extraTube: 1, doubleXP: 0, peek: 0 },
     mode: 'classic', timeBest: {}, timeWins: 0, tutorialDone: false, haptics: true,
-    coins: 0, playerId: '', redeemedCodes: [], tubeTheme: 0, tubeThemes: [0] };
+    coins: 0, playerId: '', redeemedCodes: [], tubeTheme: 0, tubeThemes: [0], pageTheme: 'default' };
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return def;
   const s = Object.assign({}, def, raw);
   s.unlocked = Math.min(CFG.LEVEL_COUNT, Math.max(1, parseInt(s.unlocked, 10) || 1));
@@ -1632,6 +1837,19 @@ function sanitizeSave(raw) {
   if (!Array.isArray(s.tubeThemes)) s.tubeThemes = [0];
   s.tubeThemes = s.tubeThemes.filter(n => typeof n === 'number' && n >= 0);
   if (!s.tubeThemes.includes(0)) s.tubeThemes.unshift(0);
+  s.pageTheme = ['default', 'pastel', 'halloween', 'neon'].includes(s.pageTheme) ? s.pageTheme : 'default';
+  s.noHintStreak = Math.max(0, parseInt(s.noHintStreak, 10) || 0);
+  s.bestNoHintStreak = Math.max(0, parseInt(s.bestNoHintStreak, 10) || 0);
+  if (!s.stars || typeof s.stars !== 'object' || Array.isArray(s.stars)) s.stars = {};
+  else {
+    const stars = {};
+    for (const k of Object.keys(s.stars)) {
+      const lv = parseInt(k, 10);
+      const n = parseInt(s.stars[k], 10);
+      if (lv >= 1 && lv <= CFG.LEVEL_COUNT && n >= 1 && n <= 3) stars[lv] = n;
+    }
+    s.stars = stars;
+  }
   if (!s.boosters || typeof s.boosters !== 'object' || Array.isArray(s.boosters)) s.boosters = {};
   s.boosters.shuffle = Math.max(0, parseInt(s.boosters.shuffle, 10) || 0);
   s.boosters.extraTube = Math.max(0, parseInt(s.boosters.extraTube, 10) || 0);
@@ -2241,9 +2459,14 @@ function fmtTime(sec) {
 }
 function renderStats() {
   const st = app.save.stats;
+  let totalStars = 0;
+  const stMap = app.save.stars || {};
+  for (const k of Object.keys(stMap)) totalStars += stMap[k];
+  document.getElementById('statStars').textContent = totalStars;
   document.getElementById('statWins').textContent = st.wins;
   document.getElementById('statLevels').textContent = st.levels + ' / ' + CFG.LEVEL_COUNT;
   document.getElementById('statStreak').textContent = st.bestStreak;
+  document.getElementById('statCurStreak').textContent = app.save.streak || 0;
   document.getElementById('statDaily').textContent = st.dailyWins;
   const avg = st.levels ? (st.moves / st.levels).toFixed(1) : '0';
   document.getElementById('statAvg').textContent = avg;
@@ -2308,7 +2531,7 @@ function energyStateText() {
 const MODES = {
   classic: { label: 'Classic', icon: '\uD83C\uDFAE', desc: 'Energy + boss timers, classic rules.' },
   time:    { label: 'Time Attack', icon: '\u26A1', desc: 'No energy cost. Beat each level as fast as you can!' },
-  relaxed: { label: 'Relaxed', icon: '\U0001F33F', desc: 'No energy, no timers. Just sort and chill.' }
+  relaxed: { label: 'Relaxed', icon: '🌿', desc: 'No energy, no timers. Just sort and chill.' }
 };
 function currentMode() { return app.save.mode; }
 function modeNeedsEnergy() { return currentMode() === 'classic'; }
@@ -2372,7 +2595,7 @@ function bossTimerFor(n) {
 }
 let bossTick = null;
 function anyModalOpen() {
-  const ids = ['winModal', 'levelsModal', 'achModal', 'skinsModal', 'statsModal', 'helpModal', 'adModal', 'energyModal', 'shopModal', 'socialModal', 'menuModal', 'settingsModal'];
+  const ids = ['winModal', 'levelsModal', 'achModal', 'skinsModal', 'statsModal', 'helpModal', 'adModal', 'energyModal', 'shopModal', 'socialModal', 'menuModal', 'settingsModal', 'mapModal'];
   return ids.some(id => {
     const el = document.getElementById(id);
     return el && !el.classList.contains('hidden');
@@ -2453,7 +2676,7 @@ function claimChest() {
   AudioSys.play('coin');
   toast('Chest claimed! ' + reward.label);
   showRewardPopup({
-    type: 'chest', gold: true, icon: '\U0001F4B0', title: 'Chest Opened!',
+    type: 'chest', gold: true, icon: '💰', title: 'Chest Opened!',
     desc: reward.label, sub: 'Day ' + (idx + 1) + ' reward claimed',
     sound: 'levelup', duration: 2200
   });
@@ -2465,7 +2688,7 @@ function renderChest() {
   if (!btn) return;
   const claimed = chestClaimedToday();
   const idx = claimed ? app.save.chestDay : chestDayIndex();
-  btn.textContent = (claimed ? '\u2705 ' : '\U0001F4B0 ') + 'Day ' + (idx + 1) + ' Chest: ' + CHEST_REWARDS[idx].label;
+  btn.textContent = (claimed ? '\u2705 ' : '💰 ') + 'Day ' + (idx + 1) + ' Chest: ' + CHEST_REWARDS[idx].label;
   btn.disabled = claimed;
 }
 
@@ -2660,6 +2883,7 @@ function showScreen(name) {
   if (name === 'home') {
     stopBossTimer();
     stopTATimer();
+    applyPageTheme();
     renderHome();
   }
 }
@@ -2670,6 +2894,12 @@ function updateHUD() {
   document.getElementById('movesNum').textContent = app.moves;
   document.getElementById('parInfo').textContent = isDaily ? 'Daily Challenge' : 'Par ' + app.par;
   document.getElementById('btnUndo').disabled = app.history.length === 0;
+  const nh = document.getElementById('nhStreak');
+  if (nh) {
+    const n = app.save.noHintStreak || 0;
+    nh.classList.toggle('hidden', n < 2);
+    if (n >= 2) nh.querySelector('b').textContent = n;
+  }
   document.getElementById('btnSound').textContent = app.save.muted ? '\u266B' : '\u266A';
   document.getElementById('btnSound').title = app.save.muted ? 'Sound: Off' : 'Sound: On';
   updateBoosterBadges();
@@ -2743,7 +2973,7 @@ function applyTheme(level) {
   if (vignette) vignette.remove();
   const isBoss = level > 0 && isBossLevel(level);
   const theme = isBoss ? 'boss-danger' : themeForLevel(level);
-  document.body.className = 'theme-' + theme;
+  document.body.className = pageThemeBody(level);
   document.body.dataset.tube = String(app.save.tubeTheme || 0);
   AudioSys.setAmbientTheme(theme);
   if (isBoss) {
@@ -3319,13 +3549,20 @@ function confetti() {
   }
 }
 
+function starsFor(moves, par) {
+  if (moves <= par) return 3;
+  if (moves <= Math.max(par + 2, Math.ceil(par * 1.6))) return 2;
+  return 1;
+}
+
 function win() {
   AudioSys.play('win');
   stopBossTimer();
   stopTATimer();
   if (currentMode() === 'time') recordTimeBest();
   buzz(40);
-  const star = app.moves <= app.par;
+  const starCount = starsFor(app.moves, app.par);
+  const star = starCount === 3;
   app.streak += 1;
   if (star) setTimeout(() => AudioSys.play('coin'), 450);
   if (app.streak > 0 && app.streak % 5 === 0) setTimeout(() => AudioSys.play('fanfare'), 950);
@@ -3340,7 +3577,21 @@ function win() {
   st.bestStreak = Math.max(st.bestStreak || 0, app.streak);
   if (app.playStart) st.playSeconds += Math.floor((Date.now() - app.playStart) / 1000);
   if (star) st.perfect = (st.perfect || 0) + 1;
-  if ((s.hints[app.level] || 0) === 0) st.noHint = (st.noHint || 0) + 1;
+  if (!isDaily && starCount > (s.stars[app.level] || 0)) s.stars[app.level] = starCount;
+  if ((s.hints[app.level] || 0) === 0) {
+    st.noHint = (st.noHint || 0) + 1;
+    s.noHintStreak = (s.noHintStreak || 0) + 1;
+    s.bestNoHintStreak = Math.max(s.bestNoHintStreak || 0, s.noHintStreak);
+    const mil = [5, 10, 20];
+    if (mil.includes(s.noHintStreak)) setTimeout(() => {
+      showRewardPopup({
+        type: 'streak', gold: true, icon: '\uD83D\uDD25', title: 'No-Hint Streak ' + s.noHintStreak + '!',
+        desc: s.noHintStreak + ' levels solved without a single hint', sound: 'fanfare', duration: 2400
+      });
+    }, 1400);
+  } else {
+    s.noHintStreak = 0;
+  }
   if (isBoss) s.bossWins = (s.bossWins || 0) + 1;
 
   let xpGain;
@@ -3383,7 +3634,16 @@ function win() {
   checkAchievements();
 
   confetti();
-  document.getElementById('winStar').textContent = star ? '\u2605' : '';
+  const winStars = document.getElementById('winStars');
+  if (winStars) {
+    winStars.querySelectorAll('.star').forEach((el, i) => {
+      el.classList.remove('on');
+      if (i < starCount) {
+        if (i === 2) setTimeout(() => AudioSys.play('ding'), 900);
+        setTimeout(() => el.classList.add('on'), 380 + i * 420);
+      }
+    });
+  }
   document.getElementById('winMoves').textContent = app.moves;
   document.getElementById('winPar').textContent = app.par;
   document.getElementById('winBest').textContent = isDaily
@@ -3465,13 +3725,86 @@ function renderLevelGrid() {
     else {
       if (s.done.includes(i)) {
         btn.classList.add('done');
-        if (s.best[i] <= difficultyForLevel(i).moves) btn.textContent = i + '\u2605';
+        const n = app.save.stars[i] || 1;
+        btn.innerHTML = '<span class="lg-n">' + i + '</span><span class="lg-stars">' + '\u2605'.repeat(n) + '</span>';
       }
       btn.addEventListener('click', () => loadLevel(i));
     }
     if (i === app.level) btn.classList.add('current');
     grid.appendChild(btn);
   }
+}
+
+function renderLevelMap() {
+  const wrap = document.getElementById('mapCanvas');
+  if (!wrap) return;
+  const ROW_H = 76;
+  const LANES = [-118, -60, 0, 60, 118];
+  const lanePattern = [0, 1, 2, 3, 4, 3, 2, 1];
+  const W = wrap.clientWidth || 360;
+  const cx = W / 2;
+  const totalH = CFG.LEVEL_COUNT * ROW_H + 80;
+  wrap.style.height = totalH + 'px';
+  wrap.innerHTML = '';
+
+  const s = app.save;
+  const pts = [];
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('width', '100%');
+  svg.setAttribute('height', totalH);
+  svg.style.position = 'absolute';
+  svg.style.left = '0';
+  svg.style.top = '0';
+  svg.style.pointerEvents = 'none';
+  wrap.appendChild(svg);
+
+  for (let i = 1; i <= CFG.LEVEL_COUNT; i++) {
+    const lane = LANES[lanePattern[(i - 1) % lanePattern.length]];
+    const x = cx + lane;
+    const y = (i - 1) * ROW_H + 20;
+    pts.push([x, y]);
+
+    const locked = i > s.unlocked;
+    const done = s.done.includes(i);
+    const node = document.createElement('button');
+    node.className = 'map-node';
+    node.style.left = (x - 26) + 'px';
+    node.style.top = (y - 26) + 'px';
+    node.classList.toggle('locked', locked);
+    node.classList.toggle('done', !!done);
+    node.classList.toggle('current', i === app.level && !locked);
+    if (isBossLevel(i)) node.style.borderColor = 'rgba(255,140,66,.6)';
+    if (done) {
+      node.innerHTML = '<span class="mn-n">' + i + '</span><span class="mn-st">' + '\u2605'.repeat(s.stars[i] || 1) + '</span>';
+    } else {
+      node.textContent = locked ? '\uD83D\uDD12' : i;
+    }
+    node.addEventListener('click', () => {
+      if (locked) { toast('Complete Level ' + s.unlocked + ' first'); return; }
+      document.getElementById('mapModal').classList.add('hidden');
+      loadLevel(i);
+    });
+    wrap.appendChild(node);
+  }
+
+  let d = 'M ' + pts[0][0] + ' ' + pts[0][1];
+  for (let i = 1; i < pts.length; i++) {
+    const p = pts[i - 1], c = pts[i];
+    const mx = (p[0] + c[0]) / 2;
+    d += ' C ' + mx + ' ' + p[1] + ', ' + mx + ' ' + c[1] + ', ' + c[0] + ' ' + c[1];
+  }
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', d);
+  path.setAttribute('fill', 'none');
+  path.setAttribute('stroke', 'rgba(255,209,102,.32)');
+  path.setAttribute('stroke-width', '5');
+  path.setAttribute('stroke-linecap', 'round');
+  path.setAttribute('stroke-dasharray', '10 8');
+  svg.appendChild(path);
+
+  const sc = document.getElementById('mapScroll');
+  if (sc) sc.scrollTop = Math.max(0, (app.level - 1) * ROW_H - sc.clientHeight / 2);
 }
 
 /* ==================== ON-LOAD SELF-TEST =========================
@@ -3609,6 +3942,7 @@ function runFullSweep() {
 function init() {
   app.streak = app.save.streak || 0;
   touchDailyStreak();
+  applyPageTheme();
 
   try {
     selfTest();
@@ -3637,8 +3971,8 @@ function init() {
   });
   document.getElementById('btnMenuLevels').addEventListener('click', () => {
     document.getElementById('menuModal').classList.add('hidden');
-    renderLevelGrid();
-    document.getElementById('levelsModal').classList.remove('hidden');
+    document.getElementById('mapModal').classList.remove('hidden');
+    renderLevelMap();
   });
   document.getElementById('btnMenuHelp').addEventListener('click', () => {
     document.getElementById('menuModal').classList.add('hidden');
@@ -3672,8 +4006,10 @@ function init() {
   document.getElementById('btnHomeSkins').addEventListener('click', () => {
     document.getElementById('skinGrid').classList.remove('hidden');
     document.getElementById('tubeGrid').classList.add('hidden');
+    document.getElementById('themeGrid').classList.add('hidden');
     document.getElementById('tabPalettes').classList.add('active');
     document.getElementById('tabTubes').classList.remove('active');
+    document.getElementById('tabThemes').classList.remove('active');
     renderSkins();
     document.getElementById('skinsModal').classList.remove('hidden');
   });
@@ -3685,16 +4021,29 @@ function init() {
   document.getElementById('tabPalettes').addEventListener('click', () => {
     document.getElementById('skinGrid').classList.remove('hidden');
     document.getElementById('tubeGrid').classList.add('hidden');
+    document.getElementById('themeGrid').classList.add('hidden');
     document.getElementById('tabPalettes').classList.add('active');
     document.getElementById('tabTubes').classList.remove('active');
+    document.getElementById('tabThemes').classList.remove('active');
     renderSkins();
   });
   document.getElementById('tabTubes').addEventListener('click', () => {
     document.getElementById('tubeGrid').classList.remove('hidden');
     document.getElementById('skinGrid').classList.add('hidden');
+    document.getElementById('themeGrid').classList.add('hidden');
     document.getElementById('tabTubes').classList.add('active');
     document.getElementById('tabPalettes').classList.remove('active');
+    document.getElementById('tabThemes').classList.remove('active');
     renderTubeThemes();
+  });
+  document.getElementById('tabThemes').addEventListener('click', () => {
+    document.getElementById('themeGrid').classList.remove('hidden');
+    document.getElementById('skinGrid').classList.add('hidden');
+    document.getElementById('tubeGrid').classList.add('hidden');
+    document.getElementById('tabThemes').classList.add('active');
+    document.getElementById('tabPalettes').classList.remove('active');
+    document.getElementById('tabTubes').classList.remove('active');
+    renderThemes();
   });
   document.getElementById('btnHomeShop').addEventListener('click', () => {
     renderShop();
@@ -3704,6 +4053,17 @@ function init() {
     document.getElementById('shopModal').classList.add('hidden'));
   document.getElementById('shopModal').addEventListener('click', e => {
     if (e.target === e.currentTarget) document.getElementById('shopModal').classList.add('hidden');
+  });
+  document.getElementById('btnMore').addEventListener('click', () => {
+    document.getElementById('moreWrap').classList.remove('hidden');
+  });
+  document.getElementById('btnCloseMore').addEventListener('click', () =>
+    document.getElementById('moreWrap').classList.add('hidden'));
+  document.getElementById('moreWrap').addEventListener('click', e => {
+    if (e.target === e.currentTarget) document.getElementById('moreWrap').classList.add('hidden');
+  });
+  document.getElementById('moreSheet').addEventListener('click', e => {
+    if (e.target.closest('.sheet-item')) document.getElementById('moreWrap').classList.add('hidden');
   });
   document.getElementById('btnHomeSocial').addEventListener('click', () => {
     document.getElementById('socialCode').textContent = friendCode();
@@ -3787,8 +4147,8 @@ function init() {
   document.getElementById('btnHomeHelp').addEventListener('click', () =>
     document.getElementById('helpModal').classList.remove('hidden'));
   document.getElementById('btnHomeLevels').addEventListener('click', () => {
-    renderLevelGrid();
-    document.getElementById('levelsModal').classList.remove('hidden');
+    document.getElementById('mapModal').classList.remove('hidden');
+    renderLevelMap();
   });
   document.getElementById('btnUndo').addEventListener('click', undo);
   document.getElementById('btnRestart').addEventListener('click', () => loadLevel(app.level, { free: true }));
@@ -3821,6 +4181,17 @@ function init() {
   document.getElementById('btnMenuHelp').addEventListener('click', () =>
     document.getElementById('helpModal').classList.remove('hidden'));
   document.getElementById('btnLevels').addEventListener('click', () => {
+    document.getElementById('mapModal').classList.remove('hidden');
+    renderLevelMap();
+  });
+  document.getElementById('btnCloseMap').addEventListener('click', () =>
+    document.getElementById('mapModal').classList.add('hidden'));
+  document.getElementById('mapModal').addEventListener('click', e => {
+    if (e.target === e.currentTarget)
+      document.getElementById('mapModal').classList.add('hidden');
+  });
+  document.getElementById('btnMapGrid').addEventListener('click', () => {
+    document.getElementById('mapModal').classList.add('hidden');
     renderLevelGrid();
     document.getElementById('levelsModal').classList.remove('hidden');
   });
@@ -3837,8 +4208,8 @@ function init() {
   });
   document.getElementById('btnWinLevels').addEventListener('click', () => {
     document.getElementById('winModal').classList.add('hidden');
-    renderLevelGrid();
-    document.getElementById('levelsModal').classList.remove('hidden');
+    document.getElementById('mapModal').classList.remove('hidden');
+    renderLevelMap();
   });
   document.getElementById('winModal').addEventListener('click', e => {
     if (e.target === e.currentTarget)
