@@ -209,6 +209,7 @@
     text-shadow: 0 2px 10px rgba(0,0,0,.5);
   }
   .ad-count.hidden { display: none; }
+  .hidden { display: none !important; }
 
   /* ========================= PROGRESS BARS ======================== */
   .bars { margin-bottom: 12px; }
@@ -1385,10 +1386,9 @@
   <div class="modal hidden" id="energyModal">
     <div class="panel">
       <h2>&#x26A1; Out of Energy</h2>
-      <p>Watch a short ad to refill +3 energy, or wait for it to regenerate.</p>
+      <p>You're out of energy. Wait a few minutes for it to regenerate, or switch to Relaxed mode and play unlimited!</p>
       <div class="win-row">
-        <button class="btn-primary" id="btnEnergyAd">Watch Ad for Energy</button>
-        <button class="btn-ghost" id="btnCloseEnergy">Not now</button>
+        <button class="btn-primary" id="btnCloseEnergy">OK</button>
       </div>
     </div>
   </div>
@@ -2509,11 +2509,6 @@ function spendEnergy() {
   Store.save(s);
   return true;
 }
-function refillEnergy(amount) {
-  regenEnergy();
-  app.save.energy = Math.min(ENERGY_MAX, app.save.energy + amount);
-  Store.save(app.save);
-}
 function energyStateText() {
   const e = currentEnergy();
   const s = app.save;
@@ -3452,11 +3447,9 @@ function useExtraTube() {
 let adTimer = null;
 let adSecondsLeft = 5;
 const AD_SECONDS = 5;
-let adPurpose = 'hint';
 
 const REWARDED_AD_BRIDGE = {
-  show(opts) {
-    adPurpose = (opts && opts.purpose) || 'hint';
+  show() {
     openAdModal();
   }
 };
@@ -3466,11 +3459,6 @@ function openAdModal() {
   const box = document.getElementById('adBox');
   const count = document.getElementById('adCount');
   const msg = document.getElementById('adMsg');
-  const title = document.getElementById('adTitle');
-  if (title) title.textContent = adPurpose === 'energy'
-    ? 'Watch Ad for Energy' : 'Watch Ad for a Hint';
-  if (msg) msg.textContent = adPurpose === 'energy'
-    ? 'Earn +3 energy by watching a short ad' : 'Earn a hint by watching a short ad';
   modal.classList.remove('hidden');
   msg.classList.remove('hidden');
   count.classList.add('hidden');
@@ -3514,19 +3502,8 @@ function startAdPlay() {
 function finishAdPlay() {
   AudioSys.play('coin');
   closeAdModal();
-  if (adPurpose === 'energy') {
-    refillEnergy(3);
-    closeEnergyModal();
-    toast('+3 Energy!');
-    showRewardPopup({
-      type: 'energy', icon: '\u26A1', title: '+3 Energy',
-      desc: 'Thanks for watching!', sound: 'reward', duration: 1800
-    });
-    renderHome();
-  } else {
-    toast('Hint earned!');
-    useHint();
-  }
+  toast('Hint earned!');
+  useHint();
 }
 
 function closeAdModal() {
@@ -3989,10 +3966,6 @@ function init() {
     startDaily();
   });
   document.getElementById('btnChest').addEventListener('click', claimChest);
-  document.getElementById('btnEnergyAd').addEventListener('click', () => {
-    adPurpose = 'energy';
-    openAdModal();
-  });
   document.getElementById('btnCloseEnergy').addEventListener('click', closeEnergyModal);
   document.getElementById('btnHomeAch').addEventListener('click', () => {
     renderAchievements();
