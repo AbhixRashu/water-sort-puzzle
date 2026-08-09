@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Water Sort Puzzle â€” 200 Levels</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>Water Sort Puzzle - 200 Levels</title>
 <style>
   :root {
     --accent: #4dd0e1;
@@ -21,6 +21,10 @@
     min-height: 100vh; padding: 16px 10px 40px;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
+    background:
+      radial-gradient(500px 500px at 85% 8%, rgba(167,139,250,.14), transparent 60%),
+      radial-gradient(500px 500px at 10% 92%, rgba(77,208,225,.12), transparent 60%),
+      radial-gradient(1100px 700px at 50% -10%, #1b2540 0%, #131126 45%, #0a0d1a 100%);
   }
 
   /* ============================ THEMES ============================ */
@@ -51,10 +55,25 @@
   #app { position: relative; z-index: 1; width: 100%; max-width: 540px; }
 
   header {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 8px; padding: 10px 12px; margin-bottom: 10px;
-    background: var(--glass); border: 1px solid var(--glass-border);
-    border-radius: 14px;
+    display: flex; flex-direction: column; gap: 8px;
+    padding: 10px 12px; margin-bottom: 10px;
+    background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.25);
+    backdrop-filter: blur(10px);
+  }
+  .hdr-top, .hdr-bottom { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 8px; }
+  .logo-title {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 16px; font-weight: 800; letter-spacing: 1.4px;
+  }
+  .lg-drop { font-size: 18px; filter: drop-shadow(0 0 7px rgba(77,208,225,.7)); animation: dropBob 3s ease-in-out infinite; }
+  @keyframes dropBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+  .lg-text {
+    background: linear-gradient(90deg, #7dd3fc, #a78bfa 50%, #f472b6);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 2px 6px rgba(120,140,255,.35));
   }
   .level-info { display: flex; flex-direction: column; line-height: 1.15; min-width: 78px; }
   .level-info .num { font-size: 26px; font-weight: 800; }
@@ -62,9 +81,10 @@
   .moves { font-size: 15px; color: var(--muted); }
   .moves b { color: var(--text); font-size: 20px; }
 
-  .btns { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+  .btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
   .btns button {
-    width: 38px; height: 38px; border-radius: 10px; cursor: pointer;
+    width: 44px; height: 44px; border-radius: 50%; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
     background: var(--glass); border: 1px solid var(--glass-border);
     color: var(--text); font-size: 17px; line-height: 1;
     transition: transform .12s ease, background .15s ease, box-shadow .15s ease;
@@ -77,6 +97,11 @@
     background: linear-gradient(145deg, #7c5cbf, #5a3d9e); color: #fff;
     border: 1px solid rgba(255,255,255,.25);
     box-shadow: 0 3px 8px rgba(90,61,158,.4);
+  }
+  .btns button.b-settings {
+    background: linear-gradient(145deg, #c77dff, #9d4edd); color: #fff;
+    border: 1px solid rgba(255,255,255,.25);
+    box-shadow: 0 3px 8px rgba(157,78,221,.4);
   }
   .btns button.b-undo {
     background: linear-gradient(145deg, #4cc9f0, #3a86ff); color: #fff;
@@ -97,13 +122,6 @@
   }
   .btns button.b-hint:hover { animation: hintPulse .6s ease; }
   @keyframes hintPulse { 50% { box-shadow: 0 0 0 6px rgba(255,209,102,.35); } }
-  .btns button.b-shuffle {
-    background: linear-gradient(145deg, #f72585, #b5179e); color: #fff;
-    border: 1px solid rgba(255,255,255,.25);
-    box-shadow: 0 3px 8px rgba(247,37,133,.45);
-    animation: shuffleGlow 2.4s ease-in-out infinite;
-  }
-  @keyframes shuffleGlow { 0%,100% { box-shadow: 0 3px 8px rgba(247,37,133,.45); } 50% { box-shadow: 0 3px 16px rgba(247,37,133,.85); } }
   .btns button.b-extra {
     background: linear-gradient(145deg, #fca311, #e85d04); color: #fff;
     border: 1px solid rgba(255,255,255,.25);
@@ -116,11 +134,6 @@
     animation: none;
   }
   .btns button.empty:hover { transform: none; animation: none; box-shadow: none; }
-  .btns button.b-help {
-    background: linear-gradient(145deg, #80ffdb, #48bfe3); color: #1b263b;
-    border: 1px solid rgba(255,255,255,.3);
-    box-shadow: 0 3px 8px rgba(72,191,227,.4);
-  }
   .btns button.b-sound {
     background: linear-gradient(145deg, #c77dff, #9d4edd); color: #fff;
     border: 1px solid rgba(255,255,255,.25);
@@ -133,6 +146,36 @@
     font-size: 11px; font-weight: 800; line-height: 17px; text-align: center;
   }
   .hintbadge.ad { background: #e63946; color: #fff; }
+
+  /* ========================== IN-GAME MENU ======================= */
+  .menu-list { display: flex; flex-direction: column; gap: 8px; }
+  .menu-item {
+    position: relative; display: flex; align-items: center; gap: 10px;
+    width: 100%; padding: 13px 16px; border-radius: 12px; cursor: pointer;
+    font-size: 15px; font-weight: 600; color: var(--text); text-align: left;
+    background: var(--glass); border: 1px solid var(--glass-border);
+    transition: transform .12s ease, background .15s ease;
+  }
+  .menu-item:hover { background: rgba(255,255,255,.14); transform: translateX(3px); }
+  .menu-item:active { transform: scale(.98); }
+  .menu-item .hintbadge { position: absolute; right: 14px; top: 50%; margin-top: -9px; }
+  .menu-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 4px 16px; border-radius: 12px;
+    background: var(--glass); border: 1px solid var(--glass-border);
+  }
+  .menu-row .m-label { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 600; }
+  .menu-row .b-sound {
+    position: relative; width: 44px; height: 44px; border-radius: 50%; cursor: pointer;
+    background: linear-gradient(145deg, #c77dff, #9d4edd); color: #fff;
+    border: 1px solid rgba(255,255,255,.25);
+    box-shadow: 0 3px 8px rgba(157,78,221,.4); font-size: 17px;
+  }
+  .menu-sep {
+    margin: 4px 2px 0; padding: 0 4px; text-align: left;
+    font-size: 11px; font-weight: 800; letter-spacing: 1.4px;
+    color: var(--muted); text-transform: uppercase;
+  }
 
   /* ========================= REWARDED AD MODAL ==================== */
   .adbox {
@@ -245,20 +288,27 @@
   }
   .pour {
     position: fixed; z-index: 60; pointer-events: none;
-    border-radius: 4px 4px 10px 10px;
-    box-shadow: inset 0 2px 0 rgba(255,255,255,.32), inset 0 -2px 0 rgba(0,0,0,.18), 0 6px 16px rgba(0,0,0,.3);
+    border-radius: 6px 6px 55% 55% / 6px 6px 14px 14px;
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.32), inset 0 -3px 0 rgba(0,0,0,.2), 0 6px 16px rgba(0,0,0,.32);
     animation: pourFlow .38s cubic-bezier(.4,.2,.3,1.06) forwards;
     will-change: transform;
   }
+  .pour::before {
+    content: ''; position: absolute; left: 3px; right: 3px; top: 2px; bottom: 3px;
+    background: linear-gradient(115deg, rgba(255,255,255,.4), rgba(255,255,255,.05) 45%, transparent 62%);
+    border-radius: inherit;
+    pointer-events: none;
+  }
   .pour::after {
-    content: ''; position: absolute; top: -3px; left: -2px; right: -2px; height: 7px;
-    background: rgba(255,255,255,.3); border-radius: 50%;
+    content: ''; position: absolute; top: -3px; left: -2px; right: -2px; height: 8px;
+    background: radial-gradient(120% 180% at 50% 0%, rgba(255,255,255,.5), rgba(255,255,255,.12) 60%, rgba(255,255,255,0) 85%);
+    border-radius: 50%;
     animation: pourSlosh .34s ease-in-out infinite;
   }
   @keyframes pourSlosh {
     0%,100% { transform: translateX(0) scaleX(1); }
-    30% { transform: translateX(-2px) scaleX(1.14); }
-    70% { transform: translateX(2px) scaleX(.92); }
+    30% { transform: translateX(-2px) scaleX(1.16); }
+    70% { transform: translateX(2px) scaleX(.9); }
   }
   @keyframes pourFlow {
     0%   { transform: translate(0,0); }
@@ -520,6 +570,15 @@
     overflow: hidden;
     box-shadow: inset 0 2px 0 rgba(255,255,255,.3), inset 0 -2px 0 rgba(0,0,0,.16);
   }
+  .seg.seg-top {
+    border-radius: 50% 50% 6px 6px / 24px 24px 6px 6px;
+  }
+  .seg.seg-top::after {
+    content: ''; position: absolute; left: 4px; right: 4px; top: 1px; height: 5px;
+    background: radial-gradient(120% 200% at 50% 0%, rgba(255,255,255,.55), rgba(255,255,255,0) 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
   .seg::before {
     content: ''; position: absolute; inset: 0;
     background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.22) 48%, rgba(255,255,255,.06) 55%, transparent 70%);
@@ -736,19 +795,11 @@
   /* ======================= PHASE 5 ============================= */
   .coins-hero { margin: 2px 0 6px; font-size: 14px; color: #ffd166; font-weight: 700; }
 
-  .btns button.b-peek {
-    background: linear-gradient(145deg, #43aa8b, #277da1); color: #fff;
-    border: 1px solid rgba(255,255,255,.25);
-    box-shadow: 0 3px 8px rgba(39,125,161,.45);
-  }
-  .btns button.b-xp {
-    background: linear-gradient(145deg, #ff9f1c, #f72585); color: #fff;
-    border: 1px solid rgba(255,255,255,.3);
-    box-shadow: 0 3px 8px rgba(247,37,133,.5);
-  }
-  .btns button.b-xp.armed {
-    animation: xpPulse .9s ease-in-out infinite;
-  }
+  .menu-item.b-shuffle { background: linear-gradient(145deg, rgba(247,37,133,.35), rgba(181,23,158,.3)); }
+  .menu-item.b-peek { background: linear-gradient(145deg, rgba(67,170,139,.35), rgba(39,125,161,.3)); }
+  .menu-item.b-xp { background: linear-gradient(145deg, rgba(255,159,28,.35), rgba(247,37,133,.3)); }
+  .menu-item.armed { animation: xpPulse .9s ease-in-out infinite; }
+  .menu-item.empty { filter: grayscale(.8); opacity: .5; }
   @keyframes xpPulse {
     0%,100% { box-shadow: 0 3px 8px rgba(247,37,133,.5); }
     50% { box-shadow: 0 0 18px 5px rgba(255,220,90,.8); }
@@ -807,6 +858,33 @@
   body[data-tube="2"] .tube { border: 3px solid rgba(120,255,200,.75); background: linear-gradient(180deg, rgba(30,200,160,.3), rgba(10,120,110,.25)); }
   body[data-tube="3"] .tube { border: 3px solid rgba(140,140,160,.9); background: linear-gradient(180deg, rgba(90,90,110,.45), rgba(40,40,55,.5)); }
   body[data-tube="4"] .tube { border: 3px solid rgba(255,150,200,.8); background: linear-gradient(180deg, rgba(255,120,190,.3), rgba(180,60,120,.28)); }
+
+  /* ================== MOBILE RESPONSIVE ======================= */
+  @media (max-width: 480px) {
+    body { padding: 8px 6px 26px; }
+    header { padding: 8px 10px; border-radius: 14px; gap: 6px; }
+    .btns { gap: 6px; }
+    .btns button { width: 44px; height: 44px; }
+    #board { gap: 6px; padding: 6px 2px 0; }
+    .logo-title { font-size: 14px; letter-spacing: 1px; }
+    .level-info .num { font-size: 22px; }
+    .moves { font-size: 13px; }
+    .moves b { font-size: 18px; }
+    .panel { padding: 16px; border-radius: 16px; }
+  }
+  @media (orientation: landscape) and (max-height: 500px) {
+    body { padding: 6px 10px 20px; }
+    header { padding: 6px 10px; }
+    .btns button { width: 40px; height: 40px; }
+    .btns { gap: 5px; }
+    #board { gap: 5px; }
+  }
+  @media (min-width: 700px) {
+    .btns button:hover { transform: translateY(-2px) scale(1.08); }
+  }
+  @media (pointer: coarse) {
+    .menu-item, .btns button, .mini-btn, .btn-primary, .btn-ghost, .set-toggle, .mode-tab { touch-action: manipulation; }
+  }
 </style>
 </head>
 <body>
@@ -865,24 +943,47 @@
 
   <div id="app" class="screen">
     <header>
-      <div class="level-info">
-        <span class="num" id="levelNum">1</span>
-        <span class="par" id="parInfo"></span>
+      <div class="hdr-top">
+        <div class="logo-title"><span class="lg-drop">&#x1F4A7;</span><span class="lg-text">WATER SORT</span></div>
+        <span class="moves">Moves <b id="movesNum">0</b></span>
       </div>
-      <div class="moves">Moves <b id="movesNum">0</b></div>
-      <div class="btns">
-        <button id="btnMenu" title="Menu" class="b-menu">&#x2630;</button>
-        <button id="btnUndo" title="Undo" class="b-undo">&#x21A9;</button>
-        <button id="btnRestart" title="Restart" class="b-restart">&#x21BB;</button>
-        <button id="btnHint" title="Hint" class="b-hint">H<span class="hintbadge" id="hintBadge">1</span></button>
-        <button id="btnShuffle" title="Shuffle tubes" class="b-shuffle">&#x27F2;<span class="hintbadge" id="shuffleBadge">0</span></button>
-        <button id="btnExtraTube" title="Add empty tube" class="b-extra">&#x2697;<span class="hintbadge" id="extraBadge">0</span></button>
-        <button id="btnPeek" title="Peek: highlight best move" class="b-peek">&#x1F441;&#xFE0F;<span class="hintbadge" id="peekBadge">0</span></button>
-        <button id="btnDoubleXP" title="2x XP next win" class="b-xp">&#x26A1;<span class="hintbadge" id="xpBadge">0</span></button>
-        <button id="btnHelp" title="How to play" class="b-help">?</button>
-        <button id="btnSound" title="Sound" class="b-sound">&#x266A;</button>
+      <div class="hdr-bottom">
+        <div class="level-info">
+          <span class="num" id="levelNum">1</span>
+          <span class="par" id="parInfo"></span>
+        </div>
+        <div class="btns">
+          <button id="btnMenu" title="Menu" class="b-menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+          <button id="btnSettings" title="Settings" class="b-settings"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.02a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.02a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.02a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+          <button id="btnUndo" title="Undo" class="b-undo"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></button>
+          <button id="btnRestart" title="Restart" class="b-restart"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
+          <button id="btnHint" title="Hint" class="b-hint"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.4 1 2.3h6c0-.9.4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg><span class="hintbadge" id="hintBadge">1</span></button>
+          <button id="btnExtraTube" title="Add empty tube" class="b-extra"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 3h6"/><path d="M10 3v6.3L5.8 19a2 2 0 0 0 1.9 2.8h8.6a2 2 0 0 0 1.9-2.8L14 9.3V3"/></svg><span class="hintbadge" id="extraBadge">0</span></button>
+        </div>
       </div>
     </header>
+
+    <div class="modal hidden" id="menuModal">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Menu</h2>
+          <button id="btnCloseMenu">&times;</button>
+        </div>
+        <div class="menu-list">
+          <button class="menu-item" id="btnMenuHome">&#x1F3E0; <span>Home</span></button>
+          <button class="menu-item" id="btnMenuLevels">&#x1F5FA;&#xFE0F; <span>Level Select</span></button>
+          <button class="menu-item" id="btnMenuHelp">&#x2753; <span>How to Play</span></button>
+          <div class="menu-row">
+            <span class="m-label">&#x1F50A; <span>Sound</span></span>
+            <button class="b-sound" id="btnSound" title="Sound">&#x266A;</button>
+          </div>
+          <div class="menu-sep">Boosters</div>
+          <button class="menu-item b-shuffle" id="btnShuffle">&#x1F504; <span>Shuffle</span><span class="hintbadge" id="shuffleBadge">0</span></button>
+          <button class="menu-item b-peek" id="btnPeek">&#x1F441;&#xFE0F; <span>Peek</span><span class="hintbadge" id="peekBadge">0</span></button>
+          <button class="menu-item b-xp" id="btnDoubleXP">&#x26A1; <span>Double XP</span><span class="hintbadge" id="xpBadge">0</span></button>
+        </div>
+      </div>
+    </div>
 
     <div class="bars">
       <div id="bossWrap" class="boss-wrap hidden">
@@ -2271,7 +2372,7 @@ function bossTimerFor(n) {
 }
 let bossTick = null;
 function anyModalOpen() {
-  const ids = ['winModal', 'levelsModal', 'achModal', 'skinsModal', 'statsModal', 'helpModal', 'adModal', 'energyModal', 'shopModal', 'socialModal'];
+  const ids = ['winModal', 'levelsModal', 'achModal', 'skinsModal', 'statsModal', 'helpModal', 'adModal', 'energyModal', 'shopModal', 'socialModal', 'menuModal', 'settingsModal'];
   return ids.some(id => {
     const el = document.getElementById(id);
     return el && !el.classList.contains('hidden');
@@ -2606,7 +2707,7 @@ function renderBoard() {
     el.addEventListener('click', () => onTubeClick(i));
     t.forEach((color, j) => {
       const seg = document.createElement('div');
-      seg.className = 'seg';
+      seg.className = 'seg' + (j === t.length - 1 ? ' seg-top' : '');
       seg.style.background = 'linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,0) 38%), ' + currentPalette()[color];
       seg.style.bottom = (j * UNIT_H + 2) + 'px';
       seg.style.height = (UNIT_H - 4) + 'px';
@@ -3515,7 +3616,34 @@ function init() {
     console.error(e.message);
   }
 
-  document.getElementById('btnMenu').addEventListener('click', () => showScreen('home'));
+  document.getElementById('btnMenu').addEventListener('click', () => {
+    AudioSys.play('plink');
+    updateBoosterBadges();
+    document.getElementById('menuModal').classList.remove('hidden');
+  });
+  document.getElementById('btnSettings').addEventListener('click', () => {
+    AudioSys.play('plink');
+    renderSettings();
+    document.getElementById('settingsModal').classList.remove('hidden');
+  });
+  document.getElementById('btnCloseMenu').addEventListener('click', () =>
+    document.getElementById('menuModal').classList.add('hidden'));
+  document.getElementById('menuModal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) document.getElementById('menuModal').classList.add('hidden');
+  });
+  document.getElementById('btnMenuHome').addEventListener('click', () => {
+    document.getElementById('menuModal').classList.add('hidden');
+    showScreen('home');
+  });
+  document.getElementById('btnMenuLevels').addEventListener('click', () => {
+    document.getElementById('menuModal').classList.add('hidden');
+    renderLevelGrid();
+    document.getElementById('levelsModal').classList.remove('hidden');
+  });
+  document.getElementById('btnMenuHelp').addEventListener('click', () => {
+    document.getElementById('menuModal').classList.add('hidden');
+    document.getElementById('helpModal').classList.remove('hidden');
+  });
   document.getElementById('btnPlay').addEventListener('click', () => {
     AudioSys.play('plink');
     showScreen('game');
@@ -3665,10 +3793,19 @@ function init() {
   document.getElementById('btnUndo').addEventListener('click', undo);
   document.getElementById('btnRestart').addEventListener('click', () => loadLevel(app.level, { free: true }));
   document.getElementById('btnHint').addEventListener('click', hint);
-  document.getElementById('btnShuffle').addEventListener('click', useShuffle);
+  document.getElementById('btnShuffle').addEventListener('click', () => {
+    document.getElementById('menuModal').classList.add('hidden');
+    useShuffle();
+  });
   document.getElementById('btnExtraTube').addEventListener('click', useExtraTube);
-  document.getElementById('btnPeek').addEventListener('click', usePeek);
-  document.getElementById('btnDoubleXP').addEventListener('click', useDoubleXP);
+  document.getElementById('btnPeek').addEventListener('click', () => {
+    document.getElementById('menuModal').classList.add('hidden');
+    usePeek();
+  });
+  document.getElementById('btnDoubleXP').addEventListener('click', () => {
+    document.getElementById('menuModal').classList.add('hidden');
+    useDoubleXP();
+  });
   document.getElementById('btnWatchAd').addEventListener('click', startAdPlay);
   document.getElementById('btnCloseAd').addEventListener('click', closeAdModal);
   document.getElementById('adModal').addEventListener('click', e => {
@@ -3681,7 +3818,7 @@ function init() {
     updateHUD();
     renderHome();
   });
-  document.getElementById('btnHelp').addEventListener('click', () =>
+  document.getElementById('btnMenuHelp').addEventListener('click', () =>
     document.getElementById('helpModal').classList.remove('hidden'));
   document.getElementById('btnLevels').addEventListener('click', () => {
     renderLevelGrid();
