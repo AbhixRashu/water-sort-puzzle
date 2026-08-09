@@ -4,4 +4,5 @@
 # ...except the water sort game files
 !index.html
 !test-water-sort.js
+!icon-512.png
 !.gitignore

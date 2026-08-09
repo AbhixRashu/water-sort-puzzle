@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
 <title>Water Sort Puzzle - 200 Levels</title>
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="apple-touch-icon" href="icon-512.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -20,8 +22,8 @@
   body {
     font-family: 'Baloo 2', 'Segoe UI', system-ui, -apple-system, sans-serif;
     color: var(--text);
-    display: flex; justify-content: center; align-items: flex-start;
-    min-height: 100vh; padding: 16px 10px 40px;
+    display: flex; justify-content: center; align-items: stretch;
+    min-height: 100vh; padding: 0;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
     background:
@@ -58,100 +60,75 @@
   @keyframes rise { 0%{transform:translateY(0);opacity:0} 10%{opacity:.7} 100%{transform:translateY(-114vh);opacity:.05} }
   @keyframes neonPulse { 0%,100%{transform:scale(1);opacity:.25} 50%{transform:scale(1.15);opacity:.5} }
 
-  #app { position: relative; z-index: 1; width: 100%; max-width: 540px; }
+  #app { position: relative; z-index: 1; width: 100%; max-width: 540px; margin: 0 auto; }
+  #app.active {
+    display: flex; flex-direction: column;
+    height: 100dvh; height: 100vh;
+    overflow: hidden;
+  }
+  #home { width: 100%; max-width: 540px; margin: 0 auto; padding: 16px 10px 40px; }
 
   header {
-    display: flex; flex-direction: column; gap: 8px;
-    padding: 10px 12px; margin-bottom: 10px;
-    background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
-    border: 1px solid var(--glass-border);
-    border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(0,0,0,.25);
-    backdrop-filter: blur(10px);
+    flex: 0 0 9%;
+    min-height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; padding: 8px 14px;
+    background: linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.10));
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    z-index: 5;
   }
-  .hdr-top, .hdr-bottom { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 8px; }
-  .logo-title {
-    display: flex; align-items: center; gap: 7px;
-    font-size: 16px; font-weight: 800; letter-spacing: 1.4px;
+  .top-btn {
+    width: 46px; height: 46px; border-radius: 50%; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: #fff; border: 1px solid rgba(255,255,255,.25);
+    background: linear-gradient(145deg, #7c5cbf, #5a3d9e);
+    box-shadow: 0 4px 10px rgba(90,61,158,.45);
+    transition: transform .12s ease;
+    flex: 0 0 auto;
   }
-  .lg-drop { font-size: 18px; filter: drop-shadow(0 0 7px rgba(77,208,225,.7)); animation: dropBob 3s ease-in-out infinite; }
-  @keyframes dropBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
-  .lg-text {
-    background: linear-gradient(90deg, #7dd3fc, #a78bfa 50%, #f472b6);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-    filter: drop-shadow(0 2px 6px rgba(120,140,255,.35));
-  }
-  .level-info { display: flex; flex-direction: column; line-height: 1.15; min-width: 78px; }
+  .top-btn:active { transform: scale(.9); }
+  .top-btn svg { width: 22px; height: 22px; }
+  .hdr-center { display: flex; flex-direction: column; align-items: center; min-width: 0; }
+  .level-info { display: flex; flex-direction: column; align-items: center; line-height: 1.1; }
   .level-info .num { font-size: 26px; font-weight: 800; }
   .level-info .par { font-size: 12px; color: var(--muted); }
-  .moves { font-size: 15px; color: var(--muted); }
-  .moves b { color: var(--text); font-size: 20px; }
-  .hdr-right { display: flex; align-items: center; gap: 10px; }
-  .nh-streak {
-    font-size: 13px; font-weight: 700; color: #ff9f1c;
-    background: rgba(255,159,28,.14); border: 1px solid rgba(255,159,28,.35);
-    padding: 3px 9px; border-radius: 20px;
-  }
-  .nh-streak b { color: #ffd166; }
+  .hdr-right { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .moves { font-size: 13px; color: var(--muted); }
+  .moves b { color: var(--text); font-size: 19px; }
 
-  .btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-  .btns button {
-    width: 44px; height: 44px; border-radius: 50%; cursor: pointer;
+  /* ========================== BOTTOM ACTION BAR ===================== */
+  .bottom-bar {
+    flex: 0 0 16%;
+    min-height: 74px;
+    display: flex; justify-content: center; align-items: center;
+    gap: 20px; padding: 8px 14px calc(10px + env(safe-area-inset-bottom));
+    background: linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.38));
+    border-top: 1px solid rgba(255,255,255,.08);
+  }
+  .action-btn {
+    position: relative; width: 60px; height: 60px; border-radius: 50%; cursor: pointer;
     display: inline-flex; align-items: center; justify-content: center;
-    background: var(--glass); border: 1px solid var(--glass-border);
-    color: var(--text); font-size: 17px; line-height: 1;
-    transition: transform .12s ease, background .15s ease, box-shadow .15s ease;
+    color: #fff; border: 1px solid rgba(255,255,255,.25);
+    box-shadow: 0 8px 18px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.28);
+    transition: transform .12s ease, box-shadow .15s ease;
   }
-  .btns button:hover { background: rgba(255,255,255,.15); transform: translateY(-2px) scale(1.08); }
-  .btns button:active { transform: scale(.92); }
-  .btns button:disabled { opacity: .35; cursor: default; transform: none; }
-  .btns button { position: relative; }
-  .btns button.b-menu {
-    background: linear-gradient(145deg, #7c5cbf, #5a3d9e); color: #fff;
-    border: 1px solid rgba(255,255,255,.25);
-    box-shadow: 0 3px 8px rgba(90,61,158,.4);
-  }
-  .btns button.b-settings {
-    background: linear-gradient(145deg, #c77dff, #9d4edd); color: #fff;
-    border: 1px solid rgba(255,255,255,.25);
-    box-shadow: 0 3px 8px rgba(157,78,221,.4);
-  }
-  .btns button.b-undo {
-    background: linear-gradient(145deg, #4cc9f0, #3a86ff); color: #fff;
-    border: 1px solid rgba(255,255,255,.25);
-    box-shadow: 0 3px 8px rgba(58,134,255,.4);
-  }
-  .btns button.b-restart {
-    background: linear-gradient(145deg, #06d6a0, #118ab2); color: #fff;
-    border: 1px solid rgba(255,255,255,.25);
-    box-shadow: 0 3px 8px rgba(17,138,178,.4);
-  }
-  .btns button.b-restart:hover { animation: spinBtn .5s ease; }
-  @keyframes spinBtn { from { transform: rotate(0) scale(1.08); } to { transform: rotate(360deg) scale(1.08); } }
-  .btns button.b-hint {
-    background: linear-gradient(145deg, #ffd166, #f4a261); color: #5c3d00;
-    border: 1px solid rgba(255,255,255,.35);
-    box-shadow: 0 3px 8px rgba(244,162,97,.45);
-  }
-  .btns button.b-hint:hover { animation: hintPulse .6s ease; }
+  .action-btn:active { transform: scale(.9); }
+  .action-btn:disabled { opacity: .35; cursor: default; transform: none; }
+  .action-btn svg { width: 26px; height: 26px; }
+  .action-btn.b-undo { background: linear-gradient(145deg, #4cc9f0, #3a86ff); }
+  .action-btn.b-restart { background: linear-gradient(145deg, #06d6a0, #118ab2); }
+  .action-btn.b-restart:hover { animation: spinBtn .5s ease; }
+  @keyframes spinBtn { from { transform: rotate(0) scale(1.06); } to { transform: rotate(360deg) scale(1.06); } }
+  .action-btn.b-hint { background: linear-gradient(145deg, #ffd166, #f4a261); color: #5c3d00; }
+  .action-btn.b-hint:hover { animation: hintPulse .6s ease; }
   @keyframes hintPulse { 50% { box-shadow: 0 0 0 6px rgba(255,209,102,.35); } }
-  .btns button.b-extra {
-    background: linear-gradient(145deg, #fca311, #e85d04); color: #fff;
-    border: 1px solid rgba(255,255,255,.25);
-    box-shadow: 0 3px 8px rgba(232,93,4,.45);
-  }
-  .btns button.b-extra:hover { animation: extraBounce .6s ease; }
+  .action-btn.b-extra { background: linear-gradient(145deg, #fca311, #e85d04); }
+  .action-btn.b-extra:hover { animation: extraBounce .6s ease; }
   @keyframes extraBounce { 0%,100% { transform: translateY(0); } 40% { transform: translateY(-5px); } }
-  .btns button.empty {
-    filter: grayscale(.75); opacity: .55; box-shadow: none;
-    animation: none;
+  .action-btn.empty {
+    filter: grayscale(.75); opacity: .55; box-shadow: none; animation: none;
   }
-  .btns button.empty:hover { transform: none; animation: none; box-shadow: none; }
-  .btns button.b-sound {
-    background: linear-gradient(145deg, #c77dff, #9d4edd); color: #fff;
-    border: 1px solid rgba(255,255,255,.25);
-    box-shadow: 0 3px 8px rgba(157,78,221,.4);
-  }
+  .action-btn.empty:hover { transform: none; animation: none; box-shadow: none; }
   .hintbadge {
     position: absolute; top: -5px; right: -5px;
     min-width: 17px; height: 17px; padding: 0 3px;
@@ -213,10 +190,10 @@
   .hidden { display: none !important; }
 
   /* ========================= PROGRESS BARS ======================== */
-  .bars { margin-bottom: 12px; }
-  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-  .bar-label { font-size: 12px; color: var(--muted); min-width: 132px; white-space: nowrap; text-align: right; }
-  .bar { flex: 1; height: 10px; background: rgba(255,255,255,.12); border-radius: 8px; overflow: hidden; }
+  .bars { flex: 0 0 auto; padding: 6px 16px 4px; }
+  .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+  .bar-label { font-size: 11px; color: var(--muted); min-width: 118px; white-space: nowrap; text-align: right; }
+  .bar { flex: 1; height: 8px; background: rgba(255,255,255,.12); border-radius: 8px; overflow: hidden; }
   .bar-fill {
     height: 100%; width: 0%; border-radius: 8px;
     background: linear-gradient(90deg, #4dd0e1, #7ae582, #ffd166);
@@ -224,16 +201,19 @@
   }
 
   #board {
-    display: flex; flex-wrap: wrap; justify-content: center;
-    align-items: flex-end; align-content: flex-start;
-    gap: 12px; padding: 14px 6px 0;
-    min-height: 170px;
+    flex: 1 1 auto; min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    justify-items: center; align-items: center; align-content: center;
+    gap: 14px 12px; padding: 8px;
+    overflow: hidden;
   }
   .tube {
-    position: relative; width: 44px; height: 132px;
+    position: relative; width: 44px; height: 132px; --bh: 132px;
     border: 2px solid var(--glass-border);
     border-radius: 12px 12px 28px 28px / 12px 12px 52px 52px;
     background:
+      linear-gradient(115deg, transparent 34%, rgba(255,255,255,.10) 47%, rgba(255,255,255,.03) 56%, transparent 70%),
       linear-gradient(180deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,.06) 42%, rgba(255,255,255,.02) 100%);
     box-shadow:
       inset 0 1px 0 rgba(255,255,255,.22),
@@ -248,6 +228,12 @@
     transform: translateY(-16px);
     border-color: var(--accent);
     box-shadow: 0 14px 30px rgba(0,0,0,.38), 0 0 0 2px rgba(77,208,225,.28), inset 0 1px 0 rgba(255,255,255,.3);
+    animation: selPop .3s cubic-bezier(.3,1.5,.4,1);
+  }
+  @keyframes selPop {
+    0%   { transform: translateY(0) scale(1); }
+    55%  { transform: translateY(-26px) scale(1.07); }
+    100% { transform: translateY(-16px) scale(1); }
   }
   .tube.shake { animation: shake .4s ease; }
   .tube.peek {
@@ -647,7 +633,7 @@
   @keyframes bubbleUp {
     0% { transform: translateY(0); opacity: 0; }
     12% { opacity: .85; }
-    100% { transform: translateY(-128px); opacity: 0; }
+    100% { transform: translateY(calc(var(--bh, 128px) * -1)); opacity: 0; }
   }
   .seg {
     overflow: hidden;
@@ -1007,29 +993,24 @@
 
   /* ================== MOBILE RESPONSIVE ======================= */
   @media (max-width: 480px) {
-    body { padding: 8px 6px 26px; }
-    header { padding: 8px 10px; border-radius: 14px; gap: 6px; }
-    .btns { gap: 6px; }
-    .btns button { width: 44px; height: 44px; }
-    #board { gap: 6px; padding: 6px 2px 0; }
-    .logo-title { font-size: 14px; letter-spacing: 1px; }
+    #home { padding: 8px 6px 26px; }
+    #board { gap: 8px; padding: 4px 4px 8px; }
+    .action-btn { width: 56px; height: 56px; }
+    .bottom-bar { gap: 16px; }
     .level-info .num { font-size: 22px; }
-    .moves { font-size: 13px; }
-    .moves b { font-size: 18px; }
+    .moves { font-size: 12px; }
+    .moves b { font-size: 17px; }
     .panel { padding: 16px; border-radius: 16px; }
   }
   @media (orientation: landscape) and (max-height: 500px) {
-    body { padding: 6px 10px 20px; }
     header { padding: 6px 10px; }
-    .btns button { width: 40px; height: 40px; }
-    .btns { gap: 5px; }
-    #board { gap: 5px; }
+    #board { gap: 6px; }
   }
   @media (min-width: 700px) {
-    .btns button:hover { transform: translateY(-2px) scale(1.08); }
+    .action-btn:hover, .top-btn:hover { transform: translateY(-2px) scale(1.08); }
   }
   @media (pointer: coarse) {
-    .menu-item, .btns button, .nav-btn, .sheet-item, .btn-primary, .btn-ghost, .set-toggle, .mode-tab, .map-node { touch-action: manipulation; }
+    .menu-item, .action-btn, .top-btn, .nav-btn, .sheet-item, .btn-primary, .btn-ghost, .set-toggle, .mode-tab, .map-node { touch-action: manipulation; }
   }
 </style>
 </head>
@@ -1077,7 +1058,6 @@
         <button class="nav-btn" id="btnHomeShop"><span class="nb-ic">&#x1F6D2;</span><span class="nb-lb">Shop</span></button>
         <button class="nav-btn" id="btnHomeSkins"><span class="nb-ic">&#x1F3A8;</span><span class="nb-lb">Customize</span></button>
         <button class="nav-btn" id="btnHomeStats"><span class="nb-ic">&#x1F4CA;</span><span class="nb-lb">Stats</span></button>
-        <button class="nav-btn" id="btnHomeSettings"><span class="nb-ic">&#x2699;&#xFE0F;</span><span class="nb-lb">Settings</span></button>
         <button class="nav-btn" id="btnMore"><span class="nb-ic">&#x22EE;</span><span class="nb-lb">More</span></button>
       </div>
     </div>
@@ -1087,6 +1067,7 @@
     <div class="sheet" id="moreSheet">
       <div class="sheet-grab"></div>
       <div class="sheet-title">More</div>
+      <button class="sheet-item" id="btnHomeSettings"><span class="si-ic">&#x2699;&#xFE0F;</span><span>Settings</span></button>
       <button class="sheet-item" id="btnHomeSound"><span class="si-ic">&#x1F50A;</span><span>Sound</span></button>
       <button class="sheet-item" id="btnHomeHelp"><span class="si-ic">&#x2753;</span><span>How to Play</span></button>
       <button class="sheet-item" id="btnHomeAch"><span class="si-ic">&#x1F3C6;</span><span>Awards</span></button>
@@ -1098,24 +1079,15 @@
 
   <div id="app" class="screen">
     <header>
-      <div class="hdr-top">
-        <div class="logo-title"><span class="lg-drop">&#x1F4A7;</span><span class="lg-text">WATER SORT</span></div>
-        <div class="hdr-right">
-          <span class="nh-streak hidden" id="nhStreak">&#x1F525; <b>0</b></span>
-          <span class="moves">Moves <b id="movesNum">0</b></span>
-        </div>
-      </div>
-      <div class="hdr-bottom">
+      <button id="btnMenu" title="Menu" class="top-btn b-menu"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+      <div class="hdr-center">
         <div class="level-info">
           <span class="num" id="levelNum">1</span>
           <span class="par" id="parInfo"></span>
         </div>
-        <div class="btns">
-          <button id="btnMenu" title="Menu" class="b-menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
-          <button id="btnUndo" title="Undo" class="b-undo"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></button>
-          <button id="btnRestart" title="Restart" class="b-restart"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
-          <button id="btnHint" title="Hint" class="b-hint"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.4 1 2.3h6c0-.9.4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg><span class="hintbadge" id="hintBadge">1</span></button>
-        </div>
+      </div>
+      <div class="hdr-right">
+        <span class="moves">Moves <b id="movesNum">0</b></span>
       </div>
     </header>
 
@@ -1137,7 +1109,6 @@
           <div class="menu-sep">Boosters</div>
           <button class="menu-item b-shuffle" id="btnShuffle">&#x1F504; <span>Shuffle</span><span class="hintbadge" id="shuffleBadge">0</span></button>
           <button class="menu-item b-peek" id="btnPeek">&#x1F441;&#xFE0F; <span>Peek</span><span class="hintbadge" id="peekBadge">0</span></button>
-          <button class="menu-item b-extra" id="btnExtraTube">&#x2697; <span>Extra Tube</span><span class="hintbadge" id="extraBadge">0</span></button>
           <button class="menu-item b-xp" id="btnDoubleXP">&#x26A1; <span>Double XP</span><span class="hintbadge" id="xpBadge">0</span></button>
         </div>
       </div>
@@ -1164,8 +1135,11 @@
 
     <div id="board"></div>
 
-    <div style="display:flex; justify-content:center; margin-top:14px;">
-      <button class="btn-ghost" id="btnLevels">Level Select</button>
+    <div class="bottom-bar">
+      <button id="btnUndo" title="Undo" class="action-btn b-undo"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></button>
+      <button id="btnRestart" title="Restart" class="action-btn b-restart"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
+      <button id="btnExtraTube" title="Extra Tube" class="action-btn b-extra"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 3h6"/><path d="M10 3v6.3L5.8 19a2 2 0 0 0 1.9 2.8h8.6a2 2 0 0 0 1.9-2.8L14 9.3V3"/></svg><span class="hintbadge" id="extraBadge">0</span></button>
+      <button id="btnHint" title="Hint" class="action-btn b-hint"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.4 1 2.3h6c0-.9.4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg><span class="hintbadge" id="hintBadge">1</span></button>
     </div>
     <div id="toast"></div>
   </div>
@@ -1479,6 +1453,9 @@ const PARTICLES = { 'night-stars': 42, 'space': 46, 'snow': 52, 'underwater': 22
 
 const TUBE_H = 132;
 const UNIT_H = 33;
+
+let tubeMetrics = { height: TUBE_H, unitH: UNIT_H };
+const SHAPE_BASE_W = { 'test-tube': 44, 'wide-bottle': 58, 'slim-vial': 34, 'soda-bottle': 50, flask: 46 };
 
 /* ----------------------------- PRNG ----------------------------- */
 function mulberry32(seed) {
@@ -2942,25 +2919,49 @@ function updateHUD() {
   document.getElementById('sortFill').style.width = spct + '%';
 }
 
+function resizeBoard() {
+  const board = document.getElementById('board');
+  if (!board || board.clientWidth < 40) return;
+  const count = app.state.length || 0;
+  if (!count) return;
+  const baseW = SHAPE_BASE_W[app.shape] || 44;
+  const CGAP = 12, RGAP = 14;
+  const availW = Math.max(board.clientWidth - 16, 60);
+  const availH = Math.max(board.clientHeight - 16, 60);
+  const cols = Math.min(count, Math.max(2, Math.floor((availW + CGAP) / (baseW + CGAP))));
+  const rows = Math.ceil(count / cols);
+  const cellW = (availW - (cols - 1) * CGAP) / cols;
+  let height = Math.floor(((availH - (rows - 1) * RGAP) / rows) * 0.92);
+  height = Math.max(64, Math.min(height, Math.floor(cellW * 4.6)));
+  board.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+  tubeMetrics = { height, unitH: Math.floor((height - 8) / CFG.CAP) };
+}
+
 function renderBoard() {
+  resizeBoard();
   const board = document.getElementById('board');
   board.innerHTML = '';
+  const baseW = SHAPE_BASE_W[app.shape] || 44;
+  const { height, unitH } = tubeMetrics;
   app.state.forEach((t, i) => {
     const el = document.createElement('div');
     el.className = 'tube shape-' + app.shape + (i === app.selected ? ' selected' : '');
+    el.style.width = baseW + 'px';
+    el.style.height = height + 'px';
+    el.style.setProperty('--bh', height + 'px');
     el.addEventListener('click', () => onTubeClick(i));
     t.forEach((color, j) => {
       const seg = document.createElement('div');
       seg.className = 'seg' + (j === t.length - 1 ? ' seg-top' : '');
       seg.style.background = 'linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,0) 38%), ' + currentPalette()[color];
-      seg.style.bottom = (j * UNIT_H + 2) + 'px';
-      seg.style.height = (UNIT_H - 4) + 'px';
+      seg.style.bottom = (j * unitH + 2) + 'px';
+      seg.style.height = (unitH - 4) + 'px';
       el.appendChild(seg);
     });
     if (t.length) {
       const surf = document.createElement('div');
       surf.className = 'surface';
-      surf.style.bottom = ((t.length - 1) * UNIT_H + UNIT_H - 6) + 'px';
+      surf.style.bottom = ((t.length - 1) * unitH + unitH - 6) + 'px';
       el.appendChild(surf);
       const bub = document.createElement('div');
       bub.className = 'bubbles';
@@ -3181,11 +3182,13 @@ function animatePour(from, to, onDone) {
   const srcR = srcEl.getBoundingClientRect();
   const dstR = dstEl.getBoundingClientRect();
   const inset = 3;
-  const runH = Math.max(runLen * UNIT_H - (runLen - 1) * 4, 6);
+  const unitH = tubeMetrics.unitH;
+  const tubeH = tubeMetrics.height;
+  const runH = Math.max(runLen * unitH - (runLen - 1) * 4, 6);
   const units = app.state[from].length;
-  const srcRunTop = srcR.top + TUBE_H - units * UNIT_H + 2;
+  const srcRunTop = srcR.top + tubeH - units * unitH + 2;
   const dUnits = app.state[to].length;
-  const dstRunTop = dstR.top + TUBE_H - (dUnits + runLen) * UNIT_H + 2;
+  const dstRunTop = dstR.top + tubeH - (dUnits + runLen) * unitH + 2;
 
   const dx = dstR.left - srcR.left;
   const dy = dstRunTop - srcRunTop;
@@ -4180,10 +4183,6 @@ function init() {
   });
   document.getElementById('btnMenuHelp').addEventListener('click', () =>
     document.getElementById('helpModal').classList.remove('hidden'));
-  document.getElementById('btnLevels').addEventListener('click', () => {
-    document.getElementById('mapModal').classList.remove('hidden');
-    renderLevelMap();
-  });
   document.getElementById('btnCloseMap').addEventListener('click', () =>
     document.getElementById('mapModal').classList.add('hidden'));
   document.getElementById('mapModal').addEventListener('click', e => {
@@ -4228,6 +4227,16 @@ function init() {
   document.addEventListener('pointerdown', unlockAudio);
   document.addEventListener('keydown', unlockAudio);
   window.addEventListener('beforeunload', () => AudioSys.stopAmbient());
+  let rsTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(rsTimer);
+    rsTimer = setTimeout(() => {
+      if (document.getElementById('app').classList.contains('active')) {
+        resizeBoard();
+        renderBoard();
+      }
+    }, 120);
+  });
 
   loadLevel(app.save.unlocked, { free: true });
   renderHome();
