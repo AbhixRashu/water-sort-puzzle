@@ -205,7 +205,7 @@
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     justify-items: center; align-items: center; align-content: center;
-    gap: 14px 12px; padding: 8px;
+    gap: 14px 12px; padding: 12px;
     overflow: hidden;
   }
   .tube {
@@ -2926,13 +2926,13 @@ function resizeBoard() {
   if (!count) return;
   const baseW = SHAPE_BASE_W[app.shape] || 44;
   const CGAP = 12, RGAP = 14;
-  const availW = Math.max(board.clientWidth - 16, 60);
-  const availH = Math.max(board.clientHeight - 16, 60);
+  const availW = Math.max(board.clientWidth - 24, 60);
+  const availH = Math.max(board.clientHeight - 24, 60);
   const cols = Math.min(count, Math.max(2, Math.floor((availW + CGAP) / (baseW + CGAP))));
   const rows = Math.ceil(count / cols);
   const cellW = (availW - (cols - 1) * CGAP) / cols;
-  let height = Math.floor(((availH - (rows - 1) * RGAP) / rows) * 0.92);
-  height = Math.max(64, Math.min(height, Math.floor(cellW * 4.6)));
+  let height = Math.floor(((availH - (rows - 1) * RGAP) / rows) * 0.75);
+  height = Math.max(56, Math.min(height, Math.floor(cellW * 4.3), 260));
   board.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
   tubeMetrics = { height, unitH: Math.floor((height - 8) / CFG.CAP) };
 }
