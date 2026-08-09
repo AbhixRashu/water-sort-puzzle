@@ -2,6 +2,6 @@
 *
 
 # ...except the water sort game files
-!water-sort-puzzle.html
+!index.html
 !test-water-sort.js
 !.gitignore
