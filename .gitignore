@@ -1,0 +1,7 @@
+# Ignore everything by default
+*
+
+# ...except the water sort game files
+!water-sort-puzzle.html
+!test-water-sort.js
+!.gitignore

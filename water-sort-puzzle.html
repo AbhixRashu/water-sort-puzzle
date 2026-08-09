@@ -1,0 +1,3736 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Water Sort Puzzle â€” 200 Levels</title>
+<style>
+  :root {
+    --accent: #4dd0e1;
+    --text: #eef6ff;
+    --muted: #9fb3c8;
+    --glass: rgba(255,255,255,.07);
+    --glass-border: rgba(255,255,255,.28);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: var(--text);
+    display: flex; justify-content: center; align-items: flex-start;
+    min-height: 100vh; padding: 16px 10px 40px;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  /* ============================ THEMES ============================ */
+  body.theme-dark-moody  { --text:#eef6ff; --muted:#9fb3c8; --glass:rgba(255,255,255,.07); --glass-border:rgba(255,255,255,.28); background:linear-gradient(160deg,#0f1216,#1a1f26,#242a33); }
+  body.theme-soft-pastel { --text:#4a4453; --muted:#7a7285; --glass:rgba(255,255,255,.35); --glass-border:rgba(80,60,110,.22); background:linear-gradient(160deg,#fde2e4,#fad2e1,#dbe7ff); }
+  body.theme-vivid-colorful { --text:#fff; --muted:#e8f3ff; --glass:rgba(255,255,255,.14); --glass-border:rgba(255,255,255,.45); background:linear-gradient(120deg,#f94144,#f3722c,#f9c74f,#43aa8b,#577590); background-size:300% 300%; animation:gradShift 18s ease infinite; }
+  body.theme-gradient-sunset { --text:#fff; --muted:#ffe9d6; --glass:rgba(255,255,255,.12); --glass-border:rgba(255,255,255,.4); background:linear-gradient(160deg,#ff5e62,#ff9966,#ffd6a5); }
+  body.theme-neon-glow { --text:#eaf6ff; --muted:#9fb3c8; --glass:rgba(0,40,60,.25); --glass-border:rgba(120,220,255,.5); background:#070a13; }
+  body.theme-night-stars { --text:#eef6ff; --muted:#9fb3c8; --glass:rgba(255,255,255,.07); --glass-border:rgba(255,255,255,.3); background:linear-gradient(180deg,#050a18,#0d1533,#0a1026); }
+  body.theme-underwater { --text:#eafffb; --muted:#b9e8df; --glass:rgba(255,255,255,.1); --glass-border:rgba(150,255,230,.4); background:linear-gradient(180deg,#0a4f5e,#0e6d78,#12808c); }
+  body.theme-candy { --text:#6b3d5e; --muted:#8d6a82; --glass:rgba(255,255,255,.35); --glass-border:rgba(180,90,150,.25); background:linear-gradient(160deg,#ffd3e0,#ffe0f0,#f7e8ff); }
+  body.theme-space { --text:#f0eaff; --muted:#b9a8d6; --glass:rgba(255,255,255,.08); --glass-border:rgba(200,180,255,.35); background:linear-gradient(180deg,#0b0618,#1b0f3b,#2a1460); }
+  body.theme-jungle { --text:#f2ffe9; --muted:#c5e8b5; --glass:rgba(255,255,255,.1); --glass-border:rgba(190,255,160,.4); background:linear-gradient(160deg,#14381f,#1d5b2e,#2a7a3f); }
+  body.theme-snow { --text:#3b4754; --muted:#6d7f91; --glass:rgba(255,255,255,.4); --glass-border:rgba(120,140,170,.25); background:linear-gradient(180deg,#dfeaf3,#eef5fb,#d8e6f3); }
+  @keyframes gradShift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+
+  #fx { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+  .particle { position: absolute; border-radius: 50%; }
+  .p-star, .p-space { background: #fff; box-shadow: 0 0 6px rgba(255,255,255,.85); animation: twinkle ease-in-out infinite; }
+  .p-snow { background: #fff; opacity: .9; animation: fall linear infinite; }
+  .p-bubbles { background: transparent; border: 2px solid rgba(255,255,255,.45); animation: rise linear infinite; }
+  .glow { position: absolute; border-radius: 50%; filter: blur(40px); opacity: .35; animation: neonPulse 6s ease-in-out infinite; }
+  @keyframes twinkle { 0%,100%{opacity:.12} 50%{opacity:.95} }
+  @keyframes fall { 0%{transform:translateY(0);opacity:0} 10%{opacity:.9} 100%{transform:translateY(114vh);opacity:.15} }
+  @keyframes rise { 0%{transform:translateY(0);opacity:0} 10%{opacity:.7} 100%{transform:translateY(-114vh);opacity:.05} }
+  @keyframes neonPulse { 0%,100%{transform:scale(1);opacity:.25} 50%{transform:scale(1.15);opacity:.5} }
+
+  #app { position: relative; z-index: 1; width: 100%; max-width: 540px; }
+
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; padding: 10px 12px; margin-bottom: 10px;
+    background: var(--glass); border: 1px solid var(--glass-border);
+    border-radius: 14px;
+  }
+  .level-info { display: flex; flex-direction: column; line-height: 1.15; min-width: 78px; }
+  .level-info .num { font-size: 26px; font-weight: 800; }
+  .level-info .par { font-size: 12px; color: var(--muted); }
+  .moves { font-size: 15px; color: var(--muted); }
+  .moves b { color: var(--text); font-size: 20px; }
+
+  .btns { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+  .btns button {
+    width: 38px; height: 38px; border-radius: 10px; cursor: pointer;
+    background: var(--glass); border: 1px solid var(--glass-border);
+    color: var(--text); font-size: 17px; line-height: 1;
+    transition: transform .12s ease, background .15s ease, box-shadow .15s ease;
+  }
+  .btns button:hover { background: rgba(255,255,255,.15); transform: translateY(-2px) scale(1.08); }
+  .btns button:active { transform: scale(.92); }
+  .btns button:disabled { opacity: .35; cursor: default; transform: none; }
+  .btns button { position: relative; }
+  .btns button.b-menu {
+    background: linear-gradient(145deg, #7c5cbf, #5a3d9e); color: #fff;
+    border: 1px solid rgba(255,255,255,.25);
+    box-shadow: 0 3px 8px rgba(90,61,158,.4);
+  }
+  .btns button.b-undo {
+    background: linear-gradient(145deg, #4cc9f0, #3a86ff); color: #fff;
+    border: 1px solid rgba(255,255,255,.25);
+    box-shadow: 0 3px 8px rgba(58,134,255,.4);
+  }
+  .btns button.b-restart {
+    background: linear-gradient(145deg, #06d6a0, #118ab2); color: #fff;
+    border: 1px solid rgba(255,255,255,.25);
+    box-shadow: 0 3px 8px rgba(17,138,178,.4);
+  }
+  .btns button.b-restart:hover { animation: spinBtn .5s ease; }
+  @keyframes spinBtn { from { transform: rotate(0) scale(1.08); } to { transform: rotate(360deg) scale(1.08); } }
+  .btns button.b-hint {
+    background: linear-gradient(145deg, #ffd166, #f4a261); color: #5c3d00;
+    border: 1px solid rgba(255,255,255,.35);
+    box-shadow: 0 3px 8px rgba(244,162,97,.45);
+  }
+  .btns button.b-hint:hover { animation: hintPulse .6s ease; }
+  @keyframes hintPulse { 50% { box-shadow: 0 0 0 6px rgba(255,209,102,.35); } }
+  .btns button.b-shuffle {
+    background: linear-gradient(145deg, #f72585, #b5179e); color: #fff;
+    border: 1px solid rgba(255,255,255,.25);
+    box-shadow: 0 3px 8px rgba(247,37,133,.45);
+    animation: shuffleGlow 2.4s ease-in-out infinite;
+  }
+  @keyframes shuffleGlow { 0%,100% { box-shadow: 0 3px 8px rgba(247,37,133,.45); } 50% { box-shadow: 0 3px 16px rgba(247,37,133,.85); } }
+  .btns button.b-extra {
+    background: linear-gradient(145deg, #fca311, #e85d04); color: #fff;
+    border: 1px solid rgba(255,255,255,.25);
+    box-shadow: 0 3px 8px rgba(232,93,4,.45);
+  }
+  .btns button.b-extra:hover { animation: extraBounce .6s ease; }
+  @keyframes extraBounce { 0%,100% { transform: translateY(0); } 40% { transform: translateY(-5px); } }
+  .btns button.empty {
+    filter: grayscale(.75); opacity: .55; box-shadow: none;
+    animation: none;
+  }
+  .btns button.empty:hover { transform: none; animation: none; box-shadow: none; }
+  .btns button.b-help {
+    background: linear-gradient(145deg, #80ffdb, #48bfe3); color: #1b263b;
+    border: 1px solid rgba(255,255,255,.3);
+    box-shadow: 0 3px 8px rgba(72,191,227,.4);
+  }
+  .btns button.b-sound {
+    background: linear-gradient(145deg, #c77dff, #9d4edd); color: #fff;
+    border: 1px solid rgba(255,255,255,.25);
+    box-shadow: 0 3px 8px rgba(157,78,221,.4);
+  }
+  .hintbadge {
+    position: absolute; top: -5px; right: -5px;
+    min-width: 17px; height: 17px; padding: 0 3px;
+    border-radius: 9px; background: #ffd166; color: #5c3d00;
+    font-size: 11px; font-weight: 800; line-height: 17px; text-align: center;
+  }
+  .hintbadge.ad { background: #e63946; color: #fff; }
+
+  /* ========================= REWARDED AD MODAL ==================== */
+  .adbox {
+    position: relative; min-height: 110px; margin-bottom: 16px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px; overflow: hidden;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #7f5a2a, #3b6b8f 55%, #2a3f5a);
+  }
+  .ad-shine {
+    position: absolute; top: 0; bottom: 0; width: 45%;
+    background: linear-gradient(100deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.22) 50%, rgba(255,255,255,0) 100%);
+    animation: adshimmer 2.4s ease-in-out infinite;
+  }
+  @keyframes adshimmer { 0% { left: -45%; } 100% { left: 110%; } }
+  .adbox span { color: #fff; font-size: 14px; z-index: 1; text-align: center; padding: 0 10px; }
+  .ad-count {
+    font-size: 40px; font-weight: 800; color: #fff; z-index: 1;
+    text-shadow: 0 2px 10px rgba(0,0,0,.5);
+  }
+  .ad-count.hidden { display: none; }
+
+  /* ========================= PROGRESS BARS ======================== */
+  .bars { margin-bottom: 12px; }
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .bar-label { font-size: 12px; color: var(--muted); min-width: 132px; white-space: nowrap; text-align: right; }
+  .bar { flex: 1; height: 10px; background: rgba(255,255,255,.12); border-radius: 8px; overflow: hidden; }
+  .bar-fill {
+    height: 100%; width: 0%; border-radius: 8px;
+    background: linear-gradient(90deg, #4dd0e1, #7ae582, #ffd166);
+    transition: width .4s ease;
+  }
+
+  #board {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    align-items: flex-end; gap: 9px; padding: 8px 4px 0;
+    min-height: 160px;
+  }
+  .tube {
+    position: relative; width: 44px; height: 132px;
+    border: 3px solid var(--glass-border);
+    border-radius: 12px 12px 10px 10px;
+    background: var(--glass);
+    cursor: pointer; overflow: hidden;
+    transition: transform .16s cubic-bezier(.3,1.4,.5,1), border-color .16s, box-shadow .16s;
+  }
+  .tube:hover { transform: translateY(-5px); }
+  .tube.selected {
+    transform: translateY(-16px);
+    border-color: var(--accent);
+    box-shadow: 0 10px 24px rgba(0,0,0,.35), 0 0 0 2px rgba(77,208,225,.25);
+  }
+  .tube.shake { animation: shake .4s ease; }
+  .tube.peek {
+    box-shadow: 0 0 0 3px var(--accent), 0 0 22px 8px rgba(77,208,225,.6);
+    animation: peekPulse .5s ease-in-out infinite;
+  }
+  @keyframes peekPulse {
+    0%,100% { box-shadow: 0 0 0 3px var(--accent), 0 0 14px 5px rgba(77,208,225,.45); }
+    50% { box-shadow: 0 0 0 3px var(--accent), 0 0 30px 12px rgba(77,208,225,.8); }
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    55% { transform: translateX(6px); }
+    80% { transform: translateX(-3px); }
+  }
+  .tube::after {
+    content: ''; position: absolute; top: 6px; bottom: 6px; left: 5px; width: 6px;
+    border-radius: 3px;
+    background: linear-gradient(180deg, rgba(255,255,255,.4), rgba(255,255,255,.05));
+    pointer-events: none;
+  }
+  .tube.completed { animation: tubeGlow .9s ease; }
+  @keyframes tubeGlow {
+    0% { box-shadow: 0 0 0 0 rgba(255,210,90,.85); }
+    50% { box-shadow: 0 0 22px 6px rgba(255,210,90,.55); }
+    100% { box-shadow: 0 0 0 0 rgba(255,210,90,0); }
+  }
+  .ripple {
+    position: fixed; z-index: 61; pointer-events: none;
+    width: 44px; height: 44px; margin: -22px 0 0 -22px;
+    border: 3px solid rgba(255,255,255,.65); border-radius: 50%; opacity: 0;
+    animation: ripple .42s ease-out forwards;
+  }
+  @keyframes ripple {
+    0% { transform: scale(.2); opacity: .9; }
+    100% { transform: scale(2.3); opacity: 0; }
+  }
+
+  /* ========================== BOTTLE SHAPES ======================= */
+  .shape-test-tube { width: 44px; border-radius: 12px 12px 10px 10px; }
+  .shape-wide-bottle { width: 58px; border-radius: 9px 9px 7px 7px; }
+  .shape-slim-vial { width: 34px; border-radius: 8px 8px 7px 7px; }
+  .shape-soda-bottle { width: 50px; border-radius: 6px; }
+  .shape-soda-bottle::before {
+    content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 16px; height: 7px; background: rgba(255,255,255,.32); border-radius: 2px 2px 1px 1px;
+  }
+  .shape-flask { width: 46px; border-radius: 5px 5px 26px 26px; }
+  .shape-flask::before {
+    content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 12px; height: 6px; background: rgba(255,255,255,.28); border-radius: 2px;
+  }
+
+  .seg {
+    position: absolute; left: 3px; right: 3px;
+    border-radius: 5px;
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.28), inset 0 -2px 0 rgba(0,0,0,.15);
+  }
+  .pour {
+    position: fixed; z-index: 60; pointer-events: none;
+    border-radius: 4px 4px 10px 10px;
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.32), inset 0 -2px 0 rgba(0,0,0,.18), 0 6px 16px rgba(0,0,0,.3);
+    animation: pourFlow .38s cubic-bezier(.4,.2,.3,1.06) forwards;
+    will-change: transform;
+  }
+  .pour::after {
+    content: ''; position: absolute; top: -3px; left: -2px; right: -2px; height: 7px;
+    background: rgba(255,255,255,.3); border-radius: 50%;
+    animation: pourSlosh .34s ease-in-out infinite;
+  }
+  @keyframes pourSlosh {
+    0%,100% { transform: translateX(0) scaleX(1); }
+    30% { transform: translateX(-2px) scaleX(1.14); }
+    70% { transform: translateX(2px) scaleX(.92); }
+  }
+  @keyframes pourFlow {
+    0%   { transform: translate(0,0); }
+    32%  { transform: translate(var(--mx), var(--my)); }
+    100% { transform: translate(var(--dx), var(--dy)); }
+  }
+
+  #toast {
+    position: fixed; left: 50%; bottom: 30px; transform: translateX(-50%);
+    background: rgba(0,0,0,.8); color: #fff; padding: 9px 16px; border-radius: 20px;
+    font-size: 14px; opacity: 0; pointer-events: none; z-index: 80;
+    transition: opacity .25s ease;
+  }
+  #toast.show { opacity: 1; }
+
+  .modal {
+    position: fixed; inset: 0; background: rgba(5,12,18,.72);
+    display: flex; justify-content: center; align-items: center;
+    padding: 16px; z-index: 100; animation: fadeIn .2s ease;
+  }
+  .modal.hidden { display: none; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .panel {
+    background: linear-gradient(180deg, #1b2f3f, #16232f);
+    border: 1px solid var(--glass-border); border-radius: 18px;
+    padding: 22px; width: 100%; max-width: 420px; text-align: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,.5);
+    animation: popIn .25s cubic-bezier(.3,1.3,.5,1);
+  }
+  .panel.wide { max-width: 560px; }
+  @keyframes popIn { from { transform: scale(.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .panel h2 { font-size: 22px; margin-bottom: 6px; }
+  .panel p { color: var(--muted); font-size: 14px; margin-bottom: 14px; line-height: 1.5; }
+  .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .panel-head h2 { margin: 0; }
+  .panel-head button {
+    width: 34px; height: 34px; border-radius: 10px; cursor: pointer;
+    background: var(--glass); border: 1px solid var(--glass-border);
+    color: var(--text); font-size: 18px; line-height: 1;
+  }
+  .btn-primary {
+    padding: 11px 22px; border-radius: 12px; cursor: pointer;
+    background: var(--accent); border: none; color: #06232b; font-weight: 700; font-size: 15px;
+    transition: transform .12s ease, filter .15s;
+  }
+  .btn-primary:hover { filter: brightness(1.1); transform: translateY(-2px); }
+  .btn-ghost {
+    padding: 11px 18px; border-radius: 12px; cursor: pointer;
+    background: var(--glass); border: 1px solid var(--glass-border);
+    color: var(--text); font-size: 14px;
+  }
+  .win-row { display: flex; gap: 10px; justify-content: center; margin-top: 6px; }
+  .stat-row { display: flex; justify-content: center; gap: 22px; margin: 10px 0 16px; }
+  .stat { text-align: center; }
+  .stat .v { font-size: 24px; font-weight: 800; color: var(--accent); }
+  .stat .l { font-size: 12px; color: var(--muted); }
+  .star { color: #ffd166; font-size: 30px; }
+
+  #levelGrid {
+    display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px;
+    max-height: 60vh; overflow-y: auto; padding: 2px;
+  }
+  #levelGrid button {
+    aspect-ratio: 1; border-radius: 9px; cursor: pointer; font-size: 13px; font-weight: 700;
+    background: var(--glass); border: 1px solid var(--glass-border); color: var(--text);
+    transition: transform .1s ease, background .15s;
+  }
+  #levelGrid button:hover:not(.locked) { background: rgba(255,255,255,.16); transform: scale(1.08); }
+  #levelGrid button.current { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(77,208,225,.3); }
+  #levelGrid button.done { background: rgba(77,208,225,.16); }
+  #levelGrid button.timebest::after {
+    content: '\26A1'; font-size: 9px; position: absolute; top: 1px; right: 2px;
+    color: #ffd166;
+  }
+  #levelGrid button { position: relative; }
+  #levelGrid button.locked { opacity: .3; cursor: default; }
+  #levelGrid button.boss { border-color: rgba(255,140,66,.55); color: #ffb37a; font-weight: 800; }
+
+  /* ======================= PHASE 1 FEATURES ===================== */
+  .daily-btn { margin-top: 8px; background: linear-gradient(135deg, #ffb703, #fb8500); color: #2b1500; }
+  #achGrid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px; max-height: 58vh; overflow-y: auto; padding: 2px;
+  }
+  .ach {
+    text-align: center; padding: 12px 8px; border-radius: 12px;
+    background: var(--glass); border: 1px solid var(--glass-border);
+  }
+  .ach.locked { opacity: .55; filter: grayscale(.9); }
+  .ach.unlocked { border-color: rgba(255,215,102,.55); box-shadow: 0 0 12px rgba(255,209,102,.15); }
+  .ach-icon { font-size: 26px; }
+  .ach-name { font-weight: 700; font-size: 13px; margin: 4px 0 2px; }
+  .ach-desc { font-size: 11px; color: var(--muted); line-height: 1.3; }
+  .ach-prog { font-size: 12px; color: var(--accent); margin-top: 5px; }
+
+  #skinGrid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px; max-height: 54vh; overflow-y: auto; padding: 2px;
+  }
+  .skin-card {
+    padding: 12px 8px; border-radius: 12px; text-align: center; cursor: pointer;
+    background: var(--glass); border: 1px solid var(--glass-border);
+    transition: transform .12s ease, border-color .15s;
+  }
+  .skin-card.locked { opacity: .55; cursor: default; filter: grayscale(.7); }
+  .skin-card.selected { border-color: var(--accent); box-shadow: 0 0 12px rgba(77,208,225,.3); }
+  .skin-chips { display: flex; justify-content: center; gap: 4px; margin-bottom: 8px; flex-wrap: wrap; }
+  .chip { width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(255,255,255,.35); }
+  .skin-name { font-weight: 700; font-size: 13px; }
+  .skin-unlock { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .skin-hint { text-align: center; color: var(--muted); font-size: 12px; margin-top: 12px; }
+
+  .stat-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-height: 58vh; overflow-y: auto;
+  }
+  .stat-box { text-align: center; padding: 14px 8px; border-radius: 12px; background: var(--glass); border: 1px solid var(--glass-border); }
+  .stat-box .v { font-size: 22px; font-weight: 800; color: var(--accent); }
+  .stat-box .l { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  /* ======================= PHASE 2 FEATURES ===================== */
+  .energy-hero {
+    margin: 8px 0 4px; font-size: 14px; color: var(--accent); font-weight: 600;
+  }
+  .chest-btn {
+    width: 100%; margin-top: 8px; padding: 11px 14px; border-radius: 12px; cursor: pointer;
+    background: linear-gradient(135deg, #ffd166, #f4a261); color: #3a2400;
+    font-weight: 700; font-size: 14px; border: none;
+    transition: transform .12s ease, filter .15s;
+  }
+  .chest-btn:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-2px); }
+  .chest-btn:disabled { opacity: .55; cursor: default; }
+
+  .boss-wrap { margin-bottom: 8px; }
+  .boss-label {
+    font-size: 12px; font-weight: 700; color: #ff8c42; margin-bottom: 4px;
+    text-align: center; letter-spacing: .5px;
+  }
+  .boss-bar {
+    height: 10px; border-radius: 6px; overflow: hidden;
+    background: rgba(255,255,255,.1); border: 1px solid rgba(255,140,66,.4);
+  }
+  .boss-fill {
+    height: 100%; width: 100%;
+    background: linear-gradient(90deg, #ff2e63, #ff8c42);
+    transition: width .4s linear; border-radius: 6px;
+  }
+  .boss-wrap.gold .boss-fill { background: linear-gradient(90deg, #ffd166, #ff8c42); }
+  .boss-victory {
+    color: #ffd166; font-weight: 800; font-size: 15px; margin-bottom: 4px;
+    animation: bossPulse 1s ease-in-out infinite;
+  }
+  @keyframes bossPulse {
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+  }
+
+  /* ==================== DANGER THEME (BOSS) ===================== */
+  body.theme-boss-danger {
+    --text:#fff; --muted:#ffb1b1; --glass:rgba(90,0,12,.4); --glass-border:rgba(255,90,70,.55);
+    background:linear-gradient(160deg,#2b0007,#5a0012,#170003); background-size:300% 300%;
+    animation:bossDanger 1.6s ease infinite;
+  }
+  @keyframes bossDanger {
+    0%,100% { background-position:0% 50%; }
+    50% { background-position:100% 50%; }
+  }
+  .danger-vignette {
+    position: fixed; inset:0; pointer-events:none; z-index:0;
+    background: radial-gradient(ellipse at center, transparent 45%, rgba(255,40,40,.4));
+    animation: dangerPulse 1s ease-in-out infinite;
+  }
+  @keyframes dangerPulse {
+    0%,100% { opacity:.45; }
+    50% { opacity:1; }
+  }
+  .p-ember { background: radial-gradient(circle, #ff9a3c, #e63946); box-shadow: 0 0 8px rgba(255,120,40,.8); }
+
+  /* ==================== REWARD POPUP ============================ */
+  #rewardStack {
+    position: fixed; left:0; right:0; top:8%;
+    display:flex; flex-direction:column; align-items:center; gap:12px;
+    z-index:130; pointer-events:none;
+  }
+  .reward-pop {
+    min-width:260px; max-width:320px; padding:16px 20px; border-radius:18px;
+    text-align:center; pointer-events:auto; position:relative; overflow:hidden;
+    background: linear-gradient(180deg,#1b2f3f,#16232f);
+    border:1px solid rgba(255,255,255,.2);
+    box-shadow:0 18px 50px rgba(0,0,0,.5);
+    animation: rewardPop .5s cubic-bezier(.3,1.4,.5,1);
+  }
+  .reward-pop.gold { border-color:rgba(255,215,102,.75); background:linear-gradient(180deg,#3a2c12,#241a08); }
+  .reward-pop.levelup { border-color:rgba(120,255,180,.65); }
+  .reward-pop .r-icon { font-size:44px; display:inline-block; animation:rewardBounce .6s ease infinite alternate; }
+  .reward-pop .r-title { font-size:17px; font-weight:800; color:#ffd166; margin-top:2px; }
+  .reward-pop .r-desc { font-size:13px; color:var(--muted); margin-top:2px; }
+  .reward-pop .r-sub { font-size:12px; color:var(--accent); margin-top:6px; font-weight:600; }
+  @keyframes rewardPop {
+    0% { transform:scale(.3) rotate(-8deg); opacity:0; }
+    60% { transform:scale(1.15) rotate(3deg); }
+    100% { transform:scale(1) rotate(0); opacity:1; }
+  }
+  @keyframes rewardBounce { from { transform:translateY(0); } to { transform:translateY(-6px); } }
+  .reward-shine {
+    position:absolute; top:0; bottom:0; width:40px; left:-60px;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);
+    animation:rewardShine 1.6s linear infinite;
+  }
+  @keyframes rewardShine { 0% { left:-60px; } 100% { left:120%; } }
+
+  /* ==================== BOSS WIN CELEBRATION ==================== */
+  .crown-rain { position:fixed; top:-40px; font-size:26px; z-index:95; pointer-events:none; animation:crownFall linear forwards; }
+  @keyframes crownFall {
+    0% { transform:translateY(0) rotate(0); opacity:1; }
+    100% { transform:translateY(112vh) rotate(360deg); opacity:.8; }
+  }
+  .flash { position:fixed; inset:0; background:#fff; opacity:0; pointer-events:none; z-index:96; }
+  @keyframes flashAnim { 0%{opacity:0} 20%{opacity:.9} 100%{opacity:0} }
+
+  .confetti {
+    position: fixed; top: -12px; z-index: 90; width: 9px; height: 14px;
+    border-radius: 2px; pointer-events: none;
+    animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall {
+    0% { transform: translate(0,0) rotate(0); opacity: 1; }
+    100% { transform: translate(var(--cx), 104vh) rotate(680deg); opacity: .9; }
+  }
+
+  /* ======================= LIQUID EFFECTS ======================= */
+  .surface {
+    position: absolute; left: 1px; right: 1px; height: 9px;
+    background:
+      radial-gradient(120% 160% at 50% 0%, rgba(255,255,255,.65), rgba(255,255,255,.12) 55%, rgba(255,255,255,0) 78%);
+    border-radius: 50%;
+    animation: surfaceWave 1.9s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 2;
+  }
+  @keyframes surfaceWave {
+    0%,100% { transform: translateX(-2.5px) scaleX(1.06) rotate(-1.5deg); }
+    25% { transform: translateX(0) scaleX(.98) rotate(.5deg); }
+    50% { transform: translateX(2.5px) scaleX(1.08) rotate(1.5deg); }
+    75% { transform: translateX(0) scaleX(1) rotate(-.5deg); }
+  }
+  .bubbles { position: absolute; left: 0; right: 0; bottom: 0; top: 0; pointer-events: none; }
+  .bubbles i {
+    position: absolute; bottom: -9px; width: 5px; height: 5px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fff, rgba(255,255,255,.18));
+    opacity: 0;
+    animation: bubbleUp var(--bd, 3.2s) linear infinite;
+  }
+  @keyframes bubbleUp {
+    0% { transform: translateY(0); opacity: 0; }
+    12% { opacity: .85; }
+    100% { transform: translateY(-128px); opacity: 0; }
+  }
+  .seg {
+    overflow: hidden;
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.3), inset 0 -2px 0 rgba(0,0,0,.16);
+  }
+  .seg::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.22) 48%, rgba(255,255,255,.06) 55%, transparent 70%);
+    background-size: 260% 100%;
+    animation: liquidSheen 2.8s linear infinite;
+    pointer-events: none;
+  }
+  @keyframes liquidSheen {
+    0% { background-position: 130% 0; }
+    100% { background-position: -130% 0; }
+  }
+  .splash {
+    position: fixed; z-index: 62; pointer-events: none;
+    border-radius: 50%;
+    animation: splashFly .62s cubic-bezier(.2,.6,.4,1) forwards;
+  }
+  @keyframes splashFly {
+    0% { transform: translate(0,0) scale(1); opacity: .95; }
+    100% { transform: translate(var(--sx), var(--sy)) scale(.2); opacity: 0; }
+  }
+
+  /* ====================== SCREEN SWITCHING ====================== */
+  .screen { display: none; }
+  .screen.active { display: block; animation: screenIn .38s cubic-bezier(.3,1.1,.4,1); }
+  @keyframes screenIn {
+    from { opacity: 0; transform: translateY(16px) scale(.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* ========================== HOME MENU ========================== */
+  #home { width: 100%; max-width: 540px; }
+  .home-card { text-align: center; padding-top: 20px; }
+  .logo {
+    font-size: 40px; font-weight: 900; letter-spacing: 2px; line-height: 1.1;
+    background: linear-gradient(90deg, #4dd0e1, #7ae582, #ffd166, #ff6b6b);
+    background-size: 300% 100%;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: gradShift 7s ease infinite;
+    margin: 4px 0 6px;
+  }
+  .drop-emoji { display: inline-block; animation: floatDrop 2.4s ease-in-out infinite; }
+  @keyframes floatDrop { 0%,100% { transform: translateY(0) rotate(-8deg); } 50% { transform: translateY(-7px) rotate(10deg); } }
+  .logo-sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+  .home-card-inner {
+    background: var(--glass); border: 1px solid var(--glass-border);
+    border-radius: 18px; padding: 16px 18px; margin-bottom: 14px;
+    animation: cardIn .5s cubic-bezier(.3,1.15,.4,1);
+  }
+  .home-card-inner:nth-child(3) { animation-delay: .06s; }
+  .home-card-inner:nth-child(4) { animation-delay: .12s; }
+  @keyframes cardIn { from { opacity: 0; transform: translateY(14px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  .pl-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .lvl-badge { font-size: 21px; font-weight: 800; color: var(--accent); }
+  .xp-text { font-size: 12px; color: var(--muted); }
+  .big-bar {
+    height: 14px; border-radius: 8px; background: rgba(255,255,255,.12);
+    overflow: hidden; position: relative;
+  }
+  .big-bar .bar-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, #4dd0e1, #7ae582, #ffd166);
+    transition: width .8s cubic-bezier(.3,1,.4,1);
+    position: relative;
+  }
+  .big-bar .bar-fill::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,.5) 50%, transparent 70%);
+    background-size: 200% 100%;
+    animation: barShine 2.2s linear infinite;
+  }
+  @keyframes barShine { 0% { background-position: 180% 0; } 100% { background-position: -20% 0; } }
+  .streak-hero { font-size: 15px; margin: 10px 0 2px; }
+  .streak-hero b { color: #ffd166; }
+  .streak-row { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+  .streak-cell {
+    width: 36px; height: 46px; border-radius: 10px;
+    background: rgba(255,255,255,.07); border: 1px solid var(--glass-border);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  }
+  .streak-cell .d { font-size: 10px; color: var(--muted); }
+  .streak-cell .dot { width: 13px; height: 13px; border-radius: 50%; background: rgba(255,255,255,.18); }
+  .streak-cell.on { background: rgba(255,213,102,.16); border-color: rgba(255,213,102,.55); animation: cellPop .45s cubic-bezier(.3,1.5,.5,1); }
+  .streak-cell.on .dot { background: #ffd166; box-shadow: 0 0 10px rgba(255,213,102,.65); }
+  .streak-cell.today { border-color: var(--accent); }
+  @keyframes cellPop { from { transform: scale(.55); } to { transform: scale(1); } }
+  .btn-play {
+    width: 100%; padding: 16px; font-size: 22px; font-weight: 900; letter-spacing: 3px;
+    border: none; border-radius: 16px; color: #06232b; cursor: pointer;
+    background: linear-gradient(90deg, #4dd0e1, #7ae582);
+    animation: playPulse 2s ease-in-out infinite;
+    transition: transform .12s ease, filter .15s;
+  }
+  .btn-play:active { transform: scale(.96); }
+  @keyframes playPulse {
+    0%,100% { box-shadow: 0 8px 24px rgba(77,208,225,.35); transform: translateY(0); }
+    50% { box-shadow: 0 14px 32px rgba(77,208,225,.55); transform: translateY(-2px); }
+  }
+  .home-mini { display: flex; gap: 10px; justify-content: center; margin-top: 14px; }
+  .mini-btn {
+    flex: 1; padding: 12px 8px; border-radius: 12px; cursor: pointer;
+    background: var(--glass); border: 1px solid var(--glass-border);
+    color: var(--text); font-size: 14px;
+    transition: transform .12s ease, background .15s;
+  }
+  .mini-btn:active { transform: scale(.92); }
+  .xp-line { font-size: 17px; font-weight: 800; color: #7ae582; margin-top: 2px; animation: xpPop .5s cubic-bezier(.3,1.5,.5,1); }
+  @keyframes xpPop { from { transform: scale(.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .levelup {
+    margin-top: 10px; padding: 10px 14px; border-radius: 12px; font-size: 18px; font-weight: 900;
+    background: linear-gradient(90deg, #ffd166, #ff6b6b); color: #3a2400;
+    animation: levelupBounce .6s cubic-bezier(.3,1.6,.5,1);
+  }
+  @keyframes levelupBounce { 0% { transform: scale(.3) rotate(-4deg); opacity: 0; } 100% { transform: scale(1) rotate(0); opacity: 1; } }
+  .levelup.hidden { display: none; }
+
+  /* ==================== PHASE 4: MODES / SYNC / TUTORIAL ======= */
+  .mode-switch {
+    display: flex; gap: 6px; margin-top: 10px;
+    background: rgba(255,255,255,.06); border-radius: 14px; padding: 5px;
+  }
+  .mode-tab {
+    flex: 1; padding: 10px 4px; border-radius: 10px; cursor: pointer;
+    background: transparent; border: 1px solid transparent; color: var(--muted);
+    font-size: 13px; font-weight: 700; transition: all .18s ease;
+  }
+  .mode-tab.active {
+    background: linear-gradient(135deg, #4dd0e1, #7ae582); color: #06232b;
+    box-shadow: 0 4px 14px rgba(77,208,225,.4);
+  }
+  .mode-tab:not(.active):hover { background: rgba(255,255,255,.1); color: var(--text); }
+  .mode-desc {
+    text-align: center; color: var(--muted); font-size: 12px;
+    margin-top: 8px; min-height: 16px;
+  }
+
+  .ta-wrap {
+    margin-bottom: 8px; text-align: center;
+    animation: taPulse 1.4s ease-in-out infinite;
+  }
+  @keyframes taPulse { 0%,100% { opacity: 1; } 50% { opacity: .7; } }
+  .ta-label { font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #ffd166; }
+  .ta-time { font-size: 22px; font-weight: 800; color: #ffd166; }
+  .ta-wrap.hidden { display: none; }
+
+  .board-list { max-height: 56vh; overflow-y: auto; }
+  .board-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 12px; border-radius: 10px; margin-bottom: 6px;
+    background: var(--glass); border: 1px solid var(--glass-border);
+    animation: rowIn .3s ease both;
+  }
+  @keyframes rowIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+  .board-rank { font-size: 16px; font-weight: 800; color: #ffd166; width: 30px; }
+  .board-lv { font-weight: 700; }
+  .board-time { font-weight: 800; color: var(--accent); font-size: 16px; }
+  .board-hint { text-align: center; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+
+  .set-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 2px;
+  }
+  .set-label { font-size: 15px; font-weight: 600; }
+  .set-toggle {
+    padding: 8px 20px; border-radius: 20px; cursor: pointer; font-weight: 700;
+    background: linear-gradient(135deg, #4dd0e1, #7ae582); color: #06232b; border: none;
+    min-width: 60px; transition: transform .12s;
+  }
+  .set-toggle.off { background: rgba(255,255,255,.12); color: var(--muted); }
+  .set-toggle:active { transform: scale(.94); }
+  .set-hr { border: none; border-top: 1px solid var(--glass-border); margin: 12px 0; }
+  .set-title { font-size: 15px; margin-bottom: 6px; }
+  .sync-box {
+    display: flex; gap: 8px; align-items: center; margin: 6px 0 10px;
+  }
+  .sync-code {
+    flex: 1; font-size: 11px; word-break: break-all; padding: 8px;
+    background: rgba(0,0,0,.3); border-radius: 8px; color: #7ae582;
+    max-height: 64px; overflow-y: auto; display: block;
+  }
+  .sync-input {
+    width: 100%; background: rgba(0,0,0,.3); color: var(--text);
+    border: 1px solid var(--glass-border); border-radius: 10px;
+    padding: 10px; font-size: 12px; font-family: monospace; margin-bottom: 10px;
+  }
+
+  .tutorial {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(5,12,18,.86); display: flex; align-items: center; justify-content: center;
+    padding: 20px; animation: fadeIn .3s ease;
+  }
+  .tutorial.hidden { display: none; }
+  .tut-card {
+    background: linear-gradient(180deg, #1b2f3f, #16232f);
+    border: 1px solid var(--glass-border); border-radius: 18px;
+    padding: 26px 24px; max-width: 380px; width: 100%; text-align: center;
+    animation: popIn .3s cubic-bezier(.3,1.3,.5,1);
+  }
+  .tut-icon { font-size: 54px; animation: floatDrop 2.2s ease-in-out infinite; }
+  .tut-title { font-size: 22px; font-weight: 800; margin: 10px 0 6px; color: var(--accent); }
+  .tut-text { font-size: 15px; color: var(--muted); line-height: 1.5; min-height: 46px; }
+  .tut-dots { display: flex; justify-content: center; gap: 7px; margin: 14px 0; }
+  .tut-dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: rgba(255,255,255,.22); transition: all .2s;
+  }
+  .tut-dot.active { background: var(--accent); transform: scale(1.35); }
+  .tut-tube-row { display: flex; justify-content: center; gap: 8px; margin: 12px 0 4px; }
+  .tut-tube {
+    width: 34px; height: 74px; border: 2px solid var(--glass-border);
+    border-radius: 8px; position: relative; overflow: hidden; background: var(--glass);
+  }
+  .tut-tube i { position: absolute; left: 2px; right: 2px; border-radius: 4px; }
+
+  /* ======================= PHASE 5 ============================= */
+  .coins-hero { margin: 2px 0 6px; font-size: 14px; color: #ffd166; font-weight: 700; }
+
+  .btns button.b-peek {
+    background: linear-gradient(145deg, #43aa8b, #277da1); color: #fff;
+    border: 1px solid rgba(255,255,255,.25);
+    box-shadow: 0 3px 8px rgba(39,125,161,.45);
+  }
+  .btns button.b-xp {
+    background: linear-gradient(145deg, #ff9f1c, #f72585); color: #fff;
+    border: 1px solid rgba(255,255,255,.3);
+    box-shadow: 0 3px 8px rgba(247,37,133,.5);
+  }
+  .btns button.b-xp.armed {
+    animation: xpPulse .9s ease-in-out infinite;
+  }
+  @keyframes xpPulse {
+    0%,100% { box-shadow: 0 3px 8px rgba(247,37,133,.5); }
+    50% { box-shadow: 0 0 18px 5px rgba(255,220,90,.8); }
+  }
+
+  .custo-tabs { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; }
+  .custo-tab {
+    padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 13px;
+    background: var(--glass); border: 1px solid var(--glass-border); color: var(--muted);
+    transition: all .15s ease;
+  }
+  .custo-tab.active { background: linear-gradient(145deg, #4cc9f0, #3a86ff); color: #fff; border-color: transparent; }
+
+  .tube-preview {
+    width: 26px; height: 72px; margin: 6px auto 8px; position: relative;
+    border-radius: 10px 10px 8px 8px; border: 3px solid var(--glass-border);
+    background: var(--glass); overflow: hidden;
+  }
+  .tube-preview i {
+    position: absolute; left: 3px; right: 3px; border-radius: 4px; bottom: 3px;
+  }
+  .tube-card.selected { border-color: var(--accent); box-shadow: 0 0 12px rgba(77,208,225,.3); }
+
+  .shop-bal { font-size: 20px; font-weight: 800; color: #ffd166; text-align: center; margin-bottom: 10px; }
+  #shopGrid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-height: 56vh; overflow-y: auto;
+  }
+  .shop-card {
+    text-align: center; padding: 14px 10px; border-radius: 14px;
+    background: var(--glass); border: 1px solid var(--glass-border);
+  }
+  .shop-icon { font-size: 30px; }
+  .shop-name { font-weight: 700; font-size: 14px; margin: 6px 0 2px; }
+  .shop-desc { font-size: 11px; color: var(--muted); min-height: 28px; line-height: 1.35; }
+  .shop-owned { font-size: 12px; color: var(--accent); margin: 4px 0; }
+  .shop-buy {
+    width: 100%; padding: 9px 6px; border-radius: 10px; border: none; cursor: pointer;
+    font-weight: 700; font-size: 13px; color: #3a2400;
+    background: linear-gradient(135deg, #ffd166, #f4a261);
+    transition: transform .12s ease, filter .15s;
+  }
+  .shop-buy:hover { filter: brightness(1.08); transform: translateY(-2px); }
+
+  .social-code {
+    text-align: center; font-size: 20px; font-weight: 800; letter-spacing: 2px;
+    color: var(--accent); background: var(--glass); border: 1px solid var(--glass-border);
+    border-radius: 12px; padding: 12px; margin: 10px 0;
+  }
+  .social-row { display: flex; gap: 8px; margin: 8px 0; }
+  .social-row .sync-input { flex: 1; }
+  .social-rewards { text-align: center; font-size: 12px; color: var(--muted); margin-top: 10px; }
+
+  /* ================== TUBE THEMES ============================== */
+  body[data-tube="0"] .tube { border: 3px solid var(--glass-border); background: var(--glass); }
+  body[data-tube="1"] .tube { border: 3px solid rgba(255,215,130,.8); background: linear-gradient(180deg, rgba(255,240,200,.28), rgba(180,120,40,.22)); }
+  body[data-tube="2"] .tube { border: 3px solid rgba(120,255,200,.75); background: linear-gradient(180deg, rgba(30,200,160,.3), rgba(10,120,110,.25)); }
+  body[data-tube="3"] .tube { border: 3px solid rgba(140,140,160,.9); background: linear-gradient(180deg, rgba(90,90,110,.45), rgba(40,40,55,.5)); }
+  body[data-tube="4"] .tube { border: 3px solid rgba(255,150,200,.8); background: linear-gradient(180deg, rgba(255,120,190,.3), rgba(180,60,120,.28)); }
+</style>
+</head>
+<body>
+  <div id="fx"></div>
+
+  <div id="home" class="screen">
+    <div class="home-card">
+      <div class="logo"><span class="drop-emoji">&#x1F4A7;</span> WATER SORT</div>
+      <div class="logo-sub">200 levels &middot; sort the colors</div>
+
+      <div class="home-card-inner">
+        <div class="pl-row">
+          <span class="lvl-badge">Lv <span id="homeLevel">1</span></span>
+          <span class="xp-text" id="homeXpText">0 / 100 XP</span>
+        </div>
+        <div class="big-bar"><div class="bar-fill" id="homeXpBar"></div></div>
+        <div class="streak-hero">&#x1F525; <b id="homeStreak">0</b> day streak</div>
+        <div class="streak-row" id="streakRow"></div>
+        <div class="energy-hero" id="homeEnergy">&#x26A1; 5 / 5</div>
+        <div class="coins-hero" id="homeCoins">&#x1FA99; 0</div>
+        <button class="chest-btn" id="btnChest">&#x1F4B0; Day 1 Chest</button>
+      </div>
+
+      <div class="home-card-inner">
+        <div class="pl-row">
+          <span class="lvl-badge" style="font-size:16px;">Progress</span>
+          <span class="xp-text" id="homeProgressText">0 / 200</span>
+        </div>
+        <div class="big-bar"><div class="bar-fill" id="homeProgressBar"></div></div>
+      </div>
+
+      <button class="btn-play" id="btnPlay">&#x25B6; PLAY</button>
+      <button class="btn-play daily-btn" id="btnDaily">&#x2600;&#xFE0F; Daily Challenge</button>
+
+      <div class="mode-switch" id="modeSwitch">
+        <button class="mode-tab" data-mode="classic">&#x1F3AE; Classic</button>
+        <button class="mode-tab" data-mode="time">&#x26A1; Time Attack</button>
+        <button class="mode-tab" data-mode="relaxed">&#x1F33F; Relaxed</button>
+      </div>
+      <div class="mode-desc" id="modeDesc"></div>
+
+      <div class="home-mini">
+        <button class="mini-btn" id="btnHomeSound">&#x1F50A; Sound</button>
+        <button class="mini-btn" id="btnHomeHelp">&#x2753; Help</button>
+        <button class="mini-btn" id="btnHomeLevels">&#x1F5FA;&#xFE0F; Levels</button>
+        <button class="mini-btn" id="btnHomeAch">&#x1F3C6; Awards</button>
+        <button class="mini-btn" id="btnHomeShop">&#x1F6D2; Shop</button>
+        <button class="mini-btn" id="btnHomeSkins">&#x1F3A8; Customize</button>
+        <button class="mini-btn" id="btnHomeStats">&#x1F4CA; Stats</button>
+        <button class="mini-btn" id="btnHomeBoard">&#x1F3C5; Best Times</button>
+        <button class="mini-btn" id="btnHomeSocial">&#x1F91D; Friends</button>
+        <button class="mini-btn" id="btnHomeSettings">&#x2699;&#xFE0F; Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="app" class="screen">
+    <header>
+      <div class="level-info">
+        <span class="num" id="levelNum">1</span>
+        <span class="par" id="parInfo"></span>
+      </div>
+      <div class="moves">Moves <b id="movesNum">0</b></div>
+      <div class="btns">
+        <button id="btnMenu" title="Menu" class="b-menu">&#x2630;</button>
+        <button id="btnUndo" title="Undo" class="b-undo">&#x21A9;</button>
+        <button id="btnRestart" title="Restart" class="b-restart">&#x21BB;</button>
+        <button id="btnHint" title="Hint" class="b-hint">H<span class="hintbadge" id="hintBadge">1</span></button>
+        <button id="btnShuffle" title="Shuffle tubes" class="b-shuffle">&#x27F2;<span class="hintbadge" id="shuffleBadge">0</span></button>
+        <button id="btnExtraTube" title="Add empty tube" class="b-extra">&#x2697;<span class="hintbadge" id="extraBadge">0</span></button>
+        <button id="btnPeek" title="Peek: highlight best move" class="b-peek">&#x1F441;&#xFE0F;<span class="hintbadge" id="peekBadge">0</span></button>
+        <button id="btnDoubleXP" title="2x XP next win" class="b-xp">&#x26A1;<span class="hintbadge" id="xpBadge">0</span></button>
+        <button id="btnHelp" title="How to play" class="b-help">?</button>
+        <button id="btnSound" title="Sound" class="b-sound">&#x266A;</button>
+      </div>
+    </header>
+
+    <div class="bars">
+      <div id="bossWrap" class="boss-wrap hidden">
+        <div class="boss-label">&#x1F451; BOSS <span id="bossTime">0</span>s</div>
+        <div class="boss-bar"><div class="boss-fill" id="bossFill"></div></div>
+      </div>
+      <div id="taWrap" class="ta-wrap hidden">
+        <div class="ta-label">&#x26A1; TIME ATTACK</div>
+        <div class="ta-time" id="taTime">&#x23F3; 0.0s</div>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label" id="overallLabel">Level 0/200</span>
+        <div class="bar"><div class="bar-fill" id="overallFill"></div></div>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label" id="sortLabel">Sorted 0/0</span>
+        <div class="bar"><div class="bar-fill" id="sortFill"></div></div>
+      </div>
+    </div>
+
+    <div id="board"></div>
+
+    <div style="display:flex; justify-content:center; margin-top:14px;">
+      <button class="btn-ghost" id="btnLevels">Level Select</button>
+    </div>
+    <div id="toast"></div>
+  </div>
+
+  <div id="rewardStack"></div>
+
+  <div class="modal hidden" id="winModal">
+    <div class="panel">
+      <div class="star" id="winStar"></div>
+      <div class="boss-victory hidden" id="bossVictory">&#x1F451; BOSS DEFEATED! &#x1F451;</div>
+      <h2>Level Complete!</h2>
+      <div class="stat-row">
+        <div class="stat"><div class="v" id="winMoves">0</div><div class="l">Moves</div></div>
+        <div class="stat"><div class="v" id="winPar">0</div><div class="l">Par</div></div>
+        <div class="stat"><div class="v" id="winBest">0</div><div class="l">Best</div></div>
+        <div class="stat"><div class="v" id="winStreak">0</div><div class="l">Streak</div></div>
+        <div class="stat" id="winTimeStat"><div class="v" id="winTime">0</div><div class="l">Time</div></div>
+      </div>
+      <div class="xp-line" id="winXp"></div>
+      <div class="levelup hidden" id="levelUp">&#x2B50; LEVEL UP! &#x2B50;</div>
+      <div class="win-row">
+        <button class="btn-primary" id="btnNext">Next Level</button>
+        <button class="btn-ghost" id="btnWinLevels">Levels</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="levelsModal">
+    <div class="panel wide">
+      <div class="panel-head">
+        <h2>Select Level</h2>
+        <button id="btnCloseLevels">&times;</button>
+      </div>
+      <div id="levelGrid"></div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="achModal">
+    <div class="panel wide">
+      <div class="panel-head">
+        <h2>Achievements</h2>
+        <button id="btnCloseAch">&times;</button>
+      </div>
+      <div id="achGrid"></div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="skinsModal">
+    <div class="panel wide">
+      <div class="panel-head">
+        <h2>&#x1F3A8; Customize</h2>
+        <button id="btnCloseSkins">&times;</button>
+      </div>
+      <div class="custo-tabs">
+        <button class="custo-tab active" id="tabPalettes">Liquid Palettes</button>
+        <button class="custo-tab" id="tabTubes">Tube Themes</button>
+      </div>
+      <div id="skinGrid"></div>
+      <div id="tubeGrid" class="hidden"></div>
+      <div class="skin-hint">Unlock new looks by completing levels.</div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="shopModal">
+    <div class="panel wide">
+      <div class="panel-head">
+        <h2>&#x1F6D2; Booster Shop</h2>
+        <button id="btnCloseShop">&times;</button>
+      </div>
+      <div class="shop-bal" id="shopBal">&#x1FA99; 0</div>
+      <div id="shopGrid"></div>
+      <div class="skin-hint">Earn coins by winning levels, daily challenges, chests and friend codes.</div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="socialModal">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>&#x1F91D; Friends</h2>
+        <button id="btnCloseSocial">&times;</button>
+      </div>
+      <p class="board-hint">Share your friend code. Anyone who redeems it sends you a +1 Shuffle bonus, and they get coins too!</p>
+      <div class="social-code" id="socialCode">WS-XXXXXX</div>
+      <div class="win-row">
+        <button class="btn-ghost" id="btnCopyCodeSocial">Copy My Code</button>
+      </div>
+      <hr class="set-hr">
+      <p class="board-hint">Redeem a friend's code (once per code):</p>
+      <div class="social-row">
+        <input id="socialInput" class="sync-input" placeholder="WS-ABC123" maxlength="12">
+        <button class="btn-primary" id="btnRedeemSocial">Redeem</button>
+      </div>
+      <div class="social-rewards">Reward: +40 coins, +1 Shuffle, +1 Peek</div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="statsModal">
+    <div class="panel wide">
+      <div class="panel-head">
+        <h2>Your Stats</h2>
+        <button id="btnCloseStats">&times;</button>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-box"><div class="v" id="statWins">0</div><div class="l">Total Wins</div></div>
+        <div class="stat-box"><div class="v" id="statLevels">0</div><div class="l">Levels Done</div></div>
+        <div class="stat-box"><div class="v" id="statStreak">0</div><div class="l">Best Streak</div></div>
+        <div class="stat-box"><div class="v" id="statDaily">0</div><div class="l">Daily Wins</div></div>
+        <div class="stat-box"><div class="v" id="statAvg">0</div><div class="l">Avg Moves</div></div>
+        <div class="stat-box"><div class="v" id="statPerfect">0</div><div class="l">Perfect Wins</div></div>
+        <div class="stat-box"><div class="v" id="statNoHint">0</div><div class="l">No-Hint Wins</div></div>
+        <div class="stat-box"><div class="v" id="statHints">0</div><div class="l">Hints Used</div></div>
+        <div class="stat-box"><div class="v" id="statBoss">0</div><div class="l">Bosses Beaten</div></div>
+        <div class="stat-box"><div class="v" id="statTime">0</div><div class="l">Play Time</div></div>
+        <div class="stat-box"><div class="v" id="statBoosters">0</div><div class="l">Boosters Used</div></div>
+        <div class="stat-box"><div class="v" id="statTimeWins">0</div><div class="l">Time Attack Wins</div></div>
+        <div class="stat-box"><div class="v" id="statCoins">0</div><div class="l">Coins Earned</div></div>
+        <div class="stat-box"><div class="v" id="statCoinsSpent">0</div><div class="l">Coins Spent</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="helpModal">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>How to Play</h2>
+        <button id="btnCloseHelp">&times;</button>
+      </div>
+      <p>
+        Tap a bottle to pick up the top color segment, then tap another to pour it.
+        You may only pour onto an empty bottle or onto the same color, and a bottle
+        holds at most 4 units. Sort every color into its own bottle to win!
+      </p>
+      <p>
+        <b>&#x27F2; Shuffle</b> rearranges the bottles and <b>&#x2697; Extra Tube</b>
+        adds an empty bottle. Earn boosters from daily chests and winning boss levels!
+      </p>
+      <button class="btn-primary" id="btnPlayHelp">Got it</button>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="boardModal">
+    <div class="panel wide">
+      <div class="panel-head">
+        <h2>&#x1F3C5; Time Attack Best Times</h2>
+        <button id="btnCloseBoard">&times;</button>
+      </div>
+      <p class="board-hint">Your fastest time per level in Time Attack mode.</p>
+      <div id="boardList" class="board-list"></div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="settingsModal">
+    <div class="panel wide">
+      <div class="panel-head">
+        <h2>&#x2699;&#xFE0F; Settings</h2>
+        <button id="btnCloseSettings">&times;</button>
+      </div>
+      <div class="set-row">
+        <span class="set-label">Haptics (vibration)</span>
+        <button class="set-toggle" id="btnHaptics">On</button>
+      </div>
+      <div class="set-row">
+        <span class="set-label">Sound</span>
+        <button class="set-toggle" id="btnSettingsSound">On</button>
+      </div>
+      <hr class="set-hr">
+      <h3 class="set-title">&#x2601;&#xFE0F; Cloud Sync</h3>
+      <p class="board-hint">
+        Copy your backup code, then paste it on another device to restore progress.
+        No account needed.
+      </p>
+      <div class="sync-box">
+        <code id="syncCode" class="sync-code"></code>
+        <button class="btn-ghost" id="btnCopyCode">Copy Code</button>
+      </div>
+      <p class="board-hint">Or restore from a code you saved earlier:</p>
+      <textarea id="syncInput" class="sync-input" rows="3" placeholder="Paste your backup code here..."></textarea>
+      <div class="win-row">
+        <button class="btn-primary" id="btnRestoreCode">Restore</button>
+        <button class="btn-ghost" id="btnResetAll">Reset Progress</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="tutorial" class="tutorial hidden">
+    <div class="tut-card">
+      <div class="tut-icon" id="tutIcon">&#x1F4A7;</div>
+      <div class="tut-title" id="tutTitle">Sort the Colors</div>
+      <div class="tut-text" id="tutText">Tap a bottle to pick up its top color.</div>
+      <div class="tut-dots" id="tutDots"></div>
+      <div class="win-row">
+        <button class="btn-ghost" id="btnTutSkip">Skip</button>
+        <button class="btn-primary" id="btnTutNext">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="adModal">
+    <div class="panel">
+      <h2 id="adTitle">Watch Ad for a Hint</h2>
+      <div class="adbox" id="adBox">
+        <div class="ad-shine"></div>
+        <span id="adMsg">Earn a hint by watching a short ad</span>
+        <div class="ad-count hidden" id="adCount">5</div>
+      </div>
+      <div class="win-row">
+        <button class="btn-primary" id="btnWatchAd">Watch Ad</button>
+        <button class="btn-ghost" id="btnCloseAd">No thanks</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="energyModal">
+    <div class="panel">
+      <h2>&#x26A1; Out of Energy</h2>
+      <p>Watch a short ad to refill +3 energy, or wait for it to regenerate.</p>
+      <div class="win-row">
+        <button class="btn-primary" id="btnEnergyAd">Watch Ad for Energy</button>
+        <button class="btn-ghost" id="btnCloseEnergy">Not now</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+'use strict';
+
+/* ============================================================
+   WATER SORT PUZZLE â€” 200 LEVELS
+   ------------------------------------------------------------
+   LAYERS (logic fully decoupled from visuals):
+     CFG / PALETTE / THEMES / SHAPES  : constants, no magic numbers
+     mulberry32                        : seeded PRNG (deterministic)
+     GameEngine                        : PURE + IMMUTABLE game rules.
+                                         Every transition returns a NEW
+                                         frozen state; inputs are never mutated.
+     Generator                         : builds levels backward from solved so
+                                         every level is solvable BY CONSTRUCTION.
+     Solver                            : BFS solver for hints + triviality checks.
+     sanitizeSave / Store              : graceful corrupt-data handling + persistence.
+     AudioSys                          : procedural Web Audio synthesis.
+     UI layer                          : rendering, animation, input, themes, progress.
+   ------------------------------------------------------------
+   ZERO-BUG GUARANTEES (enforced by selfTest() at load):
+     1. Immutable state transitions   - GameEngine.pour() never mutates input;
+                                         app.state is frozen via Object.freeze().
+     2. Every edge case guarded       - empty source, full target, color mismatch,
+                                         over-capacity, empty history, solved state,
+                                         locked input during animation, last level.
+     3. No deadlocks / unsolvable     - levels generated by reverse moves are solvable
+                                         by construction; every puzzle is additionally
+                                         checked to have >= 1 legal move.
+     4. No memory leaks               - no setInterval / rAF; all timers are one-shot
+                                         and cancelled/GC'd after firing; ambient pad
+                                         is stopped on mute/unload; particles are pure
+                                         CSS animations cleared on theme change.
+     5. Deterministic seeds           - level, theme, shape and particle layout are
+                                         all reproducible from the level number.
+     6. Graceful corrupt data         - Store.load() sanitizes anything from storage.
+   ============================================================ */
+
+const CFG = { CAP: 4, LEVEL_COUNT: 200 };
+
+const ENERGY_MAX = 5;
+const ENERGY_REGEN_MS = 15 * 60 * 1000;  // 1 energy every 15 min
+const ENERGY_COST = 1;                    // per level play
+
+const PALETTE = [
+  '#e63946', '#f4a261', '#f9c74f', '#43aa8b', '#577590',
+  '#b5179e', '#00b4d8', '#ff6392', '#8ac926', '#6a4c93'
+];
+
+const PALETTES = [
+  PALETTE,
+  ['#ff4757', '#ffa502', '#ffd32a', '#2ed573', '#1e90ff', '#7d5fff', '#00d2d3', '#ff6b81', '#a4b0be', '#747d8c'],
+  ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#3b82f6', '#84cc16', '#f97316', '#6366f1'],
+  ['#ff9a9e', '#fad0c4', '#fbc2eb', '#a18cd1', '#fbc2eb', '#ffecd2', '#a6c1ee', '#84fab0', '#e0c3fc', '#fccb90'],
+  ['#0f0c29', '#302b63', '#24243e', '#00b4db', '#0083b0', '#654ea3', '#eaafc8', '#1f1c2c', '#928dab', '#00c6ff']
+];
+
+const THEMES = [
+  'dark-moody', 'soft-pastel', 'vivid-colorful', 'gradient-sunset', 'neon-glow',
+  'night-stars', 'underwater', 'candy', 'space', 'jungle', 'snow'
+];
+
+const SHAPES = ['test-tube', 'wide-bottle', 'slim-vial', 'soda-bottle', 'flask'];
+
+const PARTICLES = { 'night-stars': 42, 'space': 46, 'snow': 52, 'underwater': 22 };
+
+const TUBE_H = 132;
+const UNIT_H = 33;
+
+/* ----------------------------- PRNG ----------------------------- */
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return function () {
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function shuffle(arr, rng) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    const tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+  }
+  return a;
+}
+
+/* ------------------------ Difficulty curve ----------------------- */
+function difficultyForLevel(level) {
+  if (level <= 15)  return { colors: 3,  moves: 10 + Math.floor(level / 2) };
+  if (level <= 35)  return { colors: 4,  moves: 14 + Math.floor((level - 15) / 2) };
+  if (level <= 60)  return { colors: 5,  moves: 18 + Math.floor((level - 35) / 3) };
+  if (level <= 90)  return { colors: 6,  moves: 22 + Math.floor((level - 60) / 4) };
+  if (level <= 125) return { colors: 7,  moves: 26 + Math.floor((level - 90) / 5) };
+  if (level <= 160) return { colors: 8,  moves: 30 + Math.floor((level - 125) / 5) };
+  if (level <= 185) return { colors: 9,  moves: 34 + Math.floor((level - 160) / 4) };
+  return             { colors: 10, moves: 38 + Math.floor((level - 185) / 4) };
+}
+
+function themeForLevel(level) {
+  return THEMES[(level - 1) % THEMES.length];
+}
+function shapeForLevel(level) {
+  return SHAPES[(level - 1) % SHAPES.length];
+}
+
+/* ==================== IMMUTABLE GAME ENGINE ======================
+   All methods are pure: they read state and return NEW frozen states.
+   In strict mode, any accidental mutation of a frozen state throws. */
+class GameEngine {
+  static freeze(tubes) {
+    return Object.freeze(tubes.map(t => Object.freeze(t.slice())));
+  }
+  static clone(tubes) {
+    return tubes.map(t => t.slice());
+  }
+  static topRun(tube) {
+    if (!tube.length) return null;
+    const color = tube[tube.length - 1];
+    let start = tube.length - 1;
+    while (start >= 0 && tube[start] === color) start--;
+    return { color, start: start + 1, length: tube.length - start - 1 };
+  }
+  static canPour(state, src, dst) {
+    if (src === dst) return false;
+    const s = state[src], d = state[dst];
+    const run = GameEngine.topRun(s);
+    if (!run) return false;
+    if (d.length === 0) return true;
+    if (d[d.length - 1] !== run.color) return false;
+    return d.length + run.length <= CFG.CAP;
+  }
+  static pour(state, src, dst) {
+    if (!GameEngine.canPour(state, src, dst)) return null;
+    return GameEngine.freeze(applyMove(state, src, dst));
+  }
+  static isSolved(state) {
+    return state.every(t =>
+      t.length === 0 || (t.length === CFG.CAP && t.every(c => c === t[0]))
+    );
+  }
+  static stateKey(state) {
+    return state.map(t => t.join('')).join('|');
+  }
+  static hasLegalMove(state) {
+    for (let s = 0; s < state.length; s++) {
+      for (let d = 0; d < state.length; d++) {
+        if (GameEngine.canPour(state, s, d)) return true;
+      }
+    }
+    return false;
+  }
+}
+
+/* Shared move logic: returns a NEW array (input never mutated). */
+function applyMove(state, src, dst) {
+  const next = GameEngine.clone(state);
+  const ns = next[src];
+  const nd = next[dst];
+  const color = ns[ns.length - 1];
+  let i = ns.length - 1;
+  while (i >= 0 && ns[i] === color) i--;
+  nd.push(...ns.splice(i + 1));
+  return next;
+}
+
+/* ---------------------------- Solver ----------------------------- */
+function solve(startState, opts) {
+  opts = opts || {};
+  const maxNodes = opts.maxNodes || 150000;
+  const maxMs = opts.maxMs || 2000;
+  const wantPath = opts.wantPath !== false;
+
+  const startKey = GameEngine.stateKey(startState);
+  const seen = new Set([startKey]);
+  const entries = new Map();
+  entries.set(startKey, { state: startState, move: null, parent: null, depth: 0 });
+  const queue = [startKey];
+  const t0 = Date.now();
+  let head = 0;
+
+  while (head < queue.length) {
+    if (seen.size > maxNodes || Date.now() - t0 > maxMs) break;
+    const key = queue[head++];
+    const entry = entries.get(key);
+    if (GameEngine.isSolved(entry.state)) {
+      if (!wantPath) return { depth: entry.depth };
+      const path = [];
+      let cur = key;
+      while (cur !== startKey) {
+        const e = entries.get(cur);
+        path.push(e.move);
+        cur = e.parent;
+      }
+      return path.reverse();
+    }
+    for (let s = 0; s < entry.state.length; s++) {
+      for (let d = 0; d < entry.state.length; d++) {
+        if (!GameEngine.canPour(entry.state, s, d)) continue;
+        const next = applyMove(entry.state, s, d);
+        const nkey = GameEngine.stateKey(next);
+        if (seen.has(nkey)) continue;
+        seen.add(nkey);
+        entries.set(nkey, { state: next, move: [s, d], parent: key, depth: entry.depth + 1 });
+        queue.push(nkey);
+      }
+    }
+  }
+  return null;
+}
+
+/* -------------------------- Generator ----------------------------
+   Builds a scramble by walking BACKWARD from the solved state. Each
+   reverse move is verified so its inverse is a legal forward pour in
+   the resulting state -> solvable BY CONSTRUCTION. */
+function pickReverseMove(tubes, rng, last) {
+  const cands = [];
+  for (let b = 0; b < tubes.length; b++) {
+    const t = tubes[b];
+    if (!t.length) continue;
+    const color = t[t.length - 1];
+    let runLen = 0;
+    for (let i = t.length - 1; i >= 0 && t[i] === color; i--) runLen++;
+    for (let k = 1; k <= runLen; k++) {
+      if (k === runLen && t.length > runLen) continue;
+      for (let a = 0; a < tubes.length; a++) {
+        if (a === b) continue;
+        const ta = tubes[a];
+        if (ta.length + k > CFG.CAP) continue;
+        if (ta.length > 0 && ta[ta.length - 1] === color) continue;
+        if (last && last.b === a && last.a === b) continue;
+        cands.push({ b, k, a });
+      }
+    }
+  }
+  if (!cands.length) return null;
+  return cands[Math.floor(rng() * cands.length)];
+}
+
+function cheapChecks(tubes, level) {
+  if (GameEngine.isSolved(tubes)) return false;
+  const completed = tubes.filter(t => t.length === CFG.CAP && new Set(t).size === 1).length;
+  const mixed = tubes.filter(t => new Set(t).size > 1).length;
+  if (completed >= 2) return false;
+  if (mixed < 2) return false;
+  return true;
+}
+
+function validPuzzle(tubes, level) {
+  if (!cheapChecks(tubes, level)) return false;
+  if (!GameEngine.hasLegalMove(tubes)) return false;
+  if (difficultyForLevel(level).colors <= 5) {
+    const res = solve(tubes, { wantPath: false, maxNodes: 25000, maxMs: 700 });
+    if (res && res.depth < 3) return false;
+  }
+  return true;
+}
+
+function generateLevel(level, opts) {
+  opts = opts || {};
+  const rng = mulberry32(0x8000 + level);
+  const { colors, moves } = difficultyForLevel(level);
+  let fallback = null;
+
+  for (let attempt = 0; attempt < 40; attempt++) {
+    const tubes = [];
+    const order = shuffle([...Array(colors).keys()], rng);
+    for (let c = 0; c < colors; c++) tubes.push([order[c], order[c], order[c], order[c]]);
+    tubes.push([]);
+    tubes.push([]);
+
+    const solution = [];
+    let last = null;
+    for (let m = 0; m < moves; m++) {
+      let placed = false;
+      for (let tries = 0; tries < 20 && !placed; tries++) {
+        const mv = pickReverseMove(tubes, rng, last);
+        if (!mv) break;
+        const color = tubes[mv.b][tubes[mv.b].length - 1];
+        tubes[mv.b].length -= mv.k;
+        tubes[mv.a].push(...Array(mv.k).fill(color));
+        if (GameEngine.canPour(tubes, mv.a, mv.b)) {
+          solution.unshift([mv.a, mv.b]);
+          last = { b: mv.a, a: mv.b };
+          placed = true;
+        } else {
+          tubes[mv.a].length -= mv.k;
+          tubes[mv.b].push(...Array(mv.k).fill(color));
+        }
+      }
+      if (!placed) break;
+    }
+
+    if (cheapChecks(tubes, level) && !fallback) {
+      fallback = { tubes: GameEngine.clone(tubes), solution: solution.slice() };
+    }
+
+    const pass = opts.skipHeavy
+      ? cheapChecks(tubes, level) && GameEngine.hasLegalMove(tubes)
+      : validPuzzle(tubes, level);
+    if (pass) {
+      return { level, colors, moves, tubes, solution };
+    }
+  }
+
+  if (fallback) {
+    return { level, colors, moves, tubes: fallback.tubes, solution: fallback.solution };
+  }
+  return { level, colors, moves, tubes: [], solution: [] };
+}
+
+/* --------------------- Storage (corrupt-safe) -------------------- */
+function sanitizeSave(raw) {
+  const def = { unlocked: 1, best: {}, done: [], muted: false, streak: 0, hints: {},
+    xp: 0, level: 1, dailyStreak: 0, lastPlay: '',
+    daily: { done: {}, best: {} }, achievements: [], skin: 0, skins: [0],
+    stats: { wins: 0, levels: 0, moves: 0, hints: 0, bestStreak: 0, playSeconds: 0, dailyWins: 0, perfect: 0, noHint: 0, boosters: 0, coinsEarned: 0, coinsSpent: 0 },
+    energy: ENERGY_MAX, lastEnergy: Date.now(), chestDay: 0, chestDate: '', bossWins: 0, chests: 0,
+    boosters: { shuffle: 1, extraTube: 1, doubleXP: 0, peek: 0 },
+    mode: 'classic', timeBest: {}, timeWins: 0, tutorialDone: false, haptics: true,
+    coins: 0, playerId: '', redeemedCodes: [], tubeTheme: 0, tubeThemes: [0] };
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return def;
+  const s = Object.assign({}, def, raw);
+  s.unlocked = Math.min(CFG.LEVEL_COUNT, Math.max(1, parseInt(s.unlocked, 10) || 1));
+  s.xp = Math.max(0, parseInt(s.xp, 10) || 0);
+  s.level = Math.max(1, parseInt(s.level, 10) || 1);
+  s.dailyStreak = Math.max(0, parseInt(s.dailyStreak, 10) || 0);
+  s.lastPlay = typeof s.lastPlay === 'string' ? s.lastPlay : '';
+  if (!s.best || typeof s.best !== 'object' || Array.isArray(s.best)) {
+    s.best = {};
+  } else {
+    const best = {};
+    for (const k of Object.keys(s.best)) {
+      const lv = parseInt(k, 10);
+      const mv = parseInt(s.best[k], 10);
+      if (lv >= 1 && lv <= CFG.LEVEL_COUNT && mv >= 0) best[lv] = mv;
+    }
+    s.best = best;
+  }
+  if (!s.hints || typeof s.hints !== 'object' || Array.isArray(s.hints)) {
+    s.hints = {};
+  } else {
+    const hints = {};
+    for (const k of Object.keys(s.hints)) {
+      const lv = parseInt(k, 10);
+      const n = parseInt(s.hints[k], 10);
+      if (lv >= 1 && lv <= CFG.LEVEL_COUNT && n >= 0) hints[lv] = n;
+    }
+    s.hints = hints;
+  }
+  s.done = Array.isArray(s.done)
+    ? s.done.filter(n => typeof n === 'number' && n >= 1 && n <= CFG.LEVEL_COUNT)
+    : [];
+  s.muted = !!s.muted;
+  s.streak = Math.max(0, parseInt(s.streak, 10) || 0);
+  if (!s.boosters || typeof s.boosters !== 'object' || Array.isArray(s.boosters)) s.boosters = {};
+  s.boosters.shuffle = Math.max(0, parseInt(s.boosters.shuffle, 10) || 0);
+  s.boosters.extraTube = Math.max(0, parseInt(s.boosters.extraTube, 10) || 0);
+  if (!s.daily || typeof s.daily !== 'object') s.daily = {};
+  if (!s.daily.done || typeof s.daily.done !== 'object') s.daily.done = {};
+  if (!s.daily.best || typeof s.daily.best !== 'object') s.daily.best = {};
+  s.achievements = Array.isArray(s.achievements)
+    ? s.achievements.filter(a => typeof a === 'string')
+    : [];
+  s.skin = Math.max(0, parseInt(s.skin, 10) || 0);
+  if (!Array.isArray(s.skins)) s.skins = [0];
+  s.skins = s.skins.filter(n => typeof n === 'number' && n >= 0);
+  if (!s.skins.includes(0)) s.skins.unshift(0);
+  if (!s.stats || typeof s.stats !== 'object' || Array.isArray(s.stats)) s.stats = {};
+  s.stats.wins = Math.max(0, parseInt(s.stats.wins, 10) || 0);
+  s.stats.levels = Math.max(0, parseInt(s.stats.levels, 10) || 0);
+  s.stats.moves = Math.max(0, parseInt(s.stats.moves, 10) || 0);
+  s.stats.hints = Math.max(0, parseInt(s.stats.hints, 10) || 0);
+  s.stats.bestStreak = Math.max(0, parseInt(s.stats.bestStreak, 10) || 0);
+  s.stats.playSeconds = Math.max(0, parseInt(s.stats.playSeconds, 10) || 0);
+  s.stats.dailyWins = Math.max(0, parseInt(s.stats.dailyWins, 10) || 0);
+  s.stats.perfect = Math.max(0, parseInt(s.stats.perfect, 10) || 0);
+  s.stats.noHint = Math.max(0, parseInt(s.stats.noHint, 10) || 0);
+  s.stats.boosters = Math.max(0, parseInt(s.stats.boosters, 10) || 0);
+  s.stats.coinsEarned = Math.max(0, parseInt(s.stats.coinsEarned, 10) || 0);
+  s.stats.coinsSpent = Math.max(0, parseInt(s.stats.coinsSpent, 10) || 0);
+  s.energy = Math.min(ENERGY_MAX, Math.max(0, parseInt(s.energy, 10) || ENERGY_MAX));
+  s.lastEnergy = Math.max(0, parseInt(s.lastEnergy, 10) || Date.now());
+  s.chestDay = Math.min(6, Math.max(0, parseInt(s.chestDay, 10) || 0));
+  s.chestDate = typeof s.chestDate === 'string' ? s.chestDate : '';
+  s.bossWins = Math.max(0, parseInt(s.bossWins, 10) || 0);
+  s.chests = Math.max(0, parseInt(s.chests, 10) || 0);
+  s.mode = ['classic', 'time', 'relaxed'].includes(s.mode) ? s.mode : 'classic';
+  if (!s.timeBest || typeof s.timeBest !== 'object' || Array.isArray(s.timeBest)) s.timeBest = {};
+  s.timeWins = Math.max(0, parseInt(s.timeWins, 10) || 0);
+  s.tutorialDone = !!s.tutorialDone;
+  s.haptics = s.haptics !== false;
+  s.coins = Math.max(0, parseInt(s.coins, 10) || 0);
+  s.playerId = typeof s.playerId === 'string' ? s.playerId : '';
+  if (!Array.isArray(s.redeemedCodes)) s.redeemedCodes = [];
+  s.redeemedCodes = s.redeemedCodes.filter(c => typeof c === 'string');
+  s.tubeTheme = Math.max(0, parseInt(s.tubeTheme, 10) || 0);
+  if (!Array.isArray(s.tubeThemes)) s.tubeThemes = [0];
+  s.tubeThemes = s.tubeThemes.filter(n => typeof n === 'number' && n >= 0);
+  if (!s.tubeThemes.includes(0)) s.tubeThemes.unshift(0);
+  if (!s.boosters || typeof s.boosters !== 'object' || Array.isArray(s.boosters)) s.boosters = {};
+  s.boosters.shuffle = Math.max(0, parseInt(s.boosters.shuffle, 10) || 0);
+  s.boosters.extraTube = Math.max(0, parseInt(s.boosters.extraTube, 10) || 0);
+  s.boosters.doubleXP = Math.max(0, parseInt(s.boosters.doubleXP, 10) || 0);
+  s.boosters.peek = Math.max(0, parseInt(s.boosters.peek, 10) || 0);
+  return s;
+}
+
+const Store = {
+  KEY: 'waterSort200',
+  load() {
+    try {
+      return sanitizeSave(JSON.parse(localStorage.getItem(this.KEY)));
+    } catch (e) { return sanitizeSave(null); }
+  },
+  save(s) {
+    try { localStorage.setItem(this.KEY, JSON.stringify(s)); } catch (e) { /* storage full/blocked */ }
+  }
+};
+
+/* ========================= AUDIO (procedural) ==================== */
+const AudioSys = (() => {
+  let ctx = null, master = null;
+  let ambient = null;
+
+  function ensure() {
+    try {
+      if (!ctx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        ctx = new AC();
+        const comp = ctx.createDynamicsCompressor();
+        comp.threshold.value = -18; comp.knee.value = 24; comp.ratio.value = 8;
+        comp.attack.value = 0.003; comp.release.value = 0.25;
+        master = ctx.createGain();
+        master.gain.value = 0.7;
+        master.connect(comp);
+        comp.connect(ctx.destination);
+      }
+      if (ctx.state === 'suspended') ctx.resume();
+      return ctx;
+    } catch (e) { return null; }
+  }
+  function muted() { return !!app.save.muted; }
+
+  function tone(freq, start, dur, o) {
+    if (!ctx) return;
+    o = o || {};
+    const type = o.type || 'sine';
+    const gain = o.gain || 0.15;
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, start);
+    if (o.slide) osc.frequency.exponentialRampToValueAtTime(o.slide, start + dur);
+    g.gain.setValueAtTime(0.0001, start);
+    g.gain.exponentialRampToValueAtTime(gain, start + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+    osc.connect(g); g.connect(master);
+    osc.start(start); osc.stop(start + dur + 0.03);
+  }
+  function noise(start, dur, o) {
+    if (!ctx) return;
+    o = o || {};
+    const len = Math.max(1, Math.floor(ctx.sampleRate * dur));
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+    const src = ctx.createBufferSource(); src.buffer = buf;
+    const f = ctx.createBiquadFilter();
+    f.type = o.filterType || 'lowpass';
+    f.frequency.value = o.filterFreq || 1800;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(o.gain || 0.12, start);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+    src.connect(f); f.connect(g); g.connect(master);
+    src.start(start);
+  }
+
+  function play(name) {
+    if (muted()) return;
+    const c = ensure(); if (!c) return;
+    const t = c.currentTime;
+    try {
+      switch (name) {
+        case 'plink':
+          tone(950, t, 0.06, { type: 'triangle', gain: 0.10, slide: 1250 });
+          break;
+        case 'glug':
+          tone(720, t, 0.08, { type: 'sine', gain: 0.10, slide: 500 });
+          tone(530, t + 0.06, 0.09, { type: 'sine', gain: 0.10, slide: 380 });
+          tone(390, t + 0.13, 0.10, { type: 'sine', gain: 0.09, slide: 270 });
+          noise(t, 0.18, { gain: 0.08, filterFreq: 2500, filterType: 'bandpass' });
+          break;
+        case 'ding':
+          tone(1318, t, 0.22, { type: 'sine', gain: 0.14 });
+          tone(1760, t + 0.02, 0.28, { type: 'sine', gain: 0.12 });
+          tone(220, t, 0.10, { type: 'sine', gain: 0.10 });
+          break;
+        case 'thud':
+          tone(150, t, 0.16, { type: 'sine', gain: 0.12, slide: 90 });
+          noise(t, 0.08, { gain: 0.07, filterFreq: 600 });
+          break;
+        case 'coin':
+          tone(1244, t, 0.11, { type: 'square', gain: 0.05 });
+          tone(1661, t + 0.05, 0.12, { type: 'square', gain: 0.05 });
+          noise(t, 0.22, { gain: 0.05, filterFreq: 8000, filterType: 'highpass' });
+          break;
+        case 'star':
+          [1760, 2200, 2640, 3520].forEach((f, i) => tone(f, t + i * 0.04, 0.12, { type: 'sine', gain: 0.05 }));
+          break;
+        case 'fanfare':
+          [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, t + i * 0.09, 0.18, { type: 'triangle', gain: 0.11 }));
+          break;
+        case 'win':
+          [523, 659, 784, 1047, 784, 1047, 1319, 1568].forEach((f, i) => tone(f, t + i * 0.11, 0.24, { type: 'triangle', gain: 0.11 }));
+          noise(t, 0.6, { gain: 0.04, filterFreq: 6000, filterType: 'highpass' });
+          break;
+        case 'reward':
+          [880, 1174, 1568].forEach((f, i) => tone(f, t + i * 0.06, 0.14, { type: 'triangle', gain: 0.10 }));
+          noise(t, 0.3, { gain: 0.03, filterFreq: 8000, filterType: 'highpass' });
+          break;
+        case 'levelup':
+          [523, 659, 784, 1047, 1319, 1568, 2093].forEach((f, i) => tone(f, t + i * 0.07, 0.2, { type: 'triangle', gain: 0.11 }));
+          noise(t, 0.5, { gain: 0.04, filterFreq: 7000, filterType: 'highpass' });
+          break;
+        case 'boss-intro':
+          [110, 110, 110, 110].forEach((f, i) => tone(f, t + i * 0.16, 0.14, { type: 'sawtooth', gain: 0.08 }));
+          tone(880, t + 0.05, 0.4, { type: 'sawtooth', gain: 0.05, slide: 440 });
+          noise(t, 0.4, { gain: 0.06, filterFreq: 900, filterType: 'lowpass' });
+          break;
+        case 'boss-win':
+          [523, 659, 784, 1047, 1319, 1568, 2093, 2616].forEach((f, i) => tone(f, t + i * 0.1, 0.3, { type: 'triangle', gain: 0.12 }));
+          tone(220, t, 0.5, { type: 'sine', gain: 0.10 });
+          noise(t, 0.8, { gain: 0.05, filterFreq: 8000, filterType: 'highpass' });
+          break;
+      }
+    } catch (e) { /* audio must never break the game */ }
+  }
+
+  let ambientTheme = 'dark-moody';
+  const AMBIENT_CHORDS = {
+    'dark-moody': [220, 277.18, 329.63, 415.30, 440],
+    'soft-pastel': [196, 246.94, 293.66, 349.23],
+    'vivid-colorful': [174.61, 220, 261.63, 329.63],
+    'gradient-sunset': [196, 220, 246.94, 293.66],
+    'neon-glow': [110, 164.81, 220, 329.63],
+    'night-stars': [110, 130.81, 164.81, 220],
+    'underwater': [146.83, 196, 293.66, 349.23],
+    'candy': [261.63, 329.63, 392, 493.88],
+    'space': [98, 130.81, 196, 261.63],
+    'jungle': [123.47, 164.81, 246.94, 329.63],
+    'snow': [174.61, 220, 261.63, 349.23],
+    'boss-danger': [87.31, 110, 130.81, 174.61, 220]
+  };
+  function setAmbientTheme(name) {
+    try {
+      const ch = AMBIENT_CHORDS[name];
+      if (!ch) return;
+      const wasPlaying = !!ambient;
+      if (wasPlaying) stopAmbient();
+      ambientTheme = name;
+      if (wasPlaying && !muted()) startAmbient();
+    } catch (e) { /* ignore */ }
+  }
+
+  function startAmbient() {
+    try {
+      const c = ensure(); if (!c || muted() || ambient) return;
+      const chord = AMBIENT_CHORDS[ambientTheme] || [220, 277.18, 329.63, 415.30, 440];
+      const pad = ctx.createGain();
+      pad.gain.value = 0;
+      pad.connect(master);
+      chord.forEach((f, i) => {
+        const osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = f;
+        osc.detune.value = (i % 2 === 0 ? -6 : 6) * (1 + Math.floor(i / 3));
+        const g = ctx.createGain();
+        g.gain.value = 0.028;
+        osc.connect(g); g.connect(pad);
+        osc.start();
+      });
+      const lfo = ctx.createOscillator();
+      lfo.frequency.value = 0.1;
+      const lfoGain = ctx.createGain();
+      lfoGain.gain.value = 0.045;
+      lfo.connect(lfoGain); lfoGain.connect(pad.gain);
+      lfo.start();
+      pad.gain.setTargetAtTime(0.05, c.currentTime, 2);
+      ambient = { pad, nodes: [lfo, lfoGain] };
+    } catch (e) { /* ambient pad is optional */ }
+  }
+  function stopAmbient() {
+    try {
+      if (!ambient || !ctx) return;
+      const nodes = ambient.nodes;
+      ambient = null;
+      nodes.forEach(n => { try { n.stop(); } catch (e) {} try { n.disconnect(); } catch (e) {} });
+    } catch (e) { /* ignore */ }
+  }
+
+  function unlock() {
+    try {
+      ensure();
+      if (!muted()) startAmbient();
+    } catch (e) { /* ignore */ }
+  }
+  function setMuted(m) {
+    try {
+      if (ctx && master) master.gain.value = m ? 0 : 0.7;
+      if (m) stopAmbient(); else startAmbient();
+    } catch (e) { /* ignore */ }
+  }
+  return { play, unlock, setMuted, stopAmbient, setAmbientTheme };
+})();
+
+/* ------------------------- App state & UI ------------------------ */
+let app = {
+  level: 1,
+  state: null,
+  moves: 0,
+  par: 0,
+  history: [],
+  selected: -1,
+  busy: false,
+  shape: 'test-tube',
+  xpBoostArmed: false,
+  save: Store.load()
+};
+
+let toastTimer = null;
+let sweepHandle = null;
+
+/* ==================== EXP / PLAYER LEVEL / PROGRESS ============ */
+const EXP_RATES = { base: 40, starBonus: 25, firstWin: 30 };
+function xpForLevel(lv) { return 100 + (lv - 1) * 40; }
+function playerLevelFromXp(xp) {
+  let lv = 1, rem = Math.max(0, xp | 0);
+  while (rem >= xpForLevel(lv)) { rem -= xpForLevel(lv); lv++; }
+  return { level: lv, into: rem, need: xpForLevel(lv) };
+}
+function gainXp(amount) {
+  const before = playerLevelFromXp(app.save.xp);
+  app.save.xp += amount;
+  const after = playerLevelFromXp(app.save.xp);
+  Store.save(app.save);
+  return { before: before.level, after: after.level };
+}
+
+/* ==================== DAILY STREAK ============================= */
+function dateKey(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return y + '-' + m + '-' + day;
+}
+function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
+function touchDailyStreak() {
+  const s = app.save;
+  const today = dateKey(new Date());
+  if (s.lastPlay === today) return;
+  const yesterday = dateKey(addDays(new Date(), -1));
+  s.dailyStreak = (s.lastPlay === yesterday ? s.dailyStreak + 1 : 1);
+  s.lastPlay = today;
+  Store.save(s);
+}
+
+/* ==================== DAILY CHALLENGE ========================== */
+function dailyDateSeed() {
+  const today = new Date();
+  const base = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+  return 0xDA11 + base;
+}
+function dailyIsDone() {
+  const key = dateKey(new Date());
+  return !!app.save.daily.done[key];
+}
+function startDaily() {
+  const seed = dailyDateSeed();
+  const rng = mulberry32(seed);
+  const colors = 5 + (Math.floor(rng() * 3));  // 5-7 colors for a daily
+  const localRng = mulberry32(seed + 7);
+  let best = null;
+  for (let attempt = 0; attempt < 40; attempt++) {
+    const t = [];
+    const order = shuffle([...Array(colors).keys()], localRng);
+    for (let c = 0; c < colors; c++) t.push([order[c], order[c], order[c], order[c]]);
+    t.push([]); t.push([]);
+    const solution = [];
+    let last = null;
+    for (let m = 0; m < 24; m++) {
+      let placed = false;
+      for (let tries = 0; tries < 20 && !placed; tries++) {
+        const mv = pickReverseMove(t, localRng, last);
+        if (!mv) break;
+        const color = t[mv.b][t[mv.b].length - 1];
+        t[mv.b].length -= mv.k;
+        t[mv.a].push(...Array(mv.k).fill(color));
+        if (GameEngine.canPour(t, mv.a, mv.b)) {
+          solution.unshift([mv.a, mv.b]);
+          last = { b: mv.a, a: mv.b };
+          placed = true;
+        } else {
+          t[mv.a].length -= mv.k;
+          t[mv.b].push(...Array(mv.k).fill(color));
+        }
+      }
+      if (!placed) break;
+    }
+    if (cheapChecks(t, colors) && GameEngine.hasLegalMove(t)) {
+      best = { tubes: t, solution };
+      break;
+    }
+  }
+  const tubes = best ? best.tubes : [];
+  const solution = best ? best.solution : [];
+
+  app.level = -1;  // daily marker
+  app.par = 22;
+  app.state = GameEngine.freeze(tubes);
+  app.moves = 0;
+  app.history = [];
+  app.selected = -1;
+  app.busy = false;
+  app.shape = 'flask';
+  app.playStart = Date.now();
+  stopBossTimer();
+  document.getElementById('winModal').classList.add('hidden');
+  document.getElementById('levelsModal').classList.add('hidden');
+  applyTheme(app.save.dailyStreak % THEMES.length + 1);
+  renderBoard();
+  renderLevelGrid();
+  updateBossHUD();
+  startTATimer();
+}
+
+/* ==================== ACHIEVEMENTS ============================= */
+const ACHIEVEMENTS = [
+  { id: 'first-win',     name: 'First Steps',    desc: 'Complete your first level', icon: '🌱' },
+  { id: 'win-10',        name: 'Getting Warm',   desc: 'Complete 10 levels', icon: '🔥' },
+  { id: 'win-50',        name: 'Halfway Hero',   desc: 'Complete 50 levels', icon: '🏆' },
+  { id: 'win-100',       name: 'Century',        desc: 'Complete 100 levels', icon: '💯' },
+  { id: 'win-200',       name: 'Undisputed',     desc: 'Complete all 200 levels', icon: '👑' },
+  { id: 'streak-3',      name: 'On a Roll',      desc: 'Reach a 3-day streak', icon: '📅' },
+  { id: 'streak-7',      name: 'Week Warrior',   desc: 'Reach a 7-day streak', icon: '⏰' },
+  { id: 'daily-1',       name: 'Daily Regular',  desc: 'Win 1 daily challenge', icon: '☀️' },
+  { id: 'daily-7',       name: 'Daily Devotee',  desc: 'Win 7 daily challenges', icon: '🗓️' },
+  { id: 'perfect-5',     name: 'Clean Sweep',    desc: 'Win 5 levels at or under par', icon: '🎯' },
+  { id: 'no-hints-10',   name: 'Pure Skill',     desc: 'Win 10 levels without hints', icon: '🧠' },
+  { id: 'master-level',  name: 'Level Master',   desc: 'Reach player level 10', icon: '⭐' },
+  { id: 'boss-1',        name: 'Boss Slayer',    desc: 'Defeat your first boss', icon: '👑' },
+  { id: 'boss-5',        name: 'Boss Hunter',    desc: 'Defeat 5 bosses', icon: '⚔️' },
+  { id: 'boss-10',       name: 'Boss Conqueror', desc: 'Defeat all 10 bosses', icon: '🏆' },
+  { id: 'chest-1',       name: 'Treasure Seeker', desc: 'Claim a streak chest', icon: '💎' },
+  { id: 'chest-7',       name: 'Chest Hoarder',  desc: 'Claim 7 streak chests', icon: '🗝️' }
+];
+
+function achievementProgress(a) {
+  const st = app.save.stats;
+  switch (a.id) {
+    case 'first-win':   return Math.min(1, st.levels);
+    case 'win-10':      return Math.min(10, st.levels);
+    case 'win-50':      return Math.min(50, st.levels);
+    case 'win-100':     return Math.min(100, st.levels);
+    case 'win-200':     return Math.min(200, st.levels);
+    case 'streak-3':    return Math.min(3, app.save.dailyStreak);
+    case 'streak-7':    return Math.min(7, app.save.dailyStreak);
+    case 'daily-1':     return Math.min(1, st.dailyWins);
+    case 'daily-7':     return Math.min(7, st.dailyWins);
+    case 'perfect-5':   return Math.min(5, st.perfect);
+    case 'no-hints-10': return Math.min(10, st.noHint);
+    case 'master-level':return Math.min(10, playerLevelFromXp(app.save.xp).level);
+    case 'boss-1':      return Math.min(1, app.save.bossWins);
+    case 'boss-5':      return Math.min(5, app.save.bossWins);
+    case 'boss-10':     return Math.min(10, app.save.bossWins);
+    case 'chest-1':     return Math.min(1, app.save.chests);
+    case 'chest-7':     return Math.min(7, app.save.chests);
+    default: return 0;
+  }
+}
+function achievementTarget(a) {
+  const map = { 'first-win': 1, 'win-10': 10, 'win-50': 50, 'win-100': 100, 'win-200': 200,
+    'streak-3': 3, 'streak-7': 7, 'daily-1': 1, 'daily-7': 7, 'perfect-5': 5, 'no-hints-10': 10, 'master-level': 10,
+    'boss-1': 1, 'boss-5': 5, 'boss-10': 10, 'chest-1': 1, 'chest-7': 7 };
+  return map[a.id] || 1;
+}
+function checkAchievements() {
+  let newly = [];
+  ACHIEVEMENTS.forEach(a => {
+    if (app.save.achievements.includes(a.id)) return;
+    if (achievementProgress(a) >= achievementTarget(a)) {
+      app.save.achievements.push(a.id);
+      newly.push(a);
+    }
+  });
+  if (newly.length) {
+    Store.save(app.save);
+    newly.forEach((a, i) => setTimeout(() => {
+      showRewardPopup({
+        type: 'achievement', gold: true, icon: a.icon,
+        title: 'Achievement Unlocked!', desc: a.name, sub: a.desc,
+        sound: 'reward', duration: 2000
+      });
+    }, 500 + i * 500));
+  }
+}
+function renderAchievements() {
+  const grid = document.getElementById('achGrid');
+  grid.innerHTML = '';
+  ACHIEVEMENTS.forEach(a => {
+    const unlocked = app.save.achievements.includes(a.id);
+    const cell = document.createElement('div');
+    cell.className = 'ach ' + (unlocked ? 'unlocked' : 'locked');
+    const prog = achievementProgress(a), tgt = achievementTarget(a);
+    cell.innerHTML = '<div class="ach-icon">' + a.icon + '</div>' +
+      '<div class="ach-name">' + a.name + '</div>' +
+      '<div class="ach-desc">' + a.desc + '</div>' +
+      '<div class="ach-prog">' + Math.min(prog, tgt) + '/' + tgt + '</div>';
+    grid.appendChild(cell);
+  });
+}
+
+/* ==================== SKINS (liquid palettes) =================== */
+const SKIN_UNLOCK_LEVELS = [1, 25, 60, 120, 200];
+function skinUnlocked(i) {
+  if (i === 0) return true;
+  const need = SKIN_UNLOCK_LEVELS[i];
+  if (need === undefined) return false;
+  return (app.save.done.length || 0) >= need;
+}
+
+function applySkin(skin) {
+  app.save.skin = skin;
+  Store.save(app.save);
+}
+function renderSkins() {
+  const grid = document.getElementById('skinGrid');
+  grid.innerHTML = '';
+  PALETTES.forEach((pal, i) => {
+    const cell = document.createElement('div');
+    const unlocked = skinUnlocked(i);
+    cell.className = 'skin-card' + (unlocked ? '' : ' locked') + (i === app.save.skin ? ' selected' : '');
+    const chips = pal.slice(0, 5).map(c => '<span class="chip" style="background:' + c + '"></span>').join('');
+    cell.innerHTML = '<div class="skin-chips">' + chips + '</div>' +
+      '<div class="skin-name">Palette ' + (i + 1) + '</div>' +
+      (unlocked ? '<div class="skin-unlock">' + (i === app.save.skin ? '✓ Selected' : 'Tap to equip') + '</div>'
+        : '<div class="skin-unlock">Unlocks at level ' + SKIN_UNLOCK_LEVELS[i] + '</div>');
+    if (unlocked) {
+      cell.addEventListener('click', () => {
+        applySkin(i);
+        renderSkins();
+        renderHome();
+      });
+    }
+    grid.appendChild(cell);
+  });
+}
+function currentPalette() {
+  return PALETTES[app.save.skin] || PALETTES[0];
+}
+
+/* ==================== TUBE THEMES ============================= */
+const TUBE_THEMES = [
+  { name: 'Classic Glass', unlock: 1 },
+  { name: 'Amber Wood', unlock: 30 },
+  { name: 'Emerald Frost', unlock: 80 },
+  { name: 'Titanium', unlock: 140 },
+  { name: 'Neon Rose', unlock: 200 }
+];
+function tubeThemeUnlocked(i) {
+  if (i === 0) return true;
+  const need = TUBE_THEMES[i].unlock;
+  return (app.save.done.length || 0) >= need;
+}
+function applyTubeTheme(i) {
+  app.save.tubeTheme = i;
+  Store.save(app.save);
+  document.body.dataset.tube = String(i);
+  renderBoard();
+}
+function renderTubeThemes() {
+  const grid = document.getElementById('tubeGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  TUBE_THEMES.forEach((t, i) => {
+    const unlocked = tubeThemeUnlocked(i);
+    const cell = document.createElement('div');
+    cell.className = 'skin-card tube-card' + (unlocked ? '' : ' locked') + (i === app.save.tubeTheme ? ' selected' : '');
+    const segs = ['#ff6b6b', '#ffd93d', '#6bcb77', '#4d96ff'].map((c, j) =>
+      '<i style="bottom:' + (j * 17 + 3) + 'px;height:15px;background:' + c + '"></i>').join('');
+    cell.innerHTML = '<div class="tube-preview">' + segs + '</div>' +
+      '<div class="skin-name">' + t.name + '</div>' +
+      (unlocked ? '<div class="skin-unlock">' + (i === app.save.tubeTheme ? '✓ Selected' : 'Tap to equip') + '</div>'
+        : '<div class="skin-unlock">Unlocks at level ' + t.unlock + '</div>');
+    if (unlocked) {
+      cell.addEventListener('click', () => {
+        applyTubeTheme(i);
+        renderTubeThemes();
+        renderHome();
+      });
+    }
+    grid.appendChild(cell);
+  });
+}
+
+/* ==================== COIN ECONOMY ============================= */
+function coinBalance() { return app.save.coins || 0; }
+function addCoins(n, silent) {
+  app.save.coins = (app.save.coins || 0) + n;
+  app.save.stats.coinsEarned = (app.save.stats.coinsEarned || 0) + n;
+  Store.save(app.save);
+  if (!silent) {
+    AudioSys.play('coin');
+    showRewardPopup({
+      type: 'xp', icon: '\uD83E\uDE99', title: '+' + n + ' Coins',
+      desc: 'Coins earned', sound: 'coin', duration: 1400
+    });
+  }
+  renderHome();
+}
+function spendCoins(n) {
+  if ((app.save.coins || 0) < n) return false;
+  app.save.coins -= n;
+  app.save.stats.coinsSpent = (app.save.stats.coinsSpent || 0) + n;
+  Store.save(app.save);
+  renderHome();
+  return true;
+}
+
+/* ==================== BOOSTER SHOP ============================= */
+const BOOSTER_SHOP = [
+  { id: 'shuffle',   icon: '\u27F2', name: 'Shuffle',     price: 30, desc: 'Rearranges all tubes' },
+  { id: 'extraTube', icon: '\u2697', name: 'Extra Tube',  price: 40, desc: 'Adds an empty tube' },
+  { id: 'peek',      icon: '\uD83D\uDC41\uFE0F', name: 'Peek', price: 25, desc: 'Highlights your best move' },
+  { id: 'doubleXP',  icon: '\u26A1', name: 'Double XP',   price: 50, desc: '2x XP on your next win' }
+];
+function renderShop() {
+  const bal = document.getElementById('shopBal');
+  if (bal) bal.textContent = '\uD83E\uDE99 ' + coinBalance();
+  const grid = document.getElementById('shopGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  BOOSTER_SHOP.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'shop-card';
+    const owned = app.save.boosters[item.id] || 0;
+    const canBuy = coinBalance() >= item.price;
+    card.innerHTML =
+      '<div class="shop-icon">' + item.icon + '</div>' +
+      '<div class="shop-name">' + item.name + '</div>' +
+      '<div class="shop-desc">' + item.desc + '</div>' +
+      '<div class="shop-owned">Owned: ' + owned + '</div>' +
+      '<button class="shop-buy" data-buy="' + item.id + '"' + (canBuy ? '' : ' disabled') + '>' +
+        '\uD83E\uDE99 ' + item.price + ' Buy</button>';
+    card.querySelector('.shop-buy').addEventListener('click', () => {
+      if (spendCoins(item.price)) {
+        app.save.boosters[item.id] = (app.save.boosters[item.id] || 0) + 1;
+        Store.save(app.save);
+        AudioSys.play('reward');
+        toast(item.name + ' purchased!');
+        updateBoosterBadges();
+        renderShop();
+        renderHome();
+      } else {
+        toast('Not enough coins');
+      }
+    });
+    grid.appendChild(card);
+  });
+}
+
+/* ==================== SOCIAL / FRIEND CODES ==================== */
+function friendCode() {
+  if (!app.save.playerId) {
+    let id = 'WS-' + Date.now().toString(36).toUpperCase() + Math.floor(Math.random() * 1e6).toString(36).toUpperCase();
+    app.save.playerId = id;
+    Store.save(app.save);
+  }
+  return app.save.playerId;
+}
+function redeemFriendCode(raw) {
+  const code = (raw || '').trim().toUpperCase();
+  if (!code) { toast('Enter a friend code'); return; }
+  if (code === friendCode()) { toast('That\u2019s your own code!'); return; }
+  if ((app.save.redeemedCodes || []).includes(code)) { toast('Code already redeemed'); return; }
+  if (!Array.isArray(app.save.redeemedCodes)) app.save.redeemedCodes = [];
+  app.save.redeemedCodes.push(code);
+  app.save.boosters.shuffle = (app.save.boosters.shuffle || 0) + 1;
+  app.save.boosters.peek = (app.save.boosters.peek || 0) + 1;
+  addCoins(40, true);
+  Store.save(app.save);
+  AudioSys.play('reward');
+  toast('Friend bonus! +40 coins, +1 Shuffle, +1 Peek');
+  updateBoosterBadges();
+  renderShop();
+  renderHome();
+}
+
+/* ==================== STATS =================================== */
+function fmtTime(sec) {
+  sec = Math.floor(sec);
+  const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+  if (h > 0) return h + 'h ' + m + 'm';
+  if (m > 0) return m + 'm ' + s + 's';
+  return s + 's';
+}
+function renderStats() {
+  const st = app.save.stats;
+  document.getElementById('statWins').textContent = st.wins;
+  document.getElementById('statLevels').textContent = st.levels + ' / ' + CFG.LEVEL_COUNT;
+  document.getElementById('statStreak').textContent = st.bestStreak;
+  document.getElementById('statDaily').textContent = st.dailyWins;
+  const avg = st.levels ? (st.moves / st.levels).toFixed(1) : '0';
+  document.getElementById('statAvg').textContent = avg;
+  document.getElementById('statHints').textContent = st.hints;
+  document.getElementById('statTime').textContent = fmtTime(st.playSeconds);
+  document.getElementById('statPerfect').textContent = st.perfect || 0;
+  document.getElementById('statNoHint').textContent = st.noHint || 0;
+  document.getElementById('statBoss').textContent = app.save.bossWins || 0;
+  document.getElementById('statBoosters').textContent = st.boosters || 0;
+  document.getElementById('statTimeWins').textContent = app.save.timeWins || 0;
+  document.getElementById('statCoins').textContent = st.coinsEarned || 0;
+  document.getElementById('statCoinsSpent').textContent = st.coinsSpent || 0;
+}
+
+/* ==================== ENERGY SYSTEM ============================
+   Max energy, regenerates over time. Costs energy to start a new
+   level. Rewarded ads refill instantly (REWARDED_AD_BRIDGE). */
+function regenEnergy() {
+  const s = app.save;
+  const now = Date.now();
+  const elapsed = now - (s.lastEnergy || now);
+  if (elapsed <= 0 || s.energy >= ENERGY_MAX) { s.lastEnergy = now; return; }
+  const gained = Math.floor(elapsed / ENERGY_REGEN_MS);
+  if (gained > 0) {
+    s.energy = Math.min(ENERGY_MAX, s.energy + gained);
+    s.lastEnergy = now - (elapsed % ENERGY_REGEN_MS);
+    Store.save(s);
+  }
+}
+function currentEnergy() {
+  regenEnergy();
+  return app.save.energy;
+}
+function spendEnergy() {
+  regenEnergy();
+  const s = app.save;
+  if (s.energy < ENERGY_COST) return false;
+  s.energy -= ENERGY_COST;
+  s.lastEnergy = Date.now();
+  Store.save(s);
+  return true;
+}
+function refillEnergy(amount) {
+  regenEnergy();
+  app.save.energy = Math.min(ENERGY_MAX, app.save.energy + amount);
+  Store.save(app.save);
+}
+function energyStateText() {
+  const e = currentEnergy();
+  const s = app.save;
+  if (e >= ENERGY_MAX) return 'Full';
+  const next = s.lastEnergy + ENERGY_REGEN_MS - Date.now();
+  const sec = Math.max(0, Math.ceil(next / 1000));
+  const m = Math.floor(sec / 60), ss = sec % 60;
+  return (m > 0 ? m + 'm' : '') + ss + 's';
+}
+
+/* ==================== GAME MODES ==============================
+   classic : normal rules, costs energy, boss timer active
+   time    : no energy cost, counts elapsed time, best time saved
+   relaxed : no energy cost, no boss timer, chill play          */
+const MODES = {
+  classic: { label: 'Classic', icon: '\uD83C\uDFAE', desc: 'Energy + boss timers, classic rules.' },
+  time:    { label: 'Time Attack', icon: '\u26A1', desc: 'No energy cost. Beat each level as fast as you can!' },
+  relaxed: { label: 'Relaxed', icon: '\U0001F33F', desc: 'No energy, no timers. Just sort and chill.' }
+};
+function currentMode() { return app.save.mode; }
+function modeNeedsEnergy() { return currentMode() === 'classic'; }
+function modeHasBossTimer() { return currentMode() !== 'relaxed'; }
+
+/* ==================== TIME ATTACK TIMER ======================= */
+let taTick = null;
+let taStartedAt = 0;
+function startTATimer() {
+  stopTATimer();
+  const wrap = document.getElementById('taWrap');
+  if (!wrap) return;
+  if (currentMode() !== 'time') {
+    wrap.classList.add('hidden');
+    return;
+  }
+  wrap.classList.remove('hidden');
+  taStartedAt = Date.now();
+  renderTATimer();
+  taTick = setInterval(renderTATimer, 100);
+}
+function stopTATimer() {
+  if (taTick) { clearInterval(taTick); taTick = null; }
+}
+function taElapsed() {
+  return taStartedAt ? Math.max(0, (Date.now() - taStartedAt) / 1000) : 0;
+}
+function renderTATimer() {
+  const el = document.getElementById('taTime');
+  if (el) el.textContent = '\u23F3 ' + taElapsed().toFixed(1) + 's';
+}
+function fmtTaTime(sec) {
+  return sec.toFixed(1) + 's';
+}
+function recordTimeBest() {
+  const lv = app.level;
+  const t = taElapsed();
+  if (!(t > 0)) return;
+  const prev = app.save.timeBest[lv];
+  if (!prev || t < prev) app.save.timeBest[lv] = Math.round(t * 10) / 10;
+  app.save.timeWins = (app.save.timeWins || 0) + 1;
+}
+
+/* ==================== HAPTICS ================================= */
+function buzz(pattern) {
+  if (!app.save.haptics) return;
+  try { if (navigator.vibrate) navigator.vibrate(pattern); } catch (e) { /* ignore */ }
+}
+
+/* ==================== BOSS LEVELS ==============================
+   Every 10th level is a boss: a timer drains your HP bar while you
+   solve. Beat the level before the bar empties to earn bonus XP.
+   Health = bossTimer seconds granted at level start. */
+const BOSS_INTERVAL = 10;
+const BOSS_TIME_BASE = 90;          // seconds of HP
+const BOSS_TIME_PER_LEVEL = 6;      // +6s per boss tier
+function isBossLevel(n) { return n > 0 && n % BOSS_INTERVAL === 0; }
+function bossTimerFor(n) {
+  const tier = Math.floor(n / BOSS_INTERVAL);
+  return BOSS_TIME_BASE + tier * BOSS_TIME_PER_LEVEL;
+}
+let bossTick = null;
+function anyModalOpen() {
+  const ids = ['winModal', 'levelsModal', 'achModal', 'skinsModal', 'statsModal', 'helpModal', 'adModal', 'energyModal', 'shopModal', 'socialModal'];
+  return ids.some(id => {
+    const el = document.getElementById(id);
+    return el && !el.classList.contains('hidden');
+  });
+}
+function startBossTimer() {
+  stopBossTimer();
+  if (!isBossLevel(app.level) || !modeHasBossTimer()) {
+    const wrap = document.getElementById('bossWrap');
+    if (wrap) wrap.classList.add('hidden');
+    return;
+  }
+  app.bossLeft = bossTimerFor(app.level);
+  updateBossHUD();
+  bossTick = setInterval(() => {
+    if (app.busy || anyModalOpen()) return;
+    app.bossLeft -= 1;
+    updateBossHUD();
+    if (app.bossLeft <= 0 && !GameEngine.isSolved(app.state)) {
+      stopBossTimer();
+      bossDefeat();
+    }
+  }, 1000);
+}
+function stopBossTimer() {
+  if (bossTick) { clearInterval(bossTick); bossTick = null; }
+}
+function updateBossHUD() {
+  const bar = document.getElementById('bossFill');
+  if (!bar) return;
+  const wrap = document.getElementById('bossWrap');
+  if (!isBossLevel(app.level)) {
+    if (wrap) wrap.classList.add('hidden');
+    return;
+  }
+  if (wrap) wrap.classList.remove('hidden');
+  document.getElementById('bossTime').textContent = app.bossLeft;
+  const total = bossTimerFor(app.level);
+  document.getElementById('bossFill').style.width =
+    Math.max(0, Math.min(100, (app.bossLeft / total) * 100)) + '%';
+}
+function bossDefeat() {
+  AudioSys.play('thud');
+  app.busy = true;
+  toast('Boss defeated you! Try again.');
+  setTimeout(() => { app.busy = false; loadLevel(app.level); }, 600);
+}
+
+/* ==================== STREAK CHEST =============================
+   7-day reward ladder keyed off dailyStreak. Claim once per day. */
+const CHEST_REWARDS = [
+  { xp: 40,  label: '+40 XP' },
+  { xp: 60,  label: '+60 XP' },
+  { xp: 80,  label: '+80 XP + Shuffle', shuffle: 1 },
+  { xp: 120, label: '+120 XP + Extra Tube', extraTube: 1 },
+  { xp: 160, label: '+160 XP' },
+  { xp: 220, label: '+220 XP + Shuffle', shuffle: 1 },
+  { xp: 300, label: '+300 XP + Extra Tube', extraTube: 1 }
+];
+function chestDayIndex() {
+  return ((app.save.dailyStreak || 1) - 1) % CHEST_REWARDS.length;
+}
+function chestClaimedToday() {
+  return app.save.chestDate === dateKey(new Date());
+}
+function claimChest() {
+  if (chestClaimedToday()) { toast('Chest already claimed today'); return; }
+  const idx = chestDayIndex();
+  const reward = CHEST_REWARDS[idx];
+  app.save.chestDate = dateKey(new Date());
+  app.save.chestDay = idx;
+  app.save.chests = (app.save.chests || 0) + 1;
+  gainXp(reward.xp);
+  if (reward.shuffle) app.save.boosters.shuffle += reward.shuffle;
+  if (reward.extraTube) app.save.boosters.extraTube += reward.extraTube;
+  addCoins(20, true);
+  Store.save(app.save);
+  AudioSys.play('coin');
+  toast('Chest claimed! ' + reward.label);
+  showRewardPopup({
+    type: 'chest', gold: true, icon: '\U0001F4B0', title: 'Chest Opened!',
+    desc: reward.label, sub: 'Day ' + (idx + 1) + ' reward claimed',
+    sound: 'levelup', duration: 2200
+  });
+  checkAchievements();
+  renderHome();
+}
+function renderChest() {
+  const btn = document.getElementById('btnChest');
+  if (!btn) return;
+  const claimed = chestClaimedToday();
+  const idx = claimed ? app.save.chestDay : chestDayIndex();
+  btn.textContent = (claimed ? '\u2705 ' : '\U0001F4B0 ') + 'Day ' + (idx + 1) + ' Chest: ' + CHEST_REWARDS[idx].label;
+  btn.disabled = claimed;
+}
+
+/* ==================== HOME / MENU RENDERING ==================== */
+function renderHome() {
+  const pl = playerLevelFromXp(app.save.xp);
+  document.getElementById('homeLevel').textContent = pl.level;
+  document.getElementById('homeXpText').textContent = pl.into + ' / ' + pl.need + ' XP';
+  const xpPct = Math.round((pl.into / pl.need) * 100);
+  document.getElementById('homeXpBar').style.width = xpPct + '%';
+
+  const done = (app.save.done || []).length;
+  document.getElementById('homeProgressText').textContent = done + ' / ' + CFG.LEVEL_COUNT;
+  document.getElementById('homeProgressBar').style.width = Math.round((done / CFG.LEVEL_COUNT) * 100) + '%';
+
+  document.getElementById('homeStreak').textContent = app.save.dailyStreak || 0;
+  const dailyBtn = document.getElementById('btnDaily');
+  if (dailyBtn) {
+    const todayDone = dailyIsDone();
+    dailyBtn.textContent = todayDone ? '\u2705 Daily: Done' : '\u2600\uFE0F Daily Challenge';
+  }
+  renderStreakRow();
+  const soundBtn = document.getElementById('btnHomeSound');
+  if (soundBtn) soundBtn.textContent = app.save.muted ? '\uD83D\uDD07 Sound' : '\uD83D\uDD0A Sound';
+  const energyEl = document.getElementById('homeEnergy');
+  if (energyEl) energyEl.textContent = '\u26A1 ' + currentEnergy() + ' / ' + ENERGY_MAX + ' \u00B7 ' + energyStateText();
+  const coinsEl = document.getElementById('homeCoins');
+  if (coinsEl) coinsEl.textContent = '\uD83E\uDE99 ' + coinBalance();
+  renderChest();
+  renderModeSwitch();
+}
+function renderStreakRow() {
+  const row = document.getElementById('streakRow');
+  row.innerHTML = '';
+  const names = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  const today = new Date();
+  const streak = app.save.dailyStreak || 0;
+  for (let i = 6; i >= 0; i--) {
+    const d = addDays(today, -i);
+    const cell = document.createElement('div');
+    cell.className = 'streak-cell';
+    if (i < streak) cell.classList.add('on');
+    if (i === 0) cell.classList.add('today');
+    const lbl = document.createElement('span');
+    lbl.className = 'd';
+    lbl.textContent = names[d.getDay()];
+    const dot = document.createElement('span');
+    dot.className = 'dot';
+    cell.appendChild(lbl);
+    cell.appendChild(dot);
+    row.appendChild(cell);
+  }
+}
+
+function setMode(m) {
+  if (!MODES[m]) return;
+  app.save.mode = m;
+  Store.save(app.save);
+  renderModeSwitch();
+}
+
+function renderSettings() {
+  const h = document.getElementById('btnHaptics');
+  const s = document.getElementById('btnSettingsSound');
+  if (h) { h.textContent = app.save.haptics ? 'On' : 'Off'; h.classList.toggle('off', !app.save.haptics); }
+  if (s) { s.textContent = app.save.muted ? 'Off' : 'On'; s.classList.toggle('off', app.save.muted); }
+}
+
+function renderModeSwitch() {
+  const wrap = document.getElementById('modeSwitch');
+  if (!wrap) return;
+  const tabs = wrap.querySelectorAll('.mode-tab');
+  tabs.forEach(t => t.classList.toggle('active', t.dataset.mode === currentMode()));
+  const desc = document.getElementById('modeDesc');
+  if (desc) desc.textContent = MODES[currentMode()].icon + ' ' + MODES[currentMode()].desc;
+}
+
+function renderLeaderboard() {
+  const list = document.getElementById('boardList');
+  list.innerHTML = '';
+  const entries = Object.keys(app.save.timeBest)
+    .map(lv => ({ lv: parseInt(lv, 10), t: app.save.timeBest[lv] }))
+    .filter(e => e.t > 0)
+    .sort((a, b) => a.t - b.t);
+  if (!entries.length) {
+    list.innerHTML = '<p class="board-hint">No Time Attack runs yet. Play in Time Attack mode to set records!</p>';
+    return;
+  }
+  entries.slice(0, 50).forEach((e, i) => {
+    const row = document.createElement('div');
+    row.className = 'board-row';
+    row.style.animationDelay = (i * 0.03) + 's';
+    const medal = i === 0 ? '\uD83E\uDD47' : i === 1 ? '\uD83E\uDD48' : i === 2 ? '\uD83E\uDD49' : (i + 1);
+    row.innerHTML = '<span class="board-rank">' + medal + '</span>' +
+      '<span class="board-lv">Level ' + e.lv + '</span>' +
+      '<span class="board-time">' + fmtTaTime(e.t) + '</span>';
+    list.appendChild(row);
+  });
+}
+
+function syncCode() {
+  try {
+    return btoa(unescape(encodeURIComponent(JSON.stringify(app.save))));
+  } catch (e) {
+    return btoa(JSON.stringify(app.save));
+  }
+}
+
+function copySyncCode() {
+  const code = syncCode();
+  const el = document.getElementById('syncCode');
+  if (el) el.textContent = code;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code).then(() => toast('Backup code copied!')).catch(() => toast('Code shown above'));
+  } else {
+    toast('Code shown above');
+  }
+}
+
+function restoreCode() {
+  const input = document.getElementById('syncInput');
+  if (!input || !input.value.trim()) { toast('Paste a backup code first'); return; }
+  try {
+    const json = decodeURIComponent(escape(atob(input.value.trim())));
+    const restored = sanitizeSave(JSON.parse(json));
+    app.save = restored;
+    app.streak = restored.streak || 0;
+    Store.save(app.save);
+    toast('Progress restored!');
+    renderHome();
+    loadLevel(app.save.unlocked, { free: true });
+  } catch (e) {
+    toast('Invalid backup code');
+  }
+}
+
+function resetAll() {
+  if (!confirm('Reset ALL progress? This cannot be undone.')) return;
+  app.save = sanitizeSave(null);
+  app.streak = 0;
+  Store.save(app.save);
+  document.getElementById('settingsModal').classList.add('hidden');
+  toast('Progress reset');
+  renderHome();
+  loadLevel(1, { free: true });
+}
+
+const TUTORIAL_STEPS = [
+  { icon: '\uD83D\uDCA7', title: 'Sort the Colors', text: 'Tap a bottle to pick up its top color.', tube: null },
+  { icon: '\uD83D\uDD04', title: 'Pour It', text: 'Tap another bottle to pour the color in. You can only pour onto the same color or an empty bottle.', tube: null },
+  { icon: '\uD83C\uDF1F', title: 'Win!', text: 'Fill each bottle with one color to beat the level and earn XP. Beat the par to earn a star!', tube: null }
+];
+let tutStep = 0;
+function showTutorial() {
+  if (app.save.tutorialDone) return;
+  const isFresh = !app.save.xp && (app.save.stats.wins || 0) === 0 && (app.save.done || []).length === 0;
+  if (!isFresh) { app.save.tutorialDone = true; Store.save(app.save); return; }
+  tutStep = 0;
+  renderTutStep();
+  document.getElementById('tutorial').classList.remove('hidden');
+}
+function hideTutorial() {
+  app.save.tutorialDone = true;
+  Store.save(app.save);
+  document.getElementById('tutorial').classList.add('hidden');
+}
+function renderTutStep() {
+  const s = TUTORIAL_STEPS[tutStep];
+  document.getElementById('tutIcon').textContent = s.icon;
+  document.getElementById('tutTitle').textContent = s.title;
+  document.getElementById('tutText').textContent = s.text;
+  const dots = document.getElementById('tutDots');
+  dots.innerHTML = '';
+  TUTORIAL_STEPS.forEach((_, i) => {
+    const d = document.createElement('span');
+    d.className = 'tut-dot' + (i === tutStep ? ' active' : '');
+    dots.appendChild(d);
+  });
+  const btn = document.getElementById('btnTutNext');
+  btn.textContent = tutStep >= TUTORIAL_STEPS.length - 1 ? 'Start Playing' : 'Next';
+}
+function nextTut() {
+  tutStep++;
+  if (tutStep >= TUTORIAL_STEPS.length) { hideTutorial(); return; }
+  renderTutStep();
+}
+
+/* ==================== SCREEN SWITCHING ========================= */
+function showScreen(name) {
+  document.getElementById('home').classList.toggle('active', name === 'home');
+  document.getElementById('app').classList.toggle('active', name === 'game');
+  if (name === 'home') {
+    stopBossTimer();
+    stopTATimer();
+    renderHome();
+  }
+}
+
+function updateHUD() {
+  const isDaily = app.level === -1;
+  document.getElementById('levelNum').textContent = isDaily ? 'DAILY' : app.level;
+  document.getElementById('movesNum').textContent = app.moves;
+  document.getElementById('parInfo').textContent = isDaily ? 'Daily Challenge' : 'Par ' + app.par;
+  document.getElementById('btnUndo').disabled = app.history.length === 0;
+  document.getElementById('btnSound').textContent = app.save.muted ? '\u266B' : '\u266A';
+  document.getElementById('btnSound').title = app.save.muted ? 'Sound: Off' : 'Sound: On';
+  updateBoosterBadges();
+
+  const used = app.save.hints[app.level] || 0;
+  const badge = document.getElementById('hintBadge');
+  if (used >= FREE_HINTS_PER_LEVEL) {
+    badge.textContent = 'AD';
+    badge.classList.add('ad');
+  } else {
+    badge.textContent = FREE_HINTS_PER_LEVEL - used;
+    badge.classList.remove('ad');
+  }
+
+  const maxCompleted = isDaily ? app.save.done.length : Math.min(app.save.unlocked - 1, CFG.LEVEL_COUNT);
+  const pct = Math.round((maxCompleted / CFG.LEVEL_COUNT) * 100);
+  document.getElementById('overallLabel').textContent = isDaily
+    ? 'Daily Challenge'
+    : 'Level ' + maxCompleted + '/200 \u00B7 ' + pct + '%';
+  document.getElementById('overallFill').style.width = (isDaily ? 0 : pct) + '%';
+
+  const colors = isDaily ? app.state.length - 2 : difficultyForLevel(app.level).colors;
+  const sorted = app.state.filter(t => t.length === CFG.CAP && t.every(c => c === t[0])).length;
+  const spct = Math.round((sorted / Math.max(colors, 1)) * 100);
+  document.getElementById('sortLabel').textContent = 'Sorted ' + sorted + '/' + colors;
+  document.getElementById('sortFill').style.width = spct + '%';
+}
+
+function renderBoard() {
+  const board = document.getElementById('board');
+  board.innerHTML = '';
+  app.state.forEach((t, i) => {
+    const el = document.createElement('div');
+    el.className = 'tube shape-' + app.shape + (i === app.selected ? ' selected' : '');
+    el.addEventListener('click', () => onTubeClick(i));
+    t.forEach((color, j) => {
+      const seg = document.createElement('div');
+      seg.className = 'seg';
+      seg.style.background = 'linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,0) 38%), ' + currentPalette()[color];
+      seg.style.bottom = (j * UNIT_H + 2) + 'px';
+      seg.style.height = (UNIT_H - 4) + 'px';
+      el.appendChild(seg);
+    });
+    if (t.length) {
+      const surf = document.createElement('div');
+      surf.className = 'surface';
+      surf.style.bottom = ((t.length - 1) * UNIT_H + UNIT_H - 6) + 'px';
+      el.appendChild(surf);
+      const bub = document.createElement('div');
+      bub.className = 'bubbles';
+      const bubbleCount = 2 + (i % 2);
+      for (let b = 0; b < bubbleCount; b++) {
+        const bb = document.createElement('i');
+        bb.style.left = (12 + ((i * 13 + b * 31) % 60)) + 'px';
+        bb.style.setProperty('--bd', (2.4 + ((i + b) % 3) * 0.6) + 's');
+        bb.style.animationDelay = ((b * 0.5 + i * 0.2) % 2) + 's';
+        bb.style.width = bb.style.height = (4 + ((i + b) % 2)) + 'px';
+        bub.appendChild(bb);
+      }
+      el.appendChild(bub);
+    }
+    board.appendChild(el);
+  });
+  updateHUD();
+}
+
+function applyTheme(level) {
+  const fx = document.getElementById('fx');
+  fx.innerHTML = '';
+  const vignette = document.getElementById('dangerVignette');
+  if (vignette) vignette.remove();
+  const isBoss = level > 0 && isBossLevel(level);
+  const theme = isBoss ? 'boss-danger' : themeForLevel(level);
+  document.body.className = 'theme-' + theme;
+  document.body.dataset.tube = String(app.save.tubeTheme || 0);
+  AudioSys.setAmbientTheme(theme);
+  if (isBoss) {
+    const v = document.createElement('div');
+    v.id = 'dangerVignette';
+    v.className = 'danger-vignette';
+    document.body.appendChild(v);
+  }
+  const rng = mulberry32(0xF00D + level);
+  const pMap = { 'night-stars': 'star', space: 'space', snow: 'snow', underwater: 'bubbles', 'boss-danger': 'ember' };
+  const count = isBoss ? 30 : (PARTICLES[theme] || 0);
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle p-' + (pMap[theme] || 'star');
+    p.style.left = (rng() * 100) + '%';
+    if (theme === 'boss-danger' || theme === 'underwater') {
+      p.style.bottom = '-24px';
+      p.style.animationDuration = (3 + rng() * 4) + 's';
+      p.style.animationDelay = (rng() * 3) + 's';
+      p.style.width = (4 + rng() * 5) + 'px';
+      p.style.height = p.style.width;
+    } else if (theme === 'snow') {
+      p.style.top = '-12px';
+      p.style.animationDuration = (6 + rng() * 6) + 's';
+      p.style.animationDelay = (rng() * 6) + 's';
+      p.style.width = (4 + rng() * 4) + 'px';
+      p.style.height = p.style.width;
+    } else {
+      p.style.top = (rng() * 100) + '%';
+      p.style.animationDuration = (2 + rng() * 3) + 's';
+      p.style.animationDelay = (rng() * 3) + 's';
+      p.style.width = (2 + rng() * 3) + 'px';
+      p.style.height = p.style.width;
+    }
+    fx.appendChild(p);
+  }
+  if (theme === 'neon-glow') {
+    const glows = [
+      ['20%', '30%', '420px', 'rgba(0,255,255,.5)'],
+      ['80%', '70%', '380px', 'rgba(255,0,200,.45)'],
+      ['50%', '10%', '300px', 'rgba(120,255,80,.3)']
+    ];
+    glows.forEach(([x, y, size, color]) => {
+      const g = document.createElement('div');
+      g.className = 'glow';
+      g.style.left = x; g.style.top = y;
+      g.style.width = size; g.style.height = size;
+      g.style.background = color;
+      g.style.animationDelay = (rng() * 3) + 's';
+      fx.appendChild(g);
+    });
+  }
+}
+
+function shakeTube(index) {
+  const board = document.getElementById('board');
+  const el = board.children[index];
+  if (!el) return;
+  el.classList.add('shake');
+  setTimeout(() => el.classList.remove('shake'), 420);
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 1600);
+}
+
+/* ==================== REWARD POPUPS ============================
+   Stacked animated reward cards with sound. Auto-dismisses.
+   Types: 'xp' | 'chest' | 'achievement' | 'levelup' | 'energy' */
+let rewardQueue = [];
+let rewardShowing = false;
+function showRewardPopup(opts) {
+  rewardQueue.push(opts);
+  if (!rewardShowing) { rewardShowing = true; nextReward(); }
+}
+function nextReward() {
+  const opts = rewardQueue.shift();
+  if (!opts) { rewardShowing = false; return; }
+  const stack = document.getElementById('rewardStack');
+  if (!stack) { rewardShowing = false; return; }
+  const pop = document.createElement('div');
+  const gold = opts.gold || opts.type === 'levelup' || opts.type === 'boss';
+  pop.className = 'reward-pop' + (gold ? ' gold' : '') + (opts.type === 'levelup' ? ' levelup' : '');
+  pop.innerHTML = '<div class="reward-shine"></div>' +
+    '<div class="r-icon">' + opts.icon + '</div>' +
+    '<div class="r-title">' + opts.title + '</div>' +
+    (opts.desc ? '<div class="r-desc">' + opts.desc + '</div>' : '') +
+    (opts.sub ? '<div class="r-sub">' + opts.sub + '</div>' : '');
+  stack.appendChild(pop);
+  try { AudioSys.play(opts.sound || 'coin'); } catch (e) { /* ignore */ }
+  const dur = opts.duration || 1900;
+  setTimeout(() => {
+    pop.style.transition = 'opacity .3s, transform .3s';
+    pop.style.opacity = '0';
+    pop.style.transform = 'translateY(-20px) scale(.9)';
+    setTimeout(() => { pop.remove(); nextReward(); }, 320);
+  }, dur);
+}
+function showBossIntro() {
+  showRewardPopup({
+    type: 'boss', gold: true, icon: '\uD83D\uDC51',
+    title: 'BOSS LEVEL!', desc: 'Defeat the boss before time runs out',
+    sub: 'Beat it to earn a huge bonus', sound: 'boss-intro', duration: 2200
+  });
+}
+function showBossVictory() {
+  showRewardPopup({
+    type: 'boss', gold: true, icon: '\uD83C\uDFC6',
+    title: 'BOSS DEFEATED!', desc: 'You crushed the boss level',
+    sub: 'Massive bonus XP earned', sound: 'boss-win', duration: 2600
+  });
+}
+function showLevelUpPopup(level) {
+  showRewardPopup({
+    type: 'levelup', icon: '\u2B50', title: 'LEVEL UP!',
+    desc: 'You reached player level ' + level, sound: 'levelup', duration: 2400
+  });
+}
+function bossFireworks() {
+  const flash = document.createElement('div');
+  flash.className = 'flash';
+  flash.style.animation = 'flashAnim .6s ease';
+  document.body.appendChild(flash);
+  setTimeout(() => flash.remove(), 700);
+  for (let i = 0; i < 16; i++) {
+    const c = document.createElement('div');
+    c.className = 'crown-rain';
+    c.textContent = '\uD83D\uDC51';
+    c.style.left = (Math.random() * 100) + 'vw';
+    c.style.animationDuration = (2 + Math.random() * 2) + 's';
+    c.style.animationDelay = (Math.random() * 0.6) + 's';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 5200);
+  }
+  setTimeout(() => confetti(), 100);
+  setTimeout(() => confetti(), 550);
+}
+
+function onTubeClick(i) {
+  if (app.busy) return;
+  if (app.selected === -1) {
+    if (app.state[i].length) {
+      app.selected = i;
+      AudioSys.play('plink');
+      buzz(8);
+      renderBoard();
+    }
+    return;
+  }
+  if (app.selected === i) {
+    app.selected = -1;
+    renderBoard();
+    return;
+  }
+  const from = app.selected;
+  if (GameEngine.canPour(app.state, from, i)) {
+    app.selected = -1;
+    renderBoard();
+    app.history.push({ state: app.state, moves: app.moves });
+    animatePour(from, i, () => {
+      const next = GameEngine.pour(app.state, from, i);
+      if (!next) {
+        app.busy = false;
+        renderBoard();
+        return;
+      }
+      app.state = next;
+      app.moves++;
+      afterMove(from, i);
+    });
+  } else {
+    shakeTube(i);
+    AudioSys.play('thud');
+    buzz(30);
+  }
+}
+
+function animatePour(from, to, onDone) {
+  app.busy = true;
+  const board = document.getElementById('board');
+  const srcEl = board.children[from];
+  const dstEl = board.children[to];
+  const run = GameEngine.topRun(app.state[from]);
+  const runLen = run ? run.length : 0;
+  if (!runLen) { app.busy = false; onDone(); return; }
+
+  const srcR = srcEl.getBoundingClientRect();
+  const dstR = dstEl.getBoundingClientRect();
+  const inset = 3;
+  const runH = Math.max(runLen * UNIT_H - (runLen - 1) * 4, 6);
+  const units = app.state[from].length;
+  const srcRunTop = srcR.top + TUBE_H - units * UNIT_H + 2;
+  const dUnits = app.state[to].length;
+  const dstRunTop = dstR.top + TUBE_H - (dUnits + runLen) * UNIT_H + 2;
+
+  const dx = dstR.left - srcR.left;
+  const dy = dstRunTop - srcRunTop;
+  const mx = dx / 2;
+  const my = Math.min(dy, -24) - 40;
+
+  const float = document.createElement('div');
+  float.className = 'pour';
+  float.style.width = (srcR.width - inset * 2) + 'px';
+  float.style.height = runH + 'px';
+  float.style.background = currentPalette()[run.color];
+  float.style.left = (srcR.left + inset) + 'px';
+  float.style.top = srcRunTop + 'px';
+  float.style.setProperty('--dx', dx + 'px');
+  float.style.setProperty('--dy', dy + 'px');
+  float.style.setProperty('--mx', mx + 'px');
+  float.style.setProperty('--my', my + 'px');
+  document.body.appendChild(float);
+
+  let committed = false;
+  const failTimer = setTimeout(() => finish(), 1000);
+  function finish() {
+    if (committed) return;
+    committed = true;
+    clearTimeout(failTimer);
+    try { if (float.parentNode) float.remove(); } catch (e) { /* ignore */ }
+    try {
+      AudioSys.play('glug');
+    } catch (e) { /* ignore */ }
+    try {
+      const ripple = document.createElement('div');
+      ripple.className = 'ripple';
+      ripple.style.left = (dstR.left + dstR.width / 2) + 'px';
+      ripple.style.top = (dstR.top + dstR.height / 2) + 'px';
+      document.body.appendChild(ripple);
+      ripple.addEventListener('animationend', () => ripple.remove(), { once: true });
+    } catch (e) { /* ignore */ }
+    try {
+      onDone();
+    } catch (e) {
+      app.busy = false;
+      console.error('pour commit failed:', e);
+    }
+  }
+  float.addEventListener('animationend', finish, { once: true });
+}
+
+function splashAt(el, color) {
+  if (!el) return;
+  const r = el.getBoundingClientRect();
+  const cx = r.left + r.width / 2;
+  const top = r.top + 4;
+  const n = 8;
+  for (let i = 0; i < n; i++) {
+    const d = document.createElement('div');
+    d.className = 'splash';
+    d.style.width = d.style.height = (5 + (i % 3) * 3) + 'px';
+    d.style.background = 'radial-gradient(circle at 35% 35%, #fff, ' + currentPalette()[color] + ')';
+    d.style.left = cx + 'px';
+    d.style.top = top + 'px';
+    const ang = -Math.PI / 2 + (i / (n - 1) - 0.5) * 2.1;
+    const dist = 30 + (i % 4) * 10;
+    d.style.setProperty('--sx', (Math.cos(ang) * dist) + 'px');
+    d.style.setProperty('--sy', (Math.sin(ang) * dist - 6) + 'px');
+    document.body.appendChild(d);
+    d.addEventListener('animationend', () => d.remove(), { once: true });
+  }
+}
+
+function afterMove(src, dst) {
+  const t = app.state[dst];
+  const tubeDone = t.length === CFG.CAP && t.every(c => c === t[0]);
+  if (tubeDone) AudioSys.play('ding');
+  if (GameEngine.isSolved(app.state)) {
+    app.busy = true;
+    renderBoard();
+    const lastColor = t[0];
+    setTimeout(() => {
+      const el = document.getElementById('board').children[dst];
+      if (el) {
+        el.classList.add('completed');
+        splashAt(el, lastColor);
+        setTimeout(() => el.classList.remove('completed'), 950);
+      }
+    }, 40);
+    setTimeout(() => { app.busy = false; win(); }, 720);
+    return;
+  }
+  app.busy = false;
+  if (tubeDone) {
+    const doneColor = t[0];
+    setTimeout(() => {
+      const el = document.getElementById('board').children[dst];
+      if (el) {
+        el.classList.add('completed');
+        splashAt(el, doneColor);
+        setTimeout(() => el.classList.remove('completed'), 950);
+      }
+    }, 60);
+  }
+  renderBoard();
+}
+
+function undo() {
+  if (app.busy) return;
+  const snap = app.history.pop();
+  if (!snap) return;
+  app.state = snap.state;
+  app.moves = snap.moves;
+  app.selected = -1;
+  renderBoard();
+}
+
+function heuristicMove(state) {
+  let best = null, bestScore = -Infinity;
+  for (let s = 0; s < state.length; s++) {
+    for (let d = 0; d < state.length; d++) {
+      if (!GameEngine.canPour(state, s, d)) continue;
+      const next = applyMove(state, s, d);
+      let score = 10;
+      if (next[s].length === 0) score += 4;
+      if (next[d].length === CFG.CAP && new Set(next[d]).size === 1) score += 6;
+      if (score > bestScore) { bestScore = score; best = [s, d]; }
+    }
+  }
+  return best;
+}
+
+/* ------------------------- Hint system ------------------------
+   Every level gets 1 free hint. After it is used, the player must
+   watch a rewarded ad to earn more. Ad flow is a local simulation
+   (timer + mock "ad"), ready to be swapped for a real ad SDK. */
+const FREE_HINTS_PER_LEVEL = 1;
+
+function computeHintMove() {
+  const colors = difficultyForLevel(app.level).colors;
+  let move = null;
+  if (colors <= 7) {
+    const sol = solve(app.state, { wantPath: true, maxNodes: 100000, maxMs: 700 });
+    if (sol && sol.length) move = sol[0];
+  }
+  if (!move) move = heuristicMove(app.state);
+  return move;
+}
+
+function hint() {
+  if (app.busy || GameEngine.isSolved(app.state)) return;
+  const used = app.save.hints[app.level] || 0;
+  if (used < FREE_HINTS_PER_LEVEL) {
+    useHint();
+  } else {
+    REWARDED_AD_BRIDGE.show();
+  }
+}
+
+function useHint() {
+  if (app.busy || GameEngine.isSolved(app.state)) return;
+  const move = computeHintMove();
+  if (!move) { toast('No hint available'); return; }
+  app.save.hints[app.level] = (app.save.hints[app.level] || 0) + 1;
+  app.save.stats.hints = (app.save.stats.hints || 0) + 1;
+  Store.save(app.save);
+  app.history.push({ state: app.state, moves: app.moves });
+  animatePour(move[0], move[1], () => {
+    const next = GameEngine.pour(app.state, move[0], move[1]);
+    app.state = next;
+    app.moves++;
+    afterMove(move[0], move[1]);
+  });
+}
+
+function updateBoosterBadges() {
+  const sb = document.getElementById('shuffleBadge');
+  const eb = document.getElementById('extraBadge');
+  const sbBtn = document.getElementById('btnShuffle');
+  const ebBtn = document.getElementById('btnExtraTube');
+  const peekBadge = document.getElementById('peekBadge');
+  const peekBtn = document.getElementById('btnPeek');
+  const xpBadge = document.getElementById('xpBadge');
+  const xpBtn = document.getElementById('btnDoubleXP');
+  if (sb) sb.textContent = app.save.boosters.shuffle;
+  if (eb) eb.textContent = app.save.boosters.extraTube;
+  if (peekBadge) peekBadge.textContent = app.save.boosters.peek || 0;
+  if (xpBadge) xpBadge.textContent = app.save.boosters.doubleXP || 0;
+  if (sbBtn) sbBtn.classList.toggle('empty', app.save.boosters.shuffle <= 0);
+  if (ebBtn) ebBtn.classList.toggle('empty', app.save.boosters.extraTube <= 0);
+  if (peekBtn) peekBtn.classList.toggle('empty', (app.save.boosters.peek || 0) <= 0);
+  if (xpBtn) {
+    xpBtn.classList.toggle('empty', (app.save.boosters.doubleXP || 0) <= 0);
+    xpBtn.classList.toggle('armed', !!app.xpBoostArmed);
+  }
+}
+
+function usePeek() {
+  if (app.busy || GameEngine.isSolved(app.state)) return;
+  if ((app.save.boosters.peek || 0) <= 0) { toast('No Peek left'); return; }
+  const move = computeHintMove();
+  if (!move) { toast('No good move to show'); return; }
+  app.save.boosters.peek--;
+  app.save.stats.boosters = (app.save.stats.boosters || 0) + 1;
+  Store.save(app.save);
+  AudioSys.play('ding');
+  const board = document.getElementById('board');
+  const el = board.children[move[0]];
+  if (el) {
+    el.classList.add('peek');
+    setTimeout(() => el.classList.remove('peek'), 1600);
+  }
+  updateBoosterBadges();
+}
+
+function useDoubleXP() {
+  if (GameEngine.isSolved(app.state)) return;
+  if ((app.save.boosters.doubleXP || 0) <= 0) { toast('No Double XP left'); return; }
+  app.save.boosters.doubleXP--;
+  app.xpBoostArmed = true;
+  Store.save(app.save);
+  AudioSys.play('glug');
+  toast('2x XP armed for next win!');
+  updateBoosterBadges();
+}
+
+function useShuffle() {
+  if (app.busy || GameEngine.isSolved(app.state)) return;
+  if (app.save.boosters.shuffle <= 0) { toast('No shuffles left'); return; }
+  const before = app.state;
+  const tubes = app.state.map(t => t.slice());
+  const n = tubes.length;
+  if (n < 3) return;
+  do {
+    for (let i = n - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = tubes[i]; tubes[i] = tubes[j]; tubes[j] = tmp;
+    }
+  } while (GameEngine.isSolved(GameEngine.freeze(tubes)));
+  app.state = GameEngine.freeze(tubes);
+  app.save.boosters.shuffle--;
+  app.save.stats.boosters = (app.save.stats.boosters || 0) + 1;
+  Store.save(app.save);
+  app.history.push({ state: before, moves: app.moves });
+  AudioSys.play('glug');
+  renderBoard();
+  updateBoosterBadges();
+  showRewardPopup({
+    type: 'boost', icon: '\u27F2', title: 'Shuffled!',
+    desc: 'Tubes rearranged', sound: 'reward', duration: 1400
+  });
+}
+
+function useExtraTube() {
+  if (app.busy || GameEngine.isSolved(app.state)) return;
+  if (app.save.boosters.extraTube <= 0) { toast('No extra tubes left'); return; }
+  const before = app.state;
+  const tubes = app.state.map(t => t.slice());
+  if (tubes.length >= 12) { toast('Board is full'); return; }
+  const total = tubes.reduce((sum, t) => sum + t.length, 0);
+  if (total >= (tubes.length + 1) * 4) { toast('No room for an empty tube'); return; }
+  tubes.push([]);
+  app.state = GameEngine.freeze(tubes);
+  app.save.boosters.extraTube--;
+  app.save.stats.boosters = (app.save.stats.boosters || 0) + 1;
+  Store.save(app.save);
+  app.history.push({ state: before, moves: app.moves });
+  AudioSys.play('glug');
+  renderBoard();
+  updateBoosterBadges();
+  showRewardPopup({
+    type: 'boost', gold: true, icon: '\u2697', title: 'Extra Tube!',
+    desc: 'An empty tube was added', sound: 'levelup', duration: 1600
+  });
+}
+
+/* -------------------- Rewarded ad simulation ------------------
+   Swap REWARDED_AD_BRIDGE for your real rewarded-ad SDK.
+   The bridge exposes show(options) where options.onRewarded()
+   grants the hint and options.onFail() keeps the modal open.
+   Until then a 5-second mock ad plays. */
+let adTimer = null;
+let adSecondsLeft = 5;
+const AD_SECONDS = 5;
+let adPurpose = 'hint';
+
+const REWARDED_AD_BRIDGE = {
+  show(opts) {
+    adPurpose = (opts && opts.purpose) || 'hint';
+    openAdModal();
+  }
+};
+
+function openAdModal() {
+  const modal = document.getElementById('adModal');
+  const box = document.getElementById('adBox');
+  const count = document.getElementById('adCount');
+  const msg = document.getElementById('adMsg');
+  const title = document.getElementById('adTitle');
+  if (title) title.textContent = adPurpose === 'energy'
+    ? 'Watch Ad for Energy' : 'Watch Ad for a Hint';
+  if (msg) msg.textContent = adPurpose === 'energy'
+    ? 'Earn +3 energy by watching a short ad' : 'Earn a hint by watching a short ad';
+  modal.classList.remove('hidden');
+  msg.classList.remove('hidden');
+  count.classList.add('hidden');
+  document.getElementById('btnWatchAd').disabled = false;
+  document.getElementById('btnWatchAd').textContent = 'Watch Ad';
+  box.classList.remove('playing');
+  clearInterval(adTimer);
+}
+
+function openEnergyModal() {
+  const modal = document.getElementById('energyModal');
+  if (modal) modal.classList.remove('hidden');
+}
+function closeEnergyModal() {
+  const modal = document.getElementById('energyModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function startAdPlay() {
+  const box = document.getElementById('adBox');
+  const count = document.getElementById('adCount');
+  const msg = document.getElementById('adMsg');
+  const btn = document.getElementById('btnWatchAd');
+  box.classList.add('playing');
+  msg.classList.add('hidden');
+  count.classList.remove('hidden');
+  btn.disabled = true;
+  adSecondsLeft = AD_SECONDS;
+  count.textContent = adSecondsLeft;
+  clearInterval(adTimer);
+  adTimer = setInterval(() => {
+    adSecondsLeft--;
+    count.textContent = adSecondsLeft;
+    if (adSecondsLeft <= 0) {
+      clearInterval(adTimer);
+      finishAdPlay();
+    }
+  }, 1000);
+}
+
+function finishAdPlay() {
+  AudioSys.play('coin');
+  closeAdModal();
+  if (adPurpose === 'energy') {
+    refillEnergy(3);
+    closeEnergyModal();
+    toast('+3 Energy!');
+    showRewardPopup({
+      type: 'energy', icon: '\u26A1', title: '+3 Energy',
+      desc: 'Thanks for watching!', sound: 'reward', duration: 1800
+    });
+    renderHome();
+  } else {
+    toast('Hint earned!');
+    useHint();
+  }
+}
+
+function closeAdModal() {
+  clearInterval(adTimer);
+  document.getElementById('adModal').classList.add('hidden');
+}
+
+/* ------------------------- Win & confetti ------------------------ */
+function confetti() {
+  for (let i = 0; i < 55; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.style.left = (Math.random() * 100) + 'vw';
+    el.style.background = PALETTE[Math.floor(Math.random() * PALETTE.length)];
+    el.style.setProperty('--cx', ((Math.random() - 0.5) * 220) + 'px');
+    el.style.animationDuration = (1.8 + Math.random() * 1.4) + 's';
+    el.style.animationDelay = (Math.random() * 0.5) + 's';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3600);
+  }
+}
+
+function win() {
+  AudioSys.play('win');
+  stopBossTimer();
+  stopTATimer();
+  if (currentMode() === 'time') recordTimeBest();
+  buzz(40);
+  const star = app.moves <= app.par;
+  app.streak += 1;
+  if (star) setTimeout(() => AudioSys.play('coin'), 450);
+  if (app.streak > 0 && app.streak % 5 === 0) setTimeout(() => AudioSys.play('fanfare'), 950);
+
+  const s = app.save;
+  const st = s.stats;
+  const isDaily = app.level === -1;
+  const isBoss = isBossLevel(app.level);
+  s.streak = app.streak;
+  st.wins += 1;
+  st.moves += app.moves;
+  st.bestStreak = Math.max(st.bestStreak || 0, app.streak);
+  if (app.playStart) st.playSeconds += Math.floor((Date.now() - app.playStart) / 1000);
+  if (star) st.perfect = (st.perfect || 0) + 1;
+  if ((s.hints[app.level] || 0) === 0) st.noHint = (st.noHint || 0) + 1;
+  if (isBoss) s.bossWins = (s.bossWins || 0) + 1;
+
+  let xpGain;
+  if (isDaily) {
+    const key = dateKey(new Date());
+    if (!s.daily.done[key]) {
+      s.daily.done[key] = true;
+      st.dailyWins = (st.dailyWins || 0) + 1;
+    }
+    if (!s.daily.best[key] || app.moves < s.daily.best[key]) s.daily.best[key] = app.moves;
+    xpGain = EXP_RATES.base * 2 + (star ? EXP_RATES.starBonus : 0);
+    document.getElementById('btnNext').disabled = false;
+    document.getElementById('btnNext').textContent = 'Back to Menu';
+  } else {
+    const firstWin = !s.done.includes(app.level);
+    if (firstWin) { s.done.push(app.level); st.levels = s.done.length; }
+    if (app.level === s.unlocked && app.level < CFG.LEVEL_COUNT) s.unlocked = app.level + 1;
+    s.best[app.level] = Math.min(s.best[app.level] || Infinity, app.moves);
+    let bonus = firstWin ? EXP_RATES.firstWin : 0;
+    if (isBoss) bonus += 50;
+    xpGain = EXP_RATES.base + (star ? EXP_RATES.starBonus : 0) + bonus;
+    document.getElementById('btnNext').disabled = app.level >= CFG.LEVEL_COUNT;
+    document.getElementById('btnNext').textContent = isBoss ? 'Defeated Boss!' : 'Next Level';
+  }
+
+  if (app.xpBoostArmed) {
+    app.xpBoostArmed = false;
+    xpGain *= 2;
+  }
+  let coinGain = isBoss ? 25 : 10;
+  if (star) coinGain += 5;
+  if (isDaily) coinGain += 10;
+  addCoins(coinGain, true);
+
+  const lvlRes = gainXp(xpGain);
+  const leveled = lvlRes.after > lvlRes.before;
+  if (isBoss) { s.boosters.shuffle += 1; s.boosters.extraTube += 1; }
+  touchDailyStreak();
+  Store.save(s);
+  checkAchievements();
+
+  confetti();
+  document.getElementById('winStar').textContent = star ? '\u2605' : '';
+  document.getElementById('winMoves').textContent = app.moves;
+  document.getElementById('winPar').textContent = app.par;
+  document.getElementById('winBest').textContent = isDaily
+    ? (s.daily.best[dateKey(new Date())] || app.moves)
+    : s.best[app.level];
+  document.getElementById('winStreak').textContent = app.streak;
+  document.getElementById('winXp').textContent = '+' + xpGain + ' XP';
+  const timeStat = document.getElementById('winTimeStat');
+  const timeEl = document.getElementById('winTime');
+  if (timeStat && timeEl) {
+    if (currentMode() === 'time') {
+      timeStat.style.display = '';
+      timeEl.textContent = fmtTaTime(app.save.timeBest[app.level] || 0);
+    } else {
+      timeStat.style.display = 'none';
+    }
+  }
+  document.getElementById('levelUp').classList.toggle('hidden', !leveled);
+  const bv = document.getElementById('bossVictory');
+  if (bv) bv.classList.toggle('hidden', !isBoss);
+  document.getElementById('winModal').classList.remove('hidden');
+
+  setTimeout(() => {
+    showRewardPopup({
+      type: 'xp', icon: '\u26A1', title: '+' + xpGain + ' XP',
+      desc: isBoss ? 'Boss bonus included!' : (star ? 'Perfect win bonus!' : 'Level completed'),
+      sound: isBoss ? 'boss-win' : 'reward', duration: 2000
+    });
+    if (leveled) setTimeout(() => showLevelUpPopup(lvlRes.after), 600);
+    if (isBoss) {
+      bossFireworks();
+      showBossVictory();
+    }
+  }, 350);
+}
+
+/* ------------------------- Level loading ------------------------- */
+function loadLevel(n, opts) {
+  opts = opts || {};
+  if (!opts.free && modeNeedsEnergy()) {
+    if (!spendEnergy()) {
+      openEnergyModal();
+      return;
+    }
+  }
+  stopBossTimer();
+  stopTATimer();
+  const gen = generateLevel(n);
+  app.level = n;
+  app.par = gen.moves;
+  app.state = GameEngine.freeze(gen.tubes);
+  app.moves = 0;
+  app.history = [];
+  app.selected = -1;
+  app.busy = false;
+  app.shape = shapeForLevel(n);
+  app.playStart = Date.now();
+  document.getElementById('winModal').classList.add('hidden');
+  document.getElementById('levelsModal').classList.add('hidden');
+  applyTheme(n);
+  renderBoard();
+  renderLevelGrid();
+  updateBossHUD();
+  startBossTimer();
+  startTATimer();
+  if (isBossLevel(n)) setTimeout(showBossIntro, 350);
+}
+
+function renderLevelGrid() {
+  const grid = document.getElementById('levelGrid');
+  grid.innerHTML = '';
+  for (let i = 1; i <= CFG.LEVEL_COUNT; i++) {
+    const btn = document.createElement('button');
+    btn.textContent = i;
+    if (isBossLevel(i)) btn.classList.add('boss');
+    if (app.save.timeBest && app.save.timeBest[i]) btn.classList.add('timebest');
+    const s = app.save;
+    if (i > s.unlocked) btn.classList.add('locked');
+    else {
+      if (s.done.includes(i)) {
+        btn.classList.add('done');
+        if (s.best[i] <= difficultyForLevel(i).moves) btn.textContent = i + '\u2605';
+      }
+      btn.addEventListener('click', () => loadLevel(i));
+    }
+    if (i === app.level) btn.classList.add('current');
+    grid.appendChild(btn);
+  }
+}
+
+/* ==================== ON-LOAD SELF-TEST =========================
+   Verifies every core function and logs ALL TESTS PASSED. */
+function selfTest() {
+  const errors = [];
+  const assert = (cond, msg) => { if (!cond) errors.push(msg); };
+
+  const r1 = mulberry32(42), r2 = mulberry32(42);
+  let same = true;
+  for (let i = 0; i < 100; i++) if (r1() !== r2()) same = false;
+  assert(same, 'PRNG not deterministic');
+
+  let prevColors = 0;
+  for (let l = 1; l <= 200; l++) {
+    const d = difficultyForLevel(l);
+    assert(d.colors >= 3 && d.colors <= 10, 'difficulty range at level ' + l);
+    assert(d.colors >= prevColors, 'difficulty colors decreased at level ' + l);
+    assert(d.moves >= 1, 'difficulty moves at level ' + l);
+    prevColors = d.colors;
+  }
+
+  const st = GameEngine.freeze([[0,0,0],[1,1],[],[1,1,1,1],[2,2,2]]);
+  assert(!GameEngine.canPour(st, 0, 3), 'full target not rejected');
+  assert(!GameEngine.canPour(st, 1, 4), 'color mismatch not rejected');
+  assert(!GameEngine.canPour(st, 2, 0), 'empty source not rejected');
+  assert(GameEngine.canPour(st, 0, 2), 'pour onto empty rejected');
+  assert(!GameEngine.canPour(st, 2, 2), 'self-pour not rejected');
+  const over = GameEngine.freeze([[1,1,0,0],[1,1,1],[]]);
+  assert(!GameEngine.canPour(over, 0, 1), 'overflow (3+2) not rejected');
+  const exact = GameEngine.freeze([[0,1],[1,1,1],[]]);
+  assert(GameEngine.canPour(exact, 0, 1), 'exact-fit pour wrongly rejected');
+  const after = GameEngine.pour(st, 0, 2);
+  assert(after !== null && after !== st, 'pour must return new state');
+  assert(after[2][0] === 0 && after[0].length === 0, 'pour result wrong');
+  assert(st[0].length === 3 && st[2].length === 0, 'input mutated (immutability broken)');
+
+  const solved = GameEngine.freeze([[0,0,0,0],[1,1,1,1],[],[]]);
+  assert(GameEngine.isSolved(solved), 'solved not detected');
+  assert(!GameEngine.isSolved(GameEngine.freeze([[0,0,1,1],[1,1,0,0],[],[]])), 'unsolved detected as solved');
+  assert(GameEngine.stateKey(solved) === GameEngine.stateKey(solved), 'stateKey unstable');
+
+  for (const lv of [1, 10, 30, 45, 70, 100, 130, 160, 185, 200]) {
+    const g = generateLevel(lv, { skipHeavy: true });
+    assert(g.tubes.length === g.colors + 2, 'level ' + lv + ' tube count');
+    assert(g.tubes.every(t => t.length <= CFG.CAP), 'level ' + lv + ' capacity');
+    assert(g.solution.length > 0, 'level ' + lv + ' missing solution');
+    assert(GameEngine.hasLegalMove(g.tubes), 'level ' + lv + ' deadlock');
+    let st2 = g.tubes, ok = true;
+    for (const [s, d] of g.solution) {
+      if (!GameEngine.canPour(st2, s, d)) { ok = false; break; }
+      st2 = GameEngine.pour(st2, s, d);
+    }
+    assert(ok && GameEngine.isSolved(st2), 'level ' + lv + ' solution broken');
+    assert(JSON.stringify(g.tubes) === JSON.stringify(generateLevel(lv, { skipHeavy: true }).tubes), 'level ' + lv + ' not deterministic');
+  }
+
+  const g1 = generateLevel(1);
+  const path = solve(g1.tubes, { wantPath: true, maxNodes: 50000, maxMs: 2000 });
+  assert(!!path && path.length > 0, 'solver returned no path');
+  if (path) {
+    let st3 = g1.tubes, ok = true;
+    for (const [s, d] of path) {
+      if (!GameEngine.canPour(st3, s, d)) { ok = false; break; }
+      st3 = GameEngine.pour(st3, s, d);
+    }
+    assert(ok && GameEngine.isSolved(st3), 'solver path invalid');
+  }
+
+  assert(sanitizeSave(null).unlocked === 1, 'sanitize null');
+  assert(sanitizeSave({ unlocked: 999 }).unlocked === 200, 'sanitize clamp high');
+  assert(sanitizeSave({ unlocked: 0 }).unlocked === 1, 'sanitize clamp low');
+  assert(Array.isArray(sanitizeSave({ done: 'x' }).done), 'sanitize done array');
+  assert(typeof sanitizeSave({ best: 'x' }).best === 'object', 'sanitize best object');
+  assert(sanitizeSave([1, 2]).unlocked === 1, 'sanitize array input');
+
+  assert(sanitizeSave({ xp: -5 }).xp === 0, 'sanitize xp negative');
+  assert(sanitizeSave({ xp: 300 }).level === 1, 'sanitize keeps player level');
+  assert(playerLevelFromXp(0).level === 1, 'player level starts at 1');
+  assert(playerLevelFromXp(0).need === 100, 'first level needs 100 xp');
+  assert(playerLevelFromXp(150).level === 2, 'player levels up past 100 xp');
+  assert(playerLevelFromXp(150).into === 50, 'xp carry-over into level 2');
+  const r = gainXp(0);
+  assert(r.before === r.after, 'gainXp zero is a no-op');
+  assert(sanitizeSave({ dailyStreak: 'x', lastPlay: 3 }).dailyStreak === 0, 'sanitize daily streak');
+  assert(sanitizeSave({ dailyStreak: 9, lastPlay: '2026-01-01' }).lastPlay === '2026-01-01', 'sanitize lastPlay');
+  assert(dateKey(new Date(2026, 0, 5)) === '2026-01-05', 'dateKey formatting');
+
+  assert(new Set(THEMES.map((_, i) => themeForLevel(i + 1))).size === THEMES.length, 'themes do not cycle through all');
+  assert(new Set(SHAPES.map((_, i) => shapeForLevel(i + 1))).size === SHAPES.length, 'shapes do not cycle through all');
+  for (let l = 1; l <= 200; l++) {
+    assert(THEMES.includes(themeForLevel(l)), 'bad theme at ' + l);
+    assert(SHAPES.includes(shapeForLevel(l)), 'bad shape at ' + l);
+  }
+
+  if (errors.length) {
+    console.error('SELF-TEST FAILED:');
+    errors.forEach(e => console.error('  - ' + e));
+    throw new Error('SELF-TEST FAILED (' + errors.length + ' assertion(s))');
+  }
+  console.log('ALL TESTS PASSED');
+  return true;
+}
+
+/* Deferred, chunked full sweep â€” verifies all 200 levels without
+   blocking the UI. Runs in the background after load. */
+function runFullSweep() {
+  let i = 1, failed = 0;
+  function step() {
+    const t0 = Date.now();
+    while (i <= CFG.LEVEL_COUNT && Date.now() - t0 < 30) {
+      try {
+        const g = generateLevel(i, { skipHeavy: true });
+        let st = g.tubes, ok = true;
+        for (const [s, d] of g.solution) {
+          if (!GameEngine.canPour(st, s, d)) { ok = false; break; }
+          st = GameEngine.pour(st, s, d);
+        }
+        if (!ok || !GameEngine.isSolved(st)) failed++;
+      } catch (e) { failed++; }
+      i++;
+    }
+    if (i <= CFG.LEVEL_COUNT) {
+      sweepHandle = setTimeout(step, 0);
+    } else if (failed === 0) {
+      console.log('FULL SWEEP: 200/200 PASSED');
+    } else {
+      console.error('FULL SWEEP FAILED: ' + failed + ' level(s)');
+    }
+  }
+  sweepHandle = setTimeout(step, 60);
+}
+
+/* ----------------------------- Init ------------------------------ */
+function init() {
+  app.streak = app.save.streak || 0;
+  touchDailyStreak();
+
+  try {
+    selfTest();
+  } catch (e) {
+    console.error(e.message);
+  }
+
+  document.getElementById('btnMenu').addEventListener('click', () => showScreen('home'));
+  document.getElementById('btnPlay').addEventListener('click', () => {
+    AudioSys.play('plink');
+    showScreen('game');
+    loadLevel(app.save.unlocked);
+  });
+  document.getElementById('btnDaily').addEventListener('click', () => {
+    AudioSys.play('plink');
+    showScreen('game');
+    startDaily();
+  });
+  document.getElementById('btnChest').addEventListener('click', claimChest);
+  document.getElementById('btnEnergyAd').addEventListener('click', () => {
+    adPurpose = 'energy';
+    openAdModal();
+  });
+  document.getElementById('btnCloseEnergy').addEventListener('click', closeEnergyModal);
+  document.getElementById('btnHomeAch').addEventListener('click', () => {
+    renderAchievements();
+    document.getElementById('achModal').classList.remove('hidden');
+  });
+  document.getElementById('btnCloseAch').addEventListener('click', () =>
+    document.getElementById('achModal').classList.add('hidden'));
+  document.getElementById('achModal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) document.getElementById('achModal').classList.add('hidden');
+  });
+  document.getElementById('btnHomeSkins').addEventListener('click', () => {
+    document.getElementById('skinGrid').classList.remove('hidden');
+    document.getElementById('tubeGrid').classList.add('hidden');
+    document.getElementById('tabPalettes').classList.add('active');
+    document.getElementById('tabTubes').classList.remove('active');
+    renderSkins();
+    document.getElementById('skinsModal').classList.remove('hidden');
+  });
+  document.getElementById('btnCloseSkins').addEventListener('click', () =>
+    document.getElementById('skinsModal').classList.add('hidden'));
+  document.getElementById('skinsModal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) document.getElementById('skinsModal').classList.add('hidden');
+  });
+  document.getElementById('tabPalettes').addEventListener('click', () => {
+    document.getElementById('skinGrid').classList.remove('hidden');
+    document.getElementById('tubeGrid').classList.add('hidden');
+    document.getElementById('tabPalettes').classList.add('active');
+    document.getElementById('tabTubes').classList.remove('active');
+    renderSkins();
+  });
+  document.getElementById('tabTubes').addEventListener('click', () => {
+    document.getElementById('tubeGrid').classList.remove('hidden');
+    document.getElementById('skinGrid').classList.add('hidden');
+    document.getElementById('tabTubes').classList.add('active');
+    document.getElementById('tabPalettes').classList.remove('active');
+    renderTubeThemes();
+  });
+  document.getElementById('btnHomeShop').addEventListener('click', () => {
+    renderShop();
+    document.getElementById('shopModal').classList.remove('hidden');
+  });
+  document.getElementById('btnCloseShop').addEventListener('click', () =>
+    document.getElementById('shopModal').classList.add('hidden'));
+  document.getElementById('shopModal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) document.getElementById('shopModal').classList.add('hidden');
+  });
+  document.getElementById('btnHomeSocial').addEventListener('click', () => {
+    document.getElementById('socialCode').textContent = friendCode();
+    document.getElementById('socialInput').value = '';
+    document.getElementById('socialModal').classList.remove('hidden');
+  });
+  document.getElementById('btnCloseSocial').addEventListener('click', () =>
+    document.getElementById('socialModal').classList.add('hidden'));
+  document.getElementById('socialModal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) document.getElementById('socialModal').classList.add('hidden');
+  });
+  document.getElementById('btnCopyCodeSocial').addEventListener('click', () => {
+    const code = friendCode();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(() => toast('Code copied!'), () => toast('Copy failed'));
+    } else {
+      toast('Your code: ' + code);
+    }
+  });
+  document.getElementById('btnRedeemSocial').addEventListener('click', () => {
+    const inp = document.getElementById('socialInput');
+    redeemFriendCode(inp.value);
+    inp.value = '';
+  });
+  document.getElementById('btnHomeStats').addEventListener('click', () => {
+    renderStats();
+    document.getElementById('statsModal').classList.remove('hidden');
+  });
+  document.getElementById('btnCloseStats').addEventListener('click', () =>
+    document.getElementById('statsModal').classList.add('hidden'));
+  document.getElementById('statsModal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) document.getElementById('statsModal').classList.add('hidden');
+  });
+  document.getElementById('btnHomeBoard').addEventListener('click', () => {
+    renderLeaderboard();
+    document.getElementById('boardModal').classList.remove('hidden');
+  });
+  document.getElementById('btnCloseBoard').addEventListener('click', () =>
+    document.getElementById('boardModal').classList.add('hidden'));
+  document.getElementById('boardModal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) document.getElementById('boardModal').classList.add('hidden');
+  });
+  document.getElementById('btnHomeSettings').addEventListener('click', () => {
+    document.getElementById('syncCode').textContent = syncCode();
+    document.getElementById('syncInput').value = '';
+    renderSettings();
+    document.getElementById('settingsModal').classList.remove('hidden');
+  });
+  document.getElementById('btnCloseSettings').addEventListener('click', () =>
+    document.getElementById('settingsModal').classList.add('hidden'));
+  document.getElementById('settingsModal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) document.getElementById('settingsModal').classList.add('hidden');
+  });
+  document.getElementById('btnHaptics').addEventListener('click', () => {
+    app.save.haptics = !app.save.haptics;
+    Store.save(app.save);
+    renderSettings();
+  });
+  document.getElementById('btnSettingsSound').addEventListener('click', () => {
+    app.save.muted = !app.save.muted;
+    Store.save(app.save);
+    AudioSys.setMuted(app.save.muted);
+    renderSettings();
+    renderHome();
+  });
+  document.getElementById('btnCopyCode').addEventListener('click', copySyncCode);
+  document.getElementById('btnRestoreCode').addEventListener('click', restoreCode);
+  document.getElementById('btnResetAll').addEventListener('click', resetAll);
+  document.getElementById('modeSwitch').addEventListener('click', e => {
+    const tab = e.target.closest('.mode-tab');
+    if (tab) { AudioSys.play('plink'); setMode(tab.dataset.mode); }
+  });
+  document.getElementById('btnTutNext').addEventListener('click', nextTut);
+  document.getElementById('btnTutSkip').addEventListener('click', hideTutorial);
+  document.getElementById('btnHomeSound').addEventListener('click', () => {
+    app.save.muted = !app.save.muted;
+    Store.save(app.save);
+    AudioSys.setMuted(app.save.muted);
+    renderHome();
+  });
+  document.getElementById('btnHomeHelp').addEventListener('click', () =>
+    document.getElementById('helpModal').classList.remove('hidden'));
+  document.getElementById('btnHomeLevels').addEventListener('click', () => {
+    renderLevelGrid();
+    document.getElementById('levelsModal').classList.remove('hidden');
+  });
+  document.getElementById('btnUndo').addEventListener('click', undo);
+  document.getElementById('btnRestart').addEventListener('click', () => loadLevel(app.level, { free: true }));
+  document.getElementById('btnHint').addEventListener('click', hint);
+  document.getElementById('btnShuffle').addEventListener('click', useShuffle);
+  document.getElementById('btnExtraTube').addEventListener('click', useExtraTube);
+  document.getElementById('btnPeek').addEventListener('click', usePeek);
+  document.getElementById('btnDoubleXP').addEventListener('click', useDoubleXP);
+  document.getElementById('btnWatchAd').addEventListener('click', startAdPlay);
+  document.getElementById('btnCloseAd').addEventListener('click', closeAdModal);
+  document.getElementById('adModal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeAdModal();
+  });
+  document.getElementById('btnSound').addEventListener('click', () => {
+    app.save.muted = !app.save.muted;
+    Store.save(app.save);
+    AudioSys.setMuted(app.save.muted);
+    updateHUD();
+    renderHome();
+  });
+  document.getElementById('btnHelp').addEventListener('click', () =>
+    document.getElementById('helpModal').classList.remove('hidden'));
+  document.getElementById('btnLevels').addEventListener('click', () => {
+    renderLevelGrid();
+    document.getElementById('levelsModal').classList.remove('hidden');
+  });
+  document.getElementById('btnCloseLevels').addEventListener('click', () =>
+    document.getElementById('levelsModal').classList.add('hidden'));
+  document.getElementById('levelsModal').addEventListener('click', e => {
+    if (e.target === e.currentTarget)
+      document.getElementById('levelsModal').classList.add('hidden');
+  });
+  document.getElementById('btnNext').addEventListener('click', () => {
+    document.getElementById('winModal').classList.add('hidden');
+    if (app.level === -1) { showScreen('home'); return; }
+    loadLevel(Math.min(app.level + 1, CFG.LEVEL_COUNT));
+  });
+  document.getElementById('btnWinLevels').addEventListener('click', () => {
+    document.getElementById('winModal').classList.add('hidden');
+    renderLevelGrid();
+    document.getElementById('levelsModal').classList.remove('hidden');
+  });
+  document.getElementById('winModal').addEventListener('click', e => {
+    if (e.target === e.currentTarget)
+      document.getElementById('winModal').classList.add('hidden');
+  });
+  document.getElementById('btnPlayHelp').addEventListener('click', () =>
+    document.getElementById('helpModal').classList.add('hidden'));
+  document.getElementById('btnCloseHelp').addEventListener('click', () =>
+    document.getElementById('helpModal').classList.add('hidden'));
+
+  function unlockAudio() {
+    AudioSys.unlock();
+    document.removeEventListener('pointerdown', unlockAudio);
+    document.removeEventListener('keydown', unlockAudio);
+  }
+  document.addEventListener('pointerdown', unlockAudio);
+  document.addEventListener('keydown', unlockAudio);
+  window.addEventListener('beforeunload', () => AudioSys.stopAmbient());
+
+  loadLevel(app.save.unlocked, { free: true });
+  renderHome();
+  showScreen('home');
+  runFullSweep();
+  showTutorial();
+}
+
+if (typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', init);
+}
+</script>
+</body>
+</html>
