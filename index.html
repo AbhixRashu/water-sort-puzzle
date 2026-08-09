@@ -25,13 +25,14 @@
     -webkit-tap-highlight-color: transparent;
     user-select: none;
     background:
-      radial-gradient(500px 500px at 85% 8%, rgba(167,139,250,.14), transparent 60%),
-      radial-gradient(500px 500px at 10% 92%, rgba(77,208,225,.12), transparent 60%),
-      radial-gradient(1100px 700px at 50% -10%, #1b2540 0%, #131126 45%, #0a0d1a 100%);
+      radial-gradient(560px 420px at 84% 6%, rgba(167,139,250,.22), transparent 62%),
+      radial-gradient(560px 420px at 12% 90%, rgba(77,208,225,.16), transparent 62%),
+      radial-gradient(540px 400px at 40% 112%, rgba(244,114,182,.14), transparent 62%),
+      linear-gradient(180deg, #1b2540 0%, #14122e 46%, #0a0d1a 100%);
   }
 
   /* ============================ THEMES ============================ */
-  body.theme-dark-moody  { --text:#eef6ff; --muted:#9fb3c8; --glass:rgba(255,255,255,.07); --glass-border:rgba(255,255,255,.28); background:radial-gradient(1000px 650px at 50% -8%, #232c4d 0%, #1a1833 46%, #0d0f22 100%); }
+  body.theme-dark-moody  { --text:#eef6ff; --muted:#9fb3c8; --glass:rgba(255,255,255,.07); --glass-border:rgba(255,255,255,.28); background:radial-gradient(620px 430px at 82% 5%, rgba(124,58,237,.22), transparent 62%), radial-gradient(620px 430px at 8% 90%, rgba(14,165,233,.17), transparent 62%), radial-gradient(560px 400px at 46% 110%, rgba(236,72,153,.12), transparent 62%), linear-gradient(180deg, #232c4d 0%, #1a1833 46%, #0d0f22 100%); }
   body.theme-halloween  { --text:#ffedd6; --muted:#d9b98c; --glass:rgba(255,255,255,.06); --glass-border:rgba(255,150,40,.4); background:radial-gradient(1000px 650px at 50% -8%, #4a1d3a 0%, #2b1030 45%, #140a18 100%); }
   body.theme-halloween { --accent:#ff9f1c; }
   body.theme-soft-pastel { --text:#4a4453; --muted:#7a7285; --glass:rgba(255,255,255,.35); --glass-border:rgba(80,60,110,.22); background:linear-gradient(160deg,#fde2e4,#fad2e1,#dbe7ff); }
@@ -224,14 +225,21 @@
 
   #board {
     display: flex; flex-wrap: wrap; justify-content: center;
-    align-items: flex-end; gap: 9px; padding: 8px 4px 0;
-    min-height: 160px;
+    align-items: flex-end; align-content: flex-start;
+    gap: 12px; padding: 14px 6px 0;
+    min-height: 170px;
   }
   .tube {
     position: relative; width: 44px; height: 132px;
-    border: 3px solid var(--glass-border);
-    border-radius: 12px 12px 10px 10px;
-    background: var(--glass);
+    border: 2px solid var(--glass-border);
+    border-radius: 12px 12px 28px 28px / 12px 12px 52px 52px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,.06) 42%, rgba(255,255,255,.02) 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.22),
+      inset 0 -10px 14px -10px rgba(0,0,0,.30),
+      inset 0 0 16px rgba(255,255,255,.05),
+      0 10px 18px rgba(0,0,0,.28);
     cursor: pointer; overflow: hidden;
     transition: transform .16s cubic-bezier(.3,1.4,.5,1), border-color .16s, box-shadow .16s;
   }
@@ -239,7 +247,7 @@
   .tube.selected {
     transform: translateY(-16px);
     border-color: var(--accent);
-    box-shadow: 0 10px 24px rgba(0,0,0,.35), 0 0 0 2px rgba(77,208,225,.25);
+    box-shadow: 0 14px 30px rgba(0,0,0,.38), 0 0 0 2px rgba(77,208,225,.28), inset 0 1px 0 rgba(255,255,255,.3);
   }
   .tube.shake { animation: shake .4s ease; }
   .tube.peek {
@@ -257,16 +265,25 @@
     80% { transform: translateX(-3px); }
   }
   .tube::after {
-    content: ''; position: absolute; top: 6px; bottom: 6px; left: 5px; width: 6px;
-    border-radius: 3px;
-    background: linear-gradient(180deg, rgba(255,255,255,.4), rgba(255,255,255,.05));
-    pointer-events: none;
+    content: ''; position: absolute; top: 6px; bottom: 8px; left: 5px; width: 5px;
+    border-radius: 4px;
+    background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.16) 55%, rgba(255,255,255,.04));
+    filter: blur(.3px);
+    box-shadow: 0 0 6px rgba(255,255,255,.18);
+    pointer-events: none; z-index: 3;
   }
   .tube.completed { animation: tubeGlow .9s ease; }
   @keyframes tubeGlow {
     0% { box-shadow: 0 0 0 0 rgba(255,210,90,.85); }
     50% { box-shadow: 0 0 22px 6px rgba(255,210,90,.55); }
     100% { box-shadow: 0 0 0 0 rgba(255,210,90,0); }
+  }
+  .tube.celebrate { animation: tubePop .55s cubic-bezier(.3,1.6,.4,1) both; }
+  @keyframes tubePop {
+    0%   { transform: translateY(0) scale(1); }
+    35%  { transform: translateY(-22px) scale(1.12); }
+    65%  { transform: translateY(2px) scale(.96); }
+    100% { transform: translateY(0) scale(1); }
   }
   .ripple {
     position: fixed; z-index: 61; pointer-events: none;
@@ -280,18 +297,18 @@
   }
 
   /* ========================== BOTTLE SHAPES ======================= */
-  .shape-test-tube { width: 44px; border-radius: 12px 12px 10px 10px; }
-  .shape-wide-bottle { width: 58px; border-radius: 9px 9px 7px 7px; }
-  .shape-slim-vial { width: 34px; border-radius: 8px 8px 7px 7px; }
-  .shape-soda-bottle { width: 50px; border-radius: 6px; }
+  .shape-test-tube { width: 44px; border-radius: 12px 12px 28px 28px / 12px 12px 52px 52px; }
+  .shape-wide-bottle { width: 58px; border-radius: 10px 10px 32px 32px / 10px 10px 56px 56px; }
+  .shape-slim-vial { width: 34px; border-radius: 8px 8px 18px 18px / 8px 8px 46px 46px; }
+  .shape-soda-bottle { width: 50px; border-radius: 8px 8px 28px 28px / 8px 8px 52px 52px; }
   .shape-soda-bottle::before {
     content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-    width: 16px; height: 7px; background: rgba(255,255,255,.32); border-radius: 2px 2px 1px 1px;
+    width: 16px; height: 7px; background: rgba(255,255,255,.34); border-radius: 2px 2px 1px 1px;
   }
-  .shape-flask { width: 46px; border-radius: 5px 5px 26px 26px; }
+  .shape-flask { width: 46px; border-radius: 8px 8px 46px 46px / 8px 8px 78px 78px; }
   .shape-flask::before {
     content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-    width: 12px; height: 6px; background: rgba(255,255,255,.28); border-radius: 2px;
+    width: 12px; height: 6px; background: rgba(255,255,255,.3); border-radius: 2px;
   }
 
   .seg {
@@ -607,8 +624,9 @@
   .surface {
     position: absolute; left: 1px; right: 1px; height: 9px;
     background:
-      radial-gradient(120% 160% at 50% 0%, rgba(255,255,255,.65), rgba(255,255,255,.12) 55%, rgba(255,255,255,0) 78%);
+      radial-gradient(120% 175% at 50% 0%, rgba(255,255,255,.8), rgba(255,255,255,.16) 55%, rgba(255,255,255,0) 80%);
     border-radius: 50%;
+    box-shadow: 0 -1px 3px rgba(255,255,255,.28);
     animation: surfaceWave 1.9s ease-in-out infinite;
     pointer-events: none;
     z-index: 2;
@@ -633,7 +651,7 @@
   }
   .seg {
     overflow: hidden;
-    box-shadow: inset 0 2px 0 rgba(255,255,255,.3), inset 0 -2px 0 rgba(0,0,0,.16);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.32), inset 0 -2px 0 rgba(0,0,0,.18), inset 0 0 12px rgba(255,255,255,.06);
   }
   .seg.seg-top {
     border-radius: 50% 50% 6px 6px / 24px 24px 6px 6px;
@@ -904,6 +922,7 @@
   .menu-item.b-shuffle { background: linear-gradient(145deg, rgba(247,37,133,.35), rgba(181,23,158,.3)); }
   .menu-item.b-peek { background: linear-gradient(145deg, rgba(67,170,139,.35), rgba(39,125,161,.3)); }
   .menu-item.b-xp { background: linear-gradient(145deg, rgba(255,159,28,.35), rgba(247,37,133,.3)); }
+  .menu-item.b-extra { background: linear-gradient(145deg, rgba(252,163,17,.35), rgba(232,93,4,.3)); }
   .menu-item.armed { animation: xpPulse .9s ease-in-out infinite; }
   .menu-item.empty { filter: grayscale(.8); opacity: .5; }
   @keyframes xpPulse {
@@ -980,11 +999,11 @@
   .social-rewards { text-align: center; font-size: 12px; color: var(--muted); margin-top: 10px; }
 
   /* ================== TUBE THEMES ============================== */
-  body[data-tube="0"] .tube { border: 3px solid var(--glass-border); background: var(--glass); }
-  body[data-tube="1"] .tube { border: 3px solid rgba(255,215,130,.8); background: linear-gradient(180deg, rgba(255,240,200,.28), rgba(180,120,40,.22)); }
-  body[data-tube="2"] .tube { border: 3px solid rgba(120,255,200,.75); background: linear-gradient(180deg, rgba(30,200,160,.3), rgba(10,120,110,.25)); }
-  body[data-tube="3"] .tube { border: 3px solid rgba(140,140,160,.9); background: linear-gradient(180deg, rgba(90,90,110,.45), rgba(40,40,55,.5)); }
-  body[data-tube="4"] .tube { border: 3px solid rgba(255,150,200,.8); background: linear-gradient(180deg, rgba(255,120,190,.3), rgba(180,60,120,.28)); }
+  body[data-tube="0"] .tube { border: 2px solid var(--glass-border); background: linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.04)); }
+  body[data-tube="1"] .tube { border: 2px solid rgba(255,215,130,.8); background: linear-gradient(180deg, rgba(255,240,200,.3), rgba(180,120,40,.22)); }
+  body[data-tube="2"] .tube { border: 2px solid rgba(120,255,200,.75); background: linear-gradient(180deg, rgba(30,200,160,.32), rgba(10,120,110,.25)); }
+  body[data-tube="3"] .tube { border: 2px solid rgba(140,140,160,.9); background: linear-gradient(180deg, rgba(90,90,110,.45), rgba(40,40,55,.5)); }
+  body[data-tube="4"] .tube { border: 2px solid rgba(255,150,200,.8); background: linear-gradient(180deg, rgba(255,120,190,.32), rgba(180,60,120,.28)); }
 
   /* ================== MOBILE RESPONSIVE ======================= */
   @media (max-width: 480px) {
@@ -1093,11 +1112,9 @@
         </div>
         <div class="btns">
           <button id="btnMenu" title="Menu" class="b-menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
-          <button id="btnSettings" title="Settings" class="b-settings"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.02a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.02a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.02a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
           <button id="btnUndo" title="Undo" class="b-undo"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></button>
           <button id="btnRestart" title="Restart" class="b-restart"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
           <button id="btnHint" title="Hint" class="b-hint"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.4 1 2.3h6c0-.9.4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg><span class="hintbadge" id="hintBadge">1</span></button>
-          <button id="btnExtraTube" title="Add empty tube" class="b-extra"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 3h6"/><path d="M10 3v6.3L5.8 19a2 2 0 0 0 1.9 2.8h8.6a2 2 0 0 0 1.9-2.8L14 9.3V3"/></svg><span class="hintbadge" id="extraBadge">0</span></button>
         </div>
       </div>
     </header>
@@ -1112,6 +1129,7 @@
           <button class="menu-item" id="btnMenuHome">&#x1F3E0; <span>Home</span></button>
           <button class="menu-item" id="btnMenuLevels">&#x1F5FA;&#xFE0F; <span>Level Select</span></button>
           <button class="menu-item" id="btnMenuHelp">&#x2753; <span>How to Play</span></button>
+          <button class="menu-item" id="btnMenuSettings">&#x2699;&#xFE0F; <span>Settings</span></button>
           <div class="menu-row">
             <span class="m-label">&#x1F50A; <span>Sound</span></span>
             <button class="b-sound" id="btnSound" title="Sound">&#x266A;</button>
@@ -1119,6 +1137,7 @@
           <div class="menu-sep">Boosters</div>
           <button class="menu-item b-shuffle" id="btnShuffle">&#x1F504; <span>Shuffle</span><span class="hintbadge" id="shuffleBadge">0</span></button>
           <button class="menu-item b-peek" id="btnPeek">&#x1F441;&#xFE0F; <span>Peek</span><span class="hintbadge" id="peekBadge">0</span></button>
+          <button class="menu-item b-extra" id="btnExtraTube">&#x2697; <span>Extra Tube</span><span class="hintbadge" id="extraBadge">0</span></button>
           <button class="menu-item b-xp" id="btnDoubleXP">&#x26A1; <span>Double XP</span><span class="hintbadge" id="xpBadge">0</span></button>
         </div>
       </div>
@@ -1437,16 +1456,16 @@ const ENERGY_REGEN_MS = 15 * 60 * 1000;  // 1 energy every 15 min
 const ENERGY_COST = 1;                    // per level play
 
 const PALETTE = [
-  '#e63946', '#f4a261', '#f9c74f', '#43aa8b', '#577590',
-  '#b5179e', '#00b4d8', '#ff6392', '#8ac926', '#6a4c93'
+  '#ff3b30', '#ff9500', '#ffcc00', '#30d158', '#0a84ff',
+  '#af52de', '#ff2d92', '#5ac8fa', '#a8e64f', '#ff6b81'
 ];
 
 const PALETTES = [
   PALETTE,
-  ['#ff4757', '#ffa502', '#ffd32a', '#2ed573', '#1e90ff', '#7d5fff', '#00d2d3', '#ff6b81', '#a4b0be', '#747d8c'],
+  ['#ff4757', '#ffa502', '#ffd32a', '#2ed573', '#1e90ff', '#7d5fff', '#00d2d3', '#ff6b81', '#f368e0', '#18dcff'],
   ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#3b82f6', '#84cc16', '#f97316', '#6366f1'],
-  ['#ff9a9e', '#fad0c4', '#fbc2eb', '#a18cd1', '#fbc2eb', '#ffecd2', '#a6c1ee', '#84fab0', '#e0c3fc', '#fccb90'],
-  ['#0f0c29', '#302b63', '#24243e', '#00b4db', '#0083b0', '#654ea3', '#eaafc8', '#1f1c2c', '#928dab', '#00c6ff']
+  ['#ff3355', '#ff8c00', '#ffd200', '#00e676', '#2979ff', '#aa00ff', '#ff1744', '#00b8d4', '#76ff03', '#ff6d00'],
+  ['#ff0055', '#ff7a00', '#ffe600', '#00e5ff', '#00c853', '#7c4dff', '#ff00aa', '#00b0ff', '#64ffda', '#ff9100']
 ];
 
 const THEMES = [
@@ -3611,6 +3630,13 @@ function win() {
   checkAchievements();
 
   confetti();
+  const tubeEls = document.getElementById('board').children;
+  for (let i = 0; i < tubeEls.length; i++) {
+    tubeEls[i].classList.remove('celebrate');
+    void tubeEls[i].offsetWidth;
+    tubeEls[i].style.animationDelay = (i * 0.06) + 's';
+    tubeEls[i].classList.add('celebrate');
+  }
   const winStars = document.getElementById('winStars');
   if (winStars) {
     winStars.querySelectorAll('.star').forEach((el, i) => {
@@ -3932,8 +3958,9 @@ function init() {
     updateBoosterBadges();
     document.getElementById('menuModal').classList.remove('hidden');
   });
-  document.getElementById('btnSettings').addEventListener('click', () => {
+  document.getElementById('btnMenuSettings').addEventListener('click', () => {
     AudioSys.play('plink');
+    document.getElementById('menuModal').classList.add('hidden');
     renderSettings();
     document.getElementById('settingsModal').classList.remove('hidden');
   });
