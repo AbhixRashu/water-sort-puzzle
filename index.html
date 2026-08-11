@@ -1569,20 +1569,21 @@ function shuffle(arr, rng) {
 
 /* ------------------------ Difficulty curve ----------------------- */
 function difficultyForLevel(level) {
-  if (level <= 4)   return { colors: 4,  moves: 10 + level };
-  if (level <= 9)   return { colors: 5,  moves: 14 + level };
-  if (level <= 14)  return { colors: 6,  moves: 18 + level };
-  if (level <= 19)  return { colors: 7,  moves: 22 + level };
-  if (level <= 24)  return { colors: 8,  moves: 26 + level };
-  if (level <= 29)  return { colors: 9,  moves: 30 + level };
-  if (level <= 34)  return { colors: 10, moves: 34 + level };
-  if (level <= 44)  return { colors: 11, moves: 38 + Math.floor(level / 2) };
-  if (level <= 54)  return { colors: 12, moves: 42 + Math.floor(level / 2) };
-  if (level <= 69)  return { colors: 13, moves: 46 + Math.floor(level / 2) };
-  if (level <= 84)  return { colors: 14, moves: 50 + Math.floor(level / 2) };
-  if (level <= 109) return { colors: 15, moves: 54 + Math.floor(level / 2) };
-  if (level <= 149) return { colors: 16, moves: 58 + Math.floor(level / 2) };
-  return             { colors: 16, moves: 62 + Math.floor(level / 2) };
+  if (level <= 6)   return { colors: 3,  moves: 8 + level };
+  if (level <= 12)  return { colors: 3,  moves: 11 + level };
+  if (level <= 18)  return { colors: 4,  moves: 13 + level };
+  if (level <= 24)  return { colors: 4,  moves: 15 + level };
+  if (level <= 32)  return { colors: 5,  moves: 17 + level };
+  if (level <= 40)  return { colors: 5,  moves: 19 + level };
+  if (level <= 52)  return { colors: 6,  moves: 21 + level };
+  if (level <= 64)  return { colors: 6,  moves: 23 + level };
+  if (level <= 78)  return { colors: 7,  moves: 25 + Math.floor(level / 2) };
+  if (level <= 94)  return { colors: 8,  moves: 27 + Math.floor(level / 2) };
+  if (level <= 112) return { colors: 9,  moves: 29 + Math.floor(level / 2) };
+  if (level <= 132) return { colors: 10, moves: 31 + Math.floor(level / 2) };
+  if (level <= 155) return { colors: 11, moves: 33 + Math.floor(level / 2) };
+  if (level <= 180) return { colors: 12, moves: 35 + Math.floor(level / 2) };
+  return             { colors: 12, moves: 37 + Math.floor(level / 2) };
 }
 
 function themeForLevel(level) {
@@ -4008,7 +4009,7 @@ function selfTest() {
   let prevColors = 0;
   for (let l = 1; l <= 200; l++) {
     const d = difficultyForLevel(l);
-    assert(d.colors >= 4 && d.colors <= 16, 'difficulty range at level ' + l);
+    assert(d.colors >= 3 && d.colors <= 12, 'difficulty range at level ' + l);
     assert(d.colors >= prevColors, 'difficulty colors decreased at level ' + l);
     assert(d.moves >= 1, 'difficulty moves at level ' + l);
     prevColors = d.colors;
