@@ -92,6 +92,11 @@
   .top-btn:active { transform: scale(.9); }
   .top-btn svg { width: 22px; height: 22px; }
   .hdr-center { display: flex; flex-direction: column; align-items: center; min-width: 0; }
+  .hdr-lv {
+    font-size: 10px; font-weight: 800; letter-spacing: .08em; color: var(--accent);
+    padding: 1px 9px; border-radius: 999px; margin-bottom: 1px;
+    background: rgba(77,208,225,.18); border: 1px solid rgba(160,200,255,.28);
+  }
   .level-info { display: flex; flex-direction: column; align-items: center; line-height: 1.1; }
   .level-info .num { font-size: 26px; font-weight: 800; }
   .level-info .par { font-size: 12px; color: var(--muted); }
@@ -1130,6 +1135,7 @@
     <header>
       <button id="btnMenu" title="Menu" class="top-btn b-menu"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
       <div class="hdr-center">
+        <span class="hdr-lv" id="hdrPlayerLv">Lv 1</span>
         <div class="level-info">
           <span class="num" id="levelNum">1</span>
           <span class="par" id="parInfo"></span>
@@ -1480,28 +1486,29 @@ const ENERGY_COST = 1;                    // per level play
 
 const PALETTE = [
   '#ff3b30', '#ff9500', '#ffcc00', '#30d158', '#0a84ff',
-  '#af52de', '#ff2d92', '#5ac8fa', '#a8e64f', '#ff6b81'
+  '#af52de', '#ff2d92', '#5ac8fa', '#a8e64f', '#ff6b81',
+  '#ff7a45', '#00c7be', '#7d5fff', '#ffd60a', '#3ddc84', '#00b0f0'
 ];
 
 const PALETTES = [
   PALETTE,
-  ['#ff4757', '#ffa502', '#ffd32a', '#2ed573', '#1e90ff', '#7d5fff', '#00d2d3', '#ff6b81', '#f368e0', '#18dcff'],
-  ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#3b82f6', '#84cc16', '#f97316', '#6366f1'],
-  ['#ff3355', '#ff8c00', '#ffd200', '#00e676', '#2979ff', '#aa00ff', '#ff1744', '#00b8d4', '#76ff03', '#ff6d00'],
-  ['#ff0055', '#ff7a00', '#ffe600', '#00e5ff', '#00c853', '#7c4dff', '#ff00aa', '#00b0ff', '#64ffda', '#ff9100']
+  ['#ff4757', '#ffa502', '#ffd32a', '#2ed573', '#1e90ff', '#7d5fff', '#00d2d3', '#ff6b81', '#f368e0', '#18dcff', '#eb3b5a', '#3867d6', '#f7b731', '#8854d0', '#fa8231', '#2bcbba'],
+  ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#3b82f6', '#84cc16', '#f97316', '#6366f1', '#14b8a6', '#f43f5e', '#22d3ee', '#a3e635', '#fb923c', '#0ea5e9'],
+  ['#ff3355', '#ff8c00', '#ffd200', '#00e676', '#2979ff', '#aa00ff', '#ff1744', '#00b8d4', '#76ff03', '#ff6d00', '#d500f9', '#00e5ff', '#ff9100', '#18ffff', '#651fff', '#ffea00'],
+  ['#ff0055', '#ff7a00', '#ffe600', '#00e5ff', '#00c853', '#7c4dff', '#ff00aa', '#00b0ff', '#64ffda', '#ff9100', '#ff5722', '#26a69a', '#5c6bc0', '#ffee58', '#e040fb', '#009688']
 ];
 
 /* Eye-catching per-level palettes (default skin rotates through these so
    every level feels fresh — sky blue, pink, violet, teal, coral...). */
 const LEVEL_PALETTES = [
-  ['#38bdf8', '#f472b6', '#a78bfa', '#2dd4bf', '#fb7185', '#34d399', '#fbbf24', '#60a5fa', '#e879f9', '#fb923c'],
-  ['#0ea5e9', '#ec4899', '#8b5cf6', '#10b981', '#f43f5e', '#f59e0b', '#14b8a6', '#3b82f6', '#f97316', '#22d3ee'],
-  ['#22d3ee', '#f0abfc', '#c084fc', '#4ade80', '#f87171', '#facc15', '#38bdf8', '#fb7185', '#2dd4bf', '#e879f9'],
-  ['#60a5fa', '#f472b6', '#fbbf24', '#22d3ee', '#fb7185', '#34d399', '#a78bfa', '#fb923c', '#e879f9', '#facc15'],
-  ['#0ea5e9', '#34d399', '#a78bfa', '#fb923c', '#f472b6', '#22d3ee', '#fbbf24', '#f43f5e', '#4ade80', '#c084fc'],
-  ['#38bdf8', '#f9a8d4', '#a5b4fc', '#6ee7b7', '#fde68a', '#fdba74', '#67e8f9', '#f0abfc', '#bef264', '#93c5fd'],
-  ['#fb7185', '#5eead4', '#60a5fa', '#fbbf24', '#a78bfa', '#34d399', '#f472b6', '#22d3ee', '#fb923c', '#c084fc'],
-  ['#4ade80', '#fb7185', '#22d3ee', '#c084fc', '#facc15', '#38bdf8', '#f9a8d4', '#2dd4bf', '#fb923c', '#e879f9']
+  ['#38bdf8', '#f472b6', '#a78bfa', '#2dd4bf', '#fb7185', '#34d399', '#fbbf24', '#60a5fa', '#e879f9', '#fb923c', '#4ade80', '#22d3ee', '#f87171', '#c084fc', '#facc15', '#fdba74'],
+  ['#0ea5e9', '#ec4899', '#8b5cf6', '#10b981', '#f43f5e', '#f59e0b', '#14b8a6', '#3b82f6', '#f97316', '#22d3ee', '#34d399', '#fb7185', '#c084fc', '#fbbf24', '#e879f9', '#4ade80'],
+  ['#22d3ee', '#f0abfc', '#c084fc', '#4ade80', '#f87171', '#facc15', '#38bdf8', '#fb7185', '#2dd4bf', '#e879f9', '#a78bfa', '#fb923c', '#60a5fa', '#fbbf24', '#34d399', '#f9a8d4'],
+  ['#60a5fa', '#f472b6', '#fbbf24', '#22d3ee', '#fb7185', '#34d399', '#a78bfa', '#fb923c', '#e879f9', '#facc15', '#38bdf8', '#4ade80', '#f87171', '#c084fc', '#2dd4bf', '#fdba74'],
+  ['#0ea5e9', '#34d399', '#a78bfa', '#fb923c', '#f472b6', '#22d3ee', '#fbbf24', '#f43f5e', '#4ade80', '#c084fc', '#38bdf8', '#fb7185', '#facc15', '#e879f9', '#60a5fa', '#f9a8d4'],
+  ['#38bdf8', '#f9a8d4', '#a5b4fc', '#6ee7b7', '#fde68a', '#fdba74', '#67e8f9', '#f0abfc', '#bef264', '#93c5fd', '#f472b6', '#34d399', '#fbbf24', '#fb7185', '#22d3ee', '#c084fc'],
+  ['#fb7185', '#5eead4', '#60a5fa', '#fbbf24', '#a78bfa', '#34d399', '#f472b6', '#22d3ee', '#fb923c', '#c084fc', '#38bdf8', '#4ade80', '#f87171', '#facc15', '#e879f9', '#2dd4bf'],
+  ['#4ade80', '#fb7185', '#22d3ee', '#c084fc', '#facc15', '#38bdf8', '#f9a8d4', '#2dd4bf', '#fb923c', '#e879f9', '#34d399', '#f87171', '#a78bfa', '#fbbf24', '#60a5fa', '#f0abfc']
 ];
 
 const THEMES = [
@@ -1562,29 +1569,29 @@ function shuffle(arr, rng) {
 
 /* ------------------------ Difficulty curve ----------------------- */
 function difficultyForLevel(level) {
-  if (level <= 15)  return { colors: 3,  moves: 10 + Math.floor(level / 2) };
-  if (level <= 35)  return { colors: 4,  moves: 14 + Math.floor((level - 15) / 2) };
-  if (level <= 60)  return { colors: 5,  moves: 18 + Math.floor((level - 35) / 3) };
-  if (level <= 90)  return { colors: 6,  moves: 22 + Math.floor((level - 60) / 4) };
-  if (level <= 125) return { colors: 7,  moves: 26 + Math.floor((level - 90) / 5) };
-  if (level <= 160) return { colors: 8,  moves: 30 + Math.floor((level - 125) / 5) };
-  if (level <= 185) return { colors: 9,  moves: 34 + Math.floor((level - 160) / 4) };
-  return             { colors: 10, moves: 38 + Math.floor((level - 185) / 4) };
+  if (level <= 4)   return { colors: 4,  moves: 10 + level };
+  if (level <= 9)   return { colors: 5,  moves: 14 + level };
+  if (level <= 14)  return { colors: 6,  moves: 18 + level };
+  if (level <= 19)  return { colors: 7,  moves: 22 + level };
+  if (level <= 24)  return { colors: 8,  moves: 26 + level };
+  if (level <= 29)  return { colors: 9,  moves: 30 + level };
+  if (level <= 34)  return { colors: 10, moves: 34 + level };
+  if (level <= 44)  return { colors: 11, moves: 38 + Math.floor(level / 2) };
+  if (level <= 54)  return { colors: 12, moves: 42 + Math.floor(level / 2) };
+  if (level <= 69)  return { colors: 13, moves: 46 + Math.floor(level / 2) };
+  if (level <= 84)  return { colors: 14, moves: 50 + Math.floor(level / 2) };
+  if (level <= 109) return { colors: 15, moves: 54 + Math.floor(level / 2) };
+  if (level <= 149) return { colors: 16, moves: 58 + Math.floor(level / 2) };
+  return             { colors: 16, moves: 62 + Math.floor(level / 2) };
 }
 
 function themeForLevel(level) {
   return THEMES[(level - 1) % THEMES.length];
 }
-/* Bottle count ramps up with level (colors + extra empties). */
-const BOTTLE_POINTS = [[1, 5], [10, 6], [25, 11], [40, 12], [60, 12], [80, 13], [100, 14], [120, 15], [150, 16], [175, 17], [200, 18]];
+/* Bottle count = one color tube per color + exactly ONE empty tube, so the
+   finish state always leaves a single empty bottle (classic hard rules). */
 function bottleCountForLevel(level) {
-  const L = Math.max(1, Math.min(CFG.LEVEL_COUNT, parseInt(level, 10) || 1));
-  for (let i = 1; i < BOTTLE_POINTS.length; i++) {
-    const l0 = BOTTLE_POINTS[i - 1][0], c0 = BOTTLE_POINTS[i - 1][1];
-    const l1 = BOTTLE_POINTS[i][0], c1 = BOTTLE_POINTS[i][1];
-    if (L <= l1) return c0 + Math.round(((L - l0) / (l1 - l0)) * (c1 - c0));
-  }
-  return BOTTLE_POINTS[BOTTLE_POINTS.length - 1][1];
+  return difficultyForLevel(level).colors + 1;
 }
 /* Shape varies in 12-level bands so the look shifts every so often. */
 function shapeForLevel(level) {
@@ -1798,9 +1805,6 @@ function generateLevel(level, opts) {
     const order = shuffle([...Array(colors).keys()], rng);
     for (let c = 0; c < colors; c++) tubes.push([order[c], order[c], order[c], order[c]]);
     tubes.push([]);
-    tubes.push([]);
-    const extraEmpty = Math.max(0, bottleCountForLevel(level) - colors - 2);
-    for (let e = 0; e < extraEmpty; e++) tubes.push([]);
 
     const solution = [];
     let last = null;
@@ -2985,6 +2989,8 @@ function showScreen(name) {
 function updateHUD() {
   const isDaily = app.level === -1;
   document.getElementById('levelNum').textContent = isDaily ? 'DAILY' : app.level;
+  const hdrLv = document.getElementById('hdrPlayerLv');
+  if (hdrLv) hdrLv.textContent = 'Lv ' + playerLevelFromXp(app.save.xp).level;
   document.getElementById('movesNum').textContent = app.moves;
   document.getElementById('parInfo').textContent = isDaily ? 'Daily Challenge' : 'Par ' + app.par;
   document.getElementById('btnUndo').disabled = app.history.length === 0;
@@ -4002,7 +4008,7 @@ function selfTest() {
   let prevColors = 0;
   for (let l = 1; l <= 200; l++) {
     const d = difficultyForLevel(l);
-    assert(d.colors >= 3 && d.colors <= 10, 'difficulty range at level ' + l);
+    assert(d.colors >= 4 && d.colors <= 16, 'difficulty range at level ' + l);
     assert(d.colors >= prevColors, 'difficulty colors decreased at level ' + l);
     assert(d.moves >= 1, 'difficulty moves at level ' + l);
     prevColors = d.colors;
@@ -4076,8 +4082,8 @@ function selfTest() {
 
   assert(new Set(THEMES.map((_, i) => themeForLevel(i + 1))).size === THEMES.length, 'themes do not cycle through all');
   assert(new Set(Array.from({ length: CFG.LEVEL_COUNT }, (_, i) => shapeForLevel(i + 1))).size === SHAPES.length, 'shapes do not cycle through all');
-  assert(LEVEL_PALETTES.every(p => Array.isArray(p) && p.length === 10 && p.every(c => /^#[0-9a-f]{6}$/i.test(c))), 'level palettes invalid');
-  assert(LEVEL_PALETTES.length >= 1 && currentPalette().length === 10, 'level palette unusable');
+  assert(LEVEL_PALETTES.every(p => Array.isArray(p) && p.length === 16 && p.every(c => /^#[0-9a-f]{6}$/i.test(c))), 'level palettes invalid');
+  assert(LEVEL_PALETTES.length >= 1 && currentPalette().length === 16, 'level palette unusable');
   for (let l = 1; l <= 200; l++) {
     assert(THEMES.includes(themeForLevel(l)), 'bad theme at ' + l);
     assert(SHAPES.includes(shapeForLevel(l)), 'bad shape at ' + l);
