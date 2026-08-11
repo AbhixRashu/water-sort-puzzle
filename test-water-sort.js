@@ -1,9 +1,9 @@
 const fs = require('fs');
-const html = fs.readFileSync('water-sort-puzzle.html', 'utf8');
+const html = fs.readFileSync('index.html', 'utf8');
 const m = html.match(/<script>([\s\S]*?)<\/script>/);
 if (!m) { console.error('No <script> block found'); process.exit(1); }
 const code = m[1];
-const mod = new Function(code + '; return { GameEngine, generateLevel, solve, validPuzzle, difficultyForLevel, CFG, sanitizeSave, selfTest, themeForLevel, shapeForLevel, THEMES, SHAPES, heuristicMove, xpForLevel, playerLevelFromXp, gainXp, dateKey, addDays, touchDailyStreak, EXP_RATES };')();
+const mod = new Function(code + '; return { GameEngine, generateLevel, solve, validPuzzle, difficultyForLevel, CFG, sanitizeSave, selfTest, themeForLevel, shapeForLevel, bottleCountForLevel, THEMES, SHAPES, heuristicMove, xpForLevel, playerLevelFromXp, gainXp, dateKey, addDays, touchDailyStreak, EXP_RATES };')();
 
 let failures = 0;
 let warnings = 0;
@@ -27,7 +27,7 @@ try {
 for (let level = 1; level <= 200; level++) {
   const gen = mod.generateLevel(level, { skipHeavy: true });
   check(gen.tubes.length > 0, 'level ' + level + ' generated empty');
-  check(gen.tubes.length === gen.colors + 2, 'level ' + level + ' wrong tube count');
+  check(gen.tubes.length === mod.bottleCountForLevel(level), 'level ' + level + ' wrong tube count');
   check(gen.tubes.every(t => t.length <= 4), 'level ' + level + ' tube over capacity');
   check(gen.tubes.every(t => t.every(c => c >= 0 && c < gen.colors)), 'level ' + level + ' color out of range');
   const total = gen.tubes.reduce((s, t) => s + t.length, 0);
@@ -48,6 +48,18 @@ for (let level = 1; level <= 200; level++) {
 
   check(mod.THEMES.includes(mod.themeForLevel(level)), 'level ' + level + ' bad theme');
   check(mod.SHAPES.includes(mod.shapeForLevel(level)), 'level ' + level + ' bad shape');
+}
+
+// Bottle count must ramp up with level (never decrease)
+{
+  let prev = 0;
+  for (let level = 1; level <= 200; level++) {
+    const c = mod.bottleCountForLevel(level);
+    check(c >= 4 && c <= 20, 'level ' + level + ' bottle count out of range');
+    check(c >= prev, 'level ' + level + ' bottle count decreased');
+    prev = c;
+  }
+  console.log('Bottle count L1/L25/L50/L121/L200:', mod.bottleCountForLevel(1), mod.bottleCountForLevel(25), mod.bottleCountForLevel(50), mod.bottleCountForLevel(121), mod.bottleCountForLevel(200));
 }
 
 // Heavy (validated) generation + BFS checks on the easy tiers

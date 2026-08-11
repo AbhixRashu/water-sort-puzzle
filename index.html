@@ -16,6 +16,9 @@
     --muted: #9fb3c8;
     --glass: rgba(255,255,255,.07);
     --glass-border: rgba(255,255,255,.28);
+    --panel-grad: linear-gradient(168deg, rgba(44,53,94,.78) 0%, rgba(24,26,54,.90) 55%, rgba(15,16,36,.96) 100%);
+    --panel-line: rgba(152,178,255,.24);
+    --rim-hi: rgba(255,255,255,.85);
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { height: 100%; }
@@ -27,14 +30,14 @@
     -webkit-tap-highlight-color: transparent;
     user-select: none;
     background:
-      radial-gradient(560px 420px at 84% 6%, rgba(167,139,250,.22), transparent 62%),
-      radial-gradient(560px 420px at 12% 90%, rgba(77,208,225,.16), transparent 62%),
-      radial-gradient(540px 400px at 40% 112%, rgba(244,114,182,.14), transparent 62%),
-      linear-gradient(180deg, #1b2540 0%, #14122e 46%, #0a0d1a 100%);
+      radial-gradient(560px 420px at 84% 6%, rgba(167,139,250,.24), transparent 62%),
+      radial-gradient(560px 420px at 12% 90%, rgba(77,208,225,.19), transparent 62%),
+      radial-gradient(540px 400px at 40% 112%, rgba(244,114,182,.15), transparent 62%),
+      linear-gradient(180deg, #1e2846 0%, #161433 46%, #0b0d1d 100%);
   }
 
   /* ============================ THEMES ============================ */
-  body.theme-dark-moody  { --text:#eef6ff; --muted:#9fb3c8; --glass:rgba(255,255,255,.07); --glass-border:rgba(255,255,255,.28); background:radial-gradient(620px 430px at 82% 5%, rgba(124,58,237,.22), transparent 62%), radial-gradient(620px 430px at 8% 90%, rgba(14,165,233,.17), transparent 62%), radial-gradient(560px 400px at 46% 110%, rgba(236,72,153,.12), transparent 62%), linear-gradient(180deg, #232c4d 0%, #1a1833 46%, #0d0f22 100%); }
+  body.theme-dark-moody  { --text:#eef6ff; --muted:#9fb3c8; --glass:rgba(255,255,255,.07); --glass-border:rgba(255,255,255,.28); background:radial-gradient(620px 430px at 82% 5%, rgba(124,58,237,.26), transparent 62%), radial-gradient(620px 430px at 8% 90%, rgba(14,165,233,.20), transparent 62%), radial-gradient(560px 400px at 46% 110%, rgba(236,72,153,.13), transparent 62%), linear-gradient(180deg, #242e52 0%, #1a1836 46%, #0c0e20 100%); }
   body.theme-halloween  { --text:#ffedd6; --muted:#d9b98c; --glass:rgba(255,255,255,.06); --glass-border:rgba(255,150,40,.4); background:radial-gradient(1000px 650px at 50% -8%, #4a1d3a 0%, #2b1030 45%, #140a18 100%); }
   body.theme-halloween { --accent:#ff9f1c; }
   body.theme-soft-pastel { --text:#4a4453; --muted:#7a7285; --glass:rgba(255,255,255,.35); --glass-border:rgba(80,60,110,.22); background:linear-gradient(160deg,#fde2e4,#fad2e1,#dbe7ff); }
@@ -53,7 +56,7 @@
   .particle { position: absolute; border-radius: 50%; }
   .p-star, .p-space { background: #fff; box-shadow: 0 0 6px rgba(255,255,255,.85); animation: twinkle ease-in-out infinite; }
   .p-snow { background: #fff; opacity: .9; animation: fall linear infinite; }
-  .p-bubbles { background: transparent; border: 2px solid rgba(255,255,255,.45); animation: rise linear infinite; }
+  .p-bubbles { background: transparent; border: 2px solid rgba(255,255,255,.42); box-shadow: inset 0 0 6px rgba(160,210,255,.5), 0 0 10px rgba(140,200,255,.28); animation: rise linear infinite; }
   .glow { position: absolute; border-radius: 50%; filter: blur(40px); opacity: .35; animation: neonPulse 6s ease-in-out infinite; }
   @keyframes twinkle { 0%,100%{opacity:.12} 50%{opacity:.95} }
   @keyframes fall { 0%{transform:translateY(0);opacity:0} 10%{opacity:.9} 100%{transform:translateY(114vh);opacity:.15} }
@@ -80,9 +83,9 @@
   .top-btn {
     width: 46px; height: 46px; border-radius: 50%; cursor: pointer;
     display: inline-flex; align-items: center; justify-content: center;
-    color: #fff; border: 1px solid rgba(255,255,255,.25);
+    color: #fff; border: 1px solid rgba(255,255,255,.28);
     background: linear-gradient(145deg, #7c5cbf, #5a3d9e);
-    box-shadow: 0 4px 10px rgba(90,61,158,.45);
+    box-shadow: 0 4px 10px rgba(90,61,158,.45), inset 0 1px 0 rgba(255,255,255,.4), inset 0 0 10px rgba(255,255,255,.14), inset 0 -3px 6px rgba(0,0,0,.25);
     transition: transform .12s ease;
     flex: 0 0 auto;
   }
@@ -109,7 +112,7 @@
     position: relative; width: 60px; height: 60px; border-radius: 50%; cursor: pointer;
     display: inline-flex; align-items: center; justify-content: center;
     color: #fff; border: 1px solid rgba(255,255,255,.25);
-    box-shadow: 0 8px 18px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.28);
+    box-shadow: 0 8px 18px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.34), inset 0 -4px 8px rgba(0,0,0,.22), inset 0 0 0 2px rgba(255,255,255,.08);
     transition: transform .12s ease, box-shadow .15s ease;
   }
   .action-btn:active { transform: scale(.9); }
@@ -210,19 +213,33 @@
   }
   .tube {
     position: relative; width: 44px; height: 132px; --bh: 132px;
-    border: 2px solid var(--glass-border);
+    border: 1px solid rgba(255,255,255,.14);
     border-radius: 12px 12px 28px 28px / 12px 12px 52px 52px;
     background:
-      linear-gradient(115deg, transparent 34%, rgba(255,255,255,.10) 47%, rgba(255,255,255,.03) 56%, transparent 70%),
-      linear-gradient(180deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,.06) 42%, rgba(255,255,255,.02) 100%);
+      linear-gradient(115deg, transparent 28%, rgba(255,255,255,.13) 43%, rgba(255,255,255,.04) 53%, transparent 66%),
+      linear-gradient(90deg, rgba(255,255,255,.13), rgba(255,255,255,.03) 36%, rgba(255,255,255,.02) 64%, rgba(255,255,255,.05)),
+      linear-gradient(180deg, rgba(255,255,255,.15) 0%, rgba(255,255,255,.05) 40%, rgba(0,0,0,.06) 100%);
     box-shadow:
-      inset 0 1px 0 rgba(255,255,255,.22),
-      inset 0 -10px 14px -10px rgba(0,0,0,.30),
-      inset 0 0 16px rgba(255,255,255,.05),
-      0 10px 18px rgba(0,0,0,.28);
+      inset 2px 0 1px -1px rgba(255,255,255,.22),
+      inset -3px 0 7px -2px rgba(0,0,0,.42),
+      inset 0 1px 0 rgba(255,255,255,.14),
+      inset 0 -12px 16px -12px rgba(0,0,0,.38),
+      inset 0 0 18px rgba(255,255,255,.04),
+      0 6px 12px rgba(0,0,0,.34),
+      0 16px 28px -10px rgba(0,0,0,.55);
     cursor: pointer; overflow: hidden;
     transition: transform .16s cubic-bezier(.3,1.4,.5,1), border-color .16s, box-shadow .16s;
   }
+  .tube::before {
+    content: ''; position: absolute; left: 50%; top: 0;
+    transform: translateX(-50%);
+    width: 58%; height: 3.5px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, var(--rim-hi), rgba(255,255,255,.14) 60%, rgba(255,255,255,0));
+    filter: blur(.35px);
+    pointer-events: none; z-index: 4;
+  }
+  .tube.pouring { transform: rotate(var(--pour-rot, -6deg)) translateY(-3px); z-index: 8; }
   .tube:hover { transform: translateY(-5px); }
   .tube.selected {
     transform: translateY(-16px);
@@ -348,11 +365,12 @@
   .modal.hidden { display: none; }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   .panel {
-    background: linear-gradient(180deg, rgba(27,47,63,.92), rgba(22,35,47,.94));
-    border: 1px solid var(--glass-border); border-radius: 18px;
+    background: var(--panel-grad);
+    border: 1px solid var(--panel-line); border-radius: 20px;
     padding: 22px; width: 100%; max-width: 420px; text-align: center;
-    box-shadow: 0 20px 50px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1);
-    backdrop-filter: blur(12px);
+    box-shadow: 0 24px 60px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.14), inset 0 -1px 0 rgba(0,0,0,.32);
+    backdrop-filter: blur(18px) saturate(1.3);
+    -webkit-backdrop-filter: blur(18px) saturate(1.3);
     animation: popIn .25s cubic-bezier(.3,1.3,.5,1);
   }
   .panel.wide { max-width: 560px; }
@@ -414,7 +432,7 @@
   .lg-n { line-height: 1; }
   #levelGrid button:hover:not(.locked) { background: rgba(255,255,255,.16); transform: scale(1.08); }
   #levelGrid button.current { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(77,208,225,.3); }
-  #levelGrid button.done { background: rgba(77,208,225,.16); }
+  #levelGrid button.done { background: linear-gradient(160deg, rgba(77,208,225,.34), rgba(58,116,255,.14)); border-color: rgba(77,208,225,.55); }
   #levelGrid button.timebest::after {
     content: '\26A1'; font-size: 9px; position: absolute; top: 1px; right: 2px;
     color: #ffd166;
@@ -435,13 +453,19 @@
   #mapCanvas { position: relative; width: 100%; }
   .map-node {
     position: absolute; width: 52px; height: 52px; border-radius: 50%; z-index: 2;
-    background: var(--glass); border: 2px solid var(--glass-border); color: var(--text);
+    background: linear-gradient(160deg, rgba(255,255,255,.16), rgba(255,255,255,.03)), var(--glass);
+    border: 2px solid var(--glass-border); color: var(--text);
     font-size: 14px; font-weight: 800; cursor: pointer;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.28), inset 0 -3px 6px rgba(0,0,0,.22), 0 8px 16px rgba(0,0,0,.32);
     transition: transform .12s ease, border-color .15s;
   }
   .map-node:active { transform: scale(.9); }
-  .map-node.done { background: rgba(77,208,225,.2); border-color: var(--accent); }
+  .map-node.done {
+    background: linear-gradient(160deg, rgba(77,208,225,.4), rgba(58,134,255,.2));
+    border-color: var(--accent);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.32), 0 0 16px rgba(77,208,225,.38), 0 8px 16px rgba(0,0,0,.3);
+  }
   .map-node.done .mn-n { line-height: 1; }
   .map-node.done .mn-st { font-size: 9px; color: #ffd166; line-height: 1; letter-spacing: .5px; }
   .map-node.current {
@@ -454,6 +478,11 @@
     50% { box-shadow: 0 0 0 3px rgba(255,209,102,.5), 0 0 30px 10px rgba(255,209,102,.65); }
   }
   .map-node.locked { opacity: .45; cursor: default; font-size: 18px; }
+  .map-path-progress {
+    fill: none; stroke-linecap: round;
+    stroke: #4dd0e1; stroke-width: 5;
+    filter: drop-shadow(0 0 6px rgba(77,208,225,.75));
+  }
 
   /* ======================= PHASE 1 FEATURES ===================== */
   .daily-btn { margin-top: 8px; background: linear-gradient(135deg, #ffb703, #fb8500); color: #2b1500; }
@@ -563,9 +592,11 @@
   .reward-pop {
     min-width:260px; max-width:320px; padding:16px 20px; border-radius:18px;
     text-align:center; pointer-events:auto; position:relative; overflow:hidden;
-    background: linear-gradient(180deg,#1b2f3f,#16232f);
-    border:1px solid rgba(255,255,255,.2);
-    box-shadow:0 18px 50px rgba(0,0,0,.5);
+    background: var(--panel-grad);
+    border:1px solid var(--panel-line);
+    box-shadow:0 18px 50px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.12);
+    backdrop-filter: blur(14px) saturate(1.2);
+    -webkit-backdrop-filter: blur(14px) saturate(1.2);
     animation: rewardPop .5s cubic-bezier(.3,1.4,.5,1);
   }
   .reward-pop.gold { border-color:rgba(255,215,102,.75); background:linear-gradient(180deg,#3a2c12,#241a08); }
@@ -608,11 +639,12 @@
 
   /* ======================= LIQUID EFFECTS ======================= */
   .surface {
-    position: absolute; left: 1px; right: 1px; height: 9px;
+    position: absolute; left: 1px; right: 1px; height: 10px;
     background:
-      radial-gradient(120% 175% at 50% 0%, rgba(255,255,255,.8), rgba(255,255,255,.16) 55%, rgba(255,255,255,0) 80%);
+      radial-gradient(115% 170% at 50% 0%, rgba(255,255,255,.88), rgba(255,255,255,.2) 52%, rgba(255,255,255,0) 80%),
+      linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,0));
     border-radius: 50%;
-    box-shadow: 0 -1px 3px rgba(255,255,255,.28);
+    box-shadow: 0 -1px 4px rgba(255,255,255,.32), inset 0 1px 3px rgba(255,255,255,.25);
     animation: surfaceWave 1.9s ease-in-out infinite;
     pointer-events: none;
     z-index: 2;
@@ -637,14 +669,14 @@
   }
   .seg {
     overflow: hidden;
-    box-shadow: inset 0 2px 0 rgba(255,255,255,.32), inset 0 -2px 0 rgba(0,0,0,.18), inset 0 0 12px rgba(255,255,255,.06);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.34), inset 0 -2px 0 rgba(0,0,0,.2), inset 0 0 14px rgba(255,255,255,.07);
   }
   .seg.seg-top {
-    border-radius: 50% 50% 6px 6px / 24px 24px 6px 6px;
+    border-radius: 50% 50% 7px 7px / 26px 26px 7px 7px;
   }
   .seg.seg-top::after {
-    content: ''; position: absolute; left: 4px; right: 4px; top: 1px; height: 5px;
-    background: radial-gradient(120% 200% at 50% 0%, rgba(255,255,255,.55), rgba(255,255,255,0) 70%);
+    content: ''; position: absolute; left: 5px; right: 5px; top: 1px; height: 6px;
+    background: radial-gradient(115% 200% at 50% 0%, rgba(255,255,255,.62), rgba(255,255,255,0) 72%);
     border-radius: 50%;
     pointer-events: none;
   }
@@ -703,7 +735,14 @@
   .home-card-inner:nth-child(4) { animation-delay: .12s; }
   @keyframes cardIn { from { opacity: 0; transform: translateY(14px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
   .pl-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-  .lvl-badge { font-size: 21px; font-weight: 800; color: var(--accent); }
+  .lvl-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 3px 16px; border-radius: 999px;
+    font-size: 20px; font-weight: 800; color: var(--accent);
+    background: linear-gradient(145deg, rgba(77,208,225,.24), rgba(124,58,237,.28));
+    border: 1px solid rgba(160,200,255,.32);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.28), 0 4px 14px rgba(77,208,225,.22);
+  }
   .xp-text { font-size: 12px; color: var(--muted); }
   .big-bar {
     height: 14px; border-radius: 8px; background: rgba(255,255,255,.12);
@@ -769,10 +808,12 @@
   .sheet-wrap.hidden { display: none; }
   .sheet {
     width: 100%; max-width: 540px;
-    background: linear-gradient(180deg, #1b2f3f, #16232f);
-    border: 1px solid var(--glass-border); border-radius: 20px 20px 0 0;
+    background: linear-gradient(168deg, rgba(44,53,94,.84), rgba(20,21,46,.95));
+    border: 1px solid var(--panel-line); border-radius: 22px 22px 0 0;
     padding: 10px 16px calc(18px + env(safe-area-inset-bottom));
-    box-shadow: 0 -12px 40px rgba(0,0,0,.5);
+    box-shadow: 0 -12px 40px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.12);
+    backdrop-filter: blur(18px) saturate(1.2);
+    -webkit-backdrop-filter: blur(18px) saturate(1.2);
     animation: sheetUp .28s cubic-bezier(.3,1.2,.4,1);
   }
   @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
@@ -881,9 +922,12 @@
   }
   .tutorial.hidden { display: none; }
   .tut-card {
-    background: linear-gradient(180deg, #1b2f3f, #16232f);
-    border: 1px solid var(--glass-border); border-radius: 18px;
+    background: var(--panel-grad);
+    border: 1px solid var(--panel-line); border-radius: 20px;
     padding: 26px 24px; max-width: 380px; width: 100%; text-align: center;
+    box-shadow: 0 24px 60px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.12);
+    backdrop-filter: blur(18px) saturate(1.3);
+    -webkit-backdrop-filter: blur(18px) saturate(1.3);
     animation: popIn .3s cubic-bezier(.3,1.3,.5,1);
   }
   .tut-icon { font-size: 54px; animation: floatDrop 2.2s ease-in-out infinite; }
@@ -1449,13 +1493,34 @@ const THEMES = [
 
 const SHAPES = ['test-tube', 'wide-bottle', 'slim-vial', 'soda-bottle', 'flask'];
 
-const PARTICLES = { 'night-stars': 42, 'space': 46, 'snow': 52, 'underwater': 22 };
+const PARTICLES = { 'night-stars': 42, 'space': 46, 'snow': 52, 'underwater': 22, 'dark-moody': 16 };
 
 const TUBE_H = 132;
 const UNIT_H = 33;
 
 let tubeMetrics = { height: TUBE_H, unitH: UNIT_H };
 const SHAPE_BASE_W = { 'test-tube': 44, 'wide-bottle': 58, 'slim-vial': 34, 'soda-bottle': 50, flask: 46 };
+
+/* ------------------- Liquid glass helpers ---------------------- */
+function hexToRgb(hex) {
+  let m = String(hex).replace('#', '');
+  if (m.length === 3) m = m.split('').map(c => c + c).join('');
+  const v = parseInt(m, 16) || 0;
+  return { r: (v >> 16) & 255, g: (v >> 8) & 255, b: v & 255 };
+}
+function mix(a, b, t) { return Math.round(a + (b - a) * t); }
+function shade(hex, amt) {
+  const { r, g, b } = hexToRgb(hex);
+  const t = Math.max(0, Math.min(1, Math.abs(amt)));
+  const to = amt >= 0 ? 255 : 0;
+  const c = [mix(r, to, t), mix(g, to, t), mix(b, to, t)]
+    .map(v => ('0' + v.toString(16)).slice(-2)).join('');
+  return '#' + c;
+}
+function liquidCss(color) {
+  return 'linear-gradient(180deg, rgba(255,255,255,.30) 0%, rgba(255,255,255,.10) 32%, rgba(255,255,255,0) 52%), ' +
+    'linear-gradient(180deg, ' + shade(color, .30) + ' 0%, ' + color + ' 46%, ' + shade(color, -.20) + ' 100%)';
+}
 
 /* ----------------------------- PRNG ----------------------------- */
 function mulberry32(seed) {
@@ -1492,8 +1557,21 @@ function difficultyForLevel(level) {
 function themeForLevel(level) {
   return THEMES[(level - 1) % THEMES.length];
 }
+/* Bottle count ramps up with level (colors + extra empties). */
+const BOTTLE_POINTS = [[1, 5], [10, 6], [25, 11], [40, 12], [60, 12], [80, 13], [100, 14], [120, 15], [150, 16], [175, 17], [200, 18]];
+function bottleCountForLevel(level) {
+  const L = Math.max(1, Math.min(CFG.LEVEL_COUNT, parseInt(level, 10) || 1));
+  for (let i = 1; i < BOTTLE_POINTS.length; i++) {
+    const l0 = BOTTLE_POINTS[i - 1][0], c0 = BOTTLE_POINTS[i - 1][1];
+    const l1 = BOTTLE_POINTS[i][0], c1 = BOTTLE_POINTS[i][1];
+    if (L <= l1) return c0 + Math.round(((L - l0) / (l1 - l0)) * (c1 - c0));
+  }
+  return BOTTLE_POINTS[BOTTLE_POINTS.length - 1][1];
+}
+/* Shape varies in 12-level bands so the look shifts every so often. */
 function shapeForLevel(level) {
-  return SHAPES[(level - 1) % SHAPES.length];
+  const band = Math.floor((Math.max(1, parseInt(level, 10) || 1) - 1) / 12);
+  return SHAPES[band % SHAPES.length];
 }
 
 /* ==================== PAGE THEMES (global look) ================= */
@@ -1703,6 +1781,8 @@ function generateLevel(level, opts) {
     for (let c = 0; c < colors; c++) tubes.push([order[c], order[c], order[c], order[c]]);
     tubes.push([]);
     tubes.push([]);
+    const extraEmpty = Math.max(0, bottleCountForLevel(level) - colors - 2);
+    for (let e = 0; e < extraEmpty; e++) tubes.push([]);
 
     const solution = [];
     let last = null;
@@ -2336,7 +2416,7 @@ function renderTubeThemes() {
     const cell = document.createElement('div');
     cell.className = 'skin-card tube-card' + (unlocked ? '' : ' locked') + (i === app.save.tubeTheme ? ' selected' : '');
     const segs = ['#ff6b6b', '#ffd93d', '#6bcb77', '#4d96ff'].map((c, j) =>
-      '<i style="bottom:' + (j * 17 + 3) + 'px;height:15px;background:' + c + '"></i>').join('');
+      '<i style="bottom:' + (j * 17 + 3) + 'px;height:15px;background:' + liquidCss(c) + '"></i>').join('');
     cell.innerHTML = '<div class="tube-preview">' + segs + '</div>' +
       '<div class="skin-name">' + t.name + '</div>' +
       (unlocked ? '<div class="skin-unlock">' + (i === app.save.tubeTheme ? '✓ Selected' : 'Tap to equip') + '</div>'
@@ -2953,7 +3033,7 @@ function renderBoard() {
     t.forEach((color, j) => {
       const seg = document.createElement('div');
       seg.className = 'seg' + (j === t.length - 1 ? ' seg-top' : '');
-      seg.style.background = 'linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,0) 38%), ' + currentPalette()[color];
+      seg.style.background = liquidCss(currentPalette()[color]);
       seg.style.bottom = (j * unitH + 2) + 'px';
       seg.style.height = (unitH - 4) + 'px';
       el.appendChild(seg);
@@ -2998,13 +3078,13 @@ function applyTheme(level) {
     document.body.appendChild(v);
   }
   const rng = mulberry32(0xF00D + level);
-  const pMap = { 'night-stars': 'star', space: 'space', snow: 'snow', underwater: 'bubbles', 'boss-danger': 'ember' };
+  const pMap = { 'night-stars': 'star', space: 'space', snow: 'snow', underwater: 'bubbles', 'boss-danger': 'ember', 'dark-moody': 'bubbles' };
   const count = isBoss ? 30 : (PARTICLES[theme] || 0);
   for (let i = 0; i < count; i++) {
     const p = document.createElement('div');
     p.className = 'particle p-' + (pMap[theme] || 'star');
     p.style.left = (rng() * 100) + '%';
-    if (theme === 'boss-danger' || theme === 'underwater') {
+    if (theme === 'dark-moody' || theme === 'boss-danger' || theme === 'underwater') {
       p.style.bottom = '-24px';
       p.style.animationDuration = (3 + rng() * 4) + 's';
       p.style.animationDelay = (rng() * 3) + 's';
@@ -3025,13 +3105,20 @@ function applyTheme(level) {
     }
     fx.appendChild(p);
   }
-  if (theme === 'neon-glow') {
-    const glows = [
+  const softGlows = {
+    'dark-moody': [
+      ['22%', '20%', '400px', 'rgba(124,58,237,.34)'],
+      ['80%', '76%', '460px', 'rgba(77,208,225,.26)'],
+      ['52%', '2%', '300px', 'rgba(236,72,153,.16)']
+    ],
+    'neon-glow': [
       ['20%', '30%', '420px', 'rgba(0,255,255,.5)'],
       ['80%', '70%', '380px', 'rgba(255,0,200,.45)'],
       ['50%', '10%', '300px', 'rgba(120,255,80,.3)']
-    ];
-    glows.forEach(([x, y, size, color]) => {
+    ]
+  };
+  if (softGlows[theme]) {
+    softGlows[theme].forEach(([x, y, size, color]) => {
       const g = document.createElement('div');
       g.className = 'glow';
       g.style.left = x; g.style.top = y;
@@ -3192,28 +3279,34 @@ function animatePour(from, to, onDone) {
 
   const dx = dstR.left - srcR.left;
   const dy = dstRunTop - srcRunTop;
-  const mx = dx / 2;
-  const my = Math.min(dy, -24) - 40;
+  const cx = dx / 2;
+  const cy = Math.min(dy, -10) - Math.max(44, Math.abs(dx) * 0.42);
+  const DUR = 520;
 
   const float = document.createElement('div');
   float.className = 'pour';
   float.style.width = (srcR.width - inset * 2) + 'px';
   float.style.height = runH + 'px';
-  float.style.background = currentPalette()[run.color];
+  float.style.background = liquidCss(currentPalette()[run.color]);
   float.style.left = (srcR.left + inset) + 'px';
   float.style.top = srcRunTop + 'px';
-  float.style.setProperty('--dx', dx + 'px');
-  float.style.setProperty('--dy', dy + 'px');
-  float.style.setProperty('--mx', mx + 'px');
-  float.style.setProperty('--my', my + 'px');
   document.body.appendChild(float);
 
+  const name = 'pourAnim_' + Math.floor(Math.random() * 1e9);
+  ensurePourStyle().textContent = pourKeyframes(name, 0, 0, cx, cy, dx, dy, 12);
+  float.style.animation = name + ' ' + DUR + 'ms linear forwards';
+
+  const rot = (dx >= 0 ? 1 : -1) * Math.min(9, 4 + Math.abs(dx) / 90);
+  srcEl.style.setProperty('--pour-rot', rot + 'deg');
+  srcEl.classList.add('pouring');
+
   let committed = false;
-  const failTimer = setTimeout(() => finish(), 1000);
+  const failTimer = setTimeout(() => finish(), 1200);
   function finish() {
     if (committed) return;
     committed = true;
     clearTimeout(failTimer);
+    srcEl.classList.remove('pouring');
     try { if (float.parentNode) float.remove(); } catch (e) { /* ignore */ }
     try {
       AudioSys.play('glug');
@@ -3222,10 +3315,11 @@ function animatePour(from, to, onDone) {
       const ripple = document.createElement('div');
       ripple.className = 'ripple';
       ripple.style.left = (dstR.left + dstR.width / 2) + 'px';
-      ripple.style.top = (dstR.top + dstR.height / 2) + 'px';
+      ripple.style.top = (dstRunTop + 2) + 'px';
       document.body.appendChild(ripple);
       ripple.addEventListener('animationend', () => ripple.remove(), { once: true });
     } catch (e) { /* ignore */ }
+    try { splashAt(dstEl, run.color); } catch (e) { /* ignore */ }
     try {
       onDone();
     } catch (e) {
@@ -3234,6 +3328,29 @@ function animatePour(from, to, onDone) {
     }
   }
   float.addEventListener('animationend', finish, { once: true });
+}
+
+let pourStyleEl = null;
+function ensurePourStyle() {
+  if (!pourStyleEl) {
+    pourStyleEl = document.createElement('style');
+    pourStyleEl.id = 'pourKf';
+    document.head.appendChild(pourStyleEl);
+  }
+  return pourStyleEl;
+}
+function easeSmooth(t) { return t * t * (3 - 2 * t); }
+function pourKeyframes(name, sx, sy, cx, cy, dx, dy, steps) {
+  let css = '@keyframes ' + name + ' {';
+  for (let i = 0; i <= steps; i++) {
+    const t = easeSmooth(i / steps);
+    const u = 1 - t;
+    const ox = u * u * sx + 2 * u * t * cx + t * t * dx;
+    const oy = u * u * sy + 2 * u * t * cy + t * t * dy;
+    css += ((i / steps) * 100) + '%{ transform: translate3d(' + ox.toFixed(1) + 'px,' + oy.toFixed(1) + 'px,0); }';
+  }
+  css += '}';
+  return css;
 }
 
 function splashAt(el, color) {
@@ -3443,7 +3560,7 @@ function useExtraTube() {
   if (app.save.boosters.extraTube <= 0) { toast('No extra tubes left'); return; }
   const before = app.state;
   const tubes = app.state.map(t => t.slice());
-  if (tubes.length >= 12) { toast('Board is full'); return; }
+  if (tubes.length >= 20) { toast('Board is full'); return; }
   const total = tubes.reduce((sum, t) => sum + t.length, 0);
   if (total >= (tubes.length + 1) * 4) { toast('No room for an empty tube'); return; }
   tubes.push([]);
@@ -3535,11 +3652,14 @@ function closeAdModal() {
 
 /* ------------------------- Win & confetti ------------------------ */
 function confetti() {
+  const colors = currentPalette();
   for (let i = 0; i < 55; i++) {
     const el = document.createElement('div');
     el.className = 'confetti';
     el.style.left = (Math.random() * 100) + 'vw';
-    el.style.background = PALETTE[Math.floor(Math.random() * PALETTE.length)];
+    const c = colors[Math.floor(Math.random() * colors.length)];
+    el.style.background = 'linear-gradient(180deg, ' + shade(c, .28) + ', ' + c + ')';
+    el.style.boxShadow = '0 0 6px ' + c + '66';
     el.style.setProperty('--cx', ((Math.random() - 0.5) * 220) + 'px');
     el.style.animationDuration = (1.8 + Math.random() * 1.4) + 's';
     el.style.animationDelay = (Math.random() * 0.5) + 's';
@@ -3809,6 +3929,21 @@ function renderLevelMap() {
   path.setAttribute('stroke-dasharray', '10 8');
   svg.appendChild(path);
 
+  const maxDone = Math.max(0, ...(s.done || []));
+  if (maxDone >= 1) {
+    const pd = 'M ' + pts[0][0] + ' ' + pts[0][1];
+    const end = Math.min(maxDone, pts.length - 1);
+    for (let i = 1; i <= end; i++) {
+      const p = pts[i - 1], c = pts[i];
+      const mx = (p[0] + c[0]) / 2;
+      pd += ' C ' + mx + ' ' + p[1] + ', ' + mx + ' ' + c[1] + ', ' + c[0] + ' ' + c[1];
+    }
+    const prog = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    prog.setAttribute('class', 'map-path-progress');
+    prog.setAttribute('d', pd);
+    svg.appendChild(prog);
+  }
+
   const sc = document.getElementById('mapScroll');
   if (sc) sc.scrollTop = Math.max(0, (app.level - 1) * ROW_H - sc.clientHeight / 2);
 }
@@ -3855,7 +3990,7 @@ function selfTest() {
 
   for (const lv of [1, 10, 30, 45, 70, 100, 130, 160, 185, 200]) {
     const g = generateLevel(lv, { skipHeavy: true });
-    assert(g.tubes.length === g.colors + 2, 'level ' + lv + ' tube count');
+    assert(g.tubes.length === bottleCountForLevel(lv), 'level ' + lv + ' tube count');
     assert(g.tubes.every(t => t.length <= CFG.CAP), 'level ' + lv + ' capacity');
     assert(g.solution.length > 0, 'level ' + lv + ' missing solution');
     assert(GameEngine.hasLegalMove(g.tubes), 'level ' + lv + ' deadlock');
@@ -3900,7 +4035,7 @@ function selfTest() {
   assert(dateKey(new Date(2026, 0, 5)) === '2026-01-05', 'dateKey formatting');
 
   assert(new Set(THEMES.map((_, i) => themeForLevel(i + 1))).size === THEMES.length, 'themes do not cycle through all');
-  assert(new Set(SHAPES.map((_, i) => shapeForLevel(i + 1))).size === SHAPES.length, 'shapes do not cycle through all');
+  assert(new Set(Array.from({ length: CFG.LEVEL_COUNT }, (_, i) => shapeForLevel(i + 1))).size === SHAPES.length, 'shapes do not cycle through all');
   for (let l = 1; l <= 200; l++) {
     assert(THEMES.includes(themeForLevel(l)), 'bad theme at ' + l);
     assert(SHAPES.includes(shapeForLevel(l)), 'bad shape at ' + l);
