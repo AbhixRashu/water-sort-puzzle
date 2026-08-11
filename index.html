@@ -239,7 +239,12 @@
     filter: blur(.35px);
     pointer-events: none; z-index: 4;
   }
-  .tube.pouring { transform: rotate(var(--pour-rot, -6deg)) translateY(-3px); z-index: 8; }
+  .tube.pouring {
+    transform-origin: 50% 100%;
+    transform: translateY(-16px) rotate(var(--pour-rot, -7deg)) scale(1.03);
+    transition: transform .26s cubic-bezier(.34,1.45,.44,1);
+    z-index: 8;
+  }
   .tube:hover { transform: translateY(-5px); }
   .tube.selected {
     transform: translateY(-16px);
@@ -1486,6 +1491,19 @@ const PALETTES = [
   ['#ff0055', '#ff7a00', '#ffe600', '#00e5ff', '#00c853', '#7c4dff', '#ff00aa', '#00b0ff', '#64ffda', '#ff9100']
 ];
 
+/* Eye-catching per-level palettes (default skin rotates through these so
+   every level feels fresh — sky blue, pink, violet, teal, coral...). */
+const LEVEL_PALETTES = [
+  ['#38bdf8', '#f472b6', '#a78bfa', '#2dd4bf', '#fb7185', '#34d399', '#fbbf24', '#60a5fa', '#e879f9', '#fb923c'],
+  ['#0ea5e9', '#ec4899', '#8b5cf6', '#10b981', '#f43f5e', '#f59e0b', '#14b8a6', '#3b82f6', '#f97316', '#22d3ee'],
+  ['#22d3ee', '#f0abfc', '#c084fc', '#4ade80', '#f87171', '#facc15', '#38bdf8', '#fb7185', '#2dd4bf', '#e879f9'],
+  ['#60a5fa', '#f472b6', '#fbbf24', '#22d3ee', '#fb7185', '#34d399', '#a78bfa', '#fb923c', '#e879f9', '#facc15'],
+  ['#0ea5e9', '#34d399', '#a78bfa', '#fb923c', '#f472b6', '#22d3ee', '#fbbf24', '#f43f5e', '#4ade80', '#c084fc'],
+  ['#38bdf8', '#f9a8d4', '#a5b4fc', '#6ee7b7', '#fde68a', '#fdba74', '#67e8f9', '#f0abfc', '#bef264', '#93c5fd'],
+  ['#fb7185', '#5eead4', '#60a5fa', '#fbbf24', '#a78bfa', '#34d399', '#f472b6', '#22d3ee', '#fb923c', '#c084fc'],
+  ['#4ade80', '#fb7185', '#22d3ee', '#c084fc', '#facc15', '#38bdf8', '#f9a8d4', '#2dd4bf', '#fb923c', '#e879f9']
+];
+
 const THEMES = [
   'dark-moody', 'soft-pastel', 'vivid-colorful', 'gradient-sunset', 'neon-glow',
   'night-stars', 'underwater', 'candy', 'space', 'jungle', 'snow'
@@ -2371,9 +2389,10 @@ function renderSkins() {
     cell.className = 'skin-card' + (unlocked ? '' : ' locked') + (i === app.save.skin ? ' selected' : '');
     const chips = pal.slice(0, 5).map(c => '<span class="chip" style="background:' + c + '"></span>').join('');
     cell.innerHTML = '<div class="skin-chips">' + chips + '</div>' +
-      '<div class="skin-name">Palette ' + (i + 1) + '</div>' +
+      '<div class="skin-name">' + (i === 0 ? 'Auto Vibrant' : 'Palette ' + (i + 1)) + '</div>' +
       (unlocked ? '<div class="skin-unlock">' + (i === app.save.skin ? '✓ Selected' : 'Tap to equip') + '</div>'
-        : '<div class="skin-unlock">Unlocks at level ' + SKIN_UNLOCK_LEVELS[i] + '</div>');
+        : '<div class="skin-unlock">Unlocks at level ' + SKIN_UNLOCK_LEVELS[i] + '</div>') +
+      (i === 0 ? '<div class="skin-hint">Colors change every level</div>' : '');
     if (unlocked) {
       cell.addEventListener('click', () => {
         applySkin(i);
@@ -2385,6 +2404,10 @@ function renderSkins() {
   });
 }
 function currentPalette() {
+  if ((app.save.skin || 0) === 0) {
+    const lv = Math.max(1, app.level || 1);
+    return LEVEL_PALETTES[(lv - 1) % LEVEL_PALETTES.length] || LEVEL_PALETTES[0];
+  }
   return PALETTES[app.save.skin] || PALETTES[0];
 }
 
@@ -3277,28 +3300,45 @@ function animatePour(from, to, onDone) {
   const dUnits = app.state[to].length;
   const dstRunTop = dstR.top + tubeH - (dUnits + runLen) * unitH + 2;
 
-  const dx = dstR.left - srcR.left;
-  const dy = dstRunTop - srcRunTop;
-  const cx = dx / 2;
-  const cy = Math.min(dy, -10) - Math.max(44, Math.abs(dx) * 0.42);
+  const dxRaw = dstR.left - srcR.left;
+  const rot = (dxRaw >= 0 ? 1 : -1) * Math.min(12, 6 + Math.abs(dxRaw) / 70);
+  srcEl.style.setProperty('--pour-rot', rot + 'deg');
+  srcEl.classList.add('pouring');
+
+  const W = srcR.width - inset * 2;
+  const H = runH;
+  const LIFT = 16;
+  const pivX = srcR.left + srcR.width / 2;
+  const pivY = srcR.top + srcR.height;
+  const fcy = srcRunTop + H / 2;
+  const rad = rot * Math.PI / 180;
+  const cs = Math.cos(rad), sn = Math.sin(rad);
+  const nx = pivX - (fcy - pivY) * sn;
+  const ny = pivY + (fcy - pivY) * cs - LIFT;
+
+  const startX = nx - W / 2;
+  const startY = ny - H / 2;
+  const targetX = dstR.left + dstR.width / 2 - W / 2;
+  const targetY = dstRunTop;
+
+  const mvx = targetX - startX;
+  const mvy = targetY - startY;
+  const cxx = mvx / 2;
+  const cyy = Math.min(mvy, -10) - Math.max(46, Math.abs(mvx) * 0.42);
   const DUR = 520;
 
   const float = document.createElement('div');
   float.className = 'pour';
-  float.style.width = (srcR.width - inset * 2) + 'px';
-  float.style.height = runH + 'px';
+  float.style.width = W + 'px';
+  float.style.height = H + 'px';
   float.style.background = liquidCss(currentPalette()[run.color]);
-  float.style.left = (srcR.left + inset) + 'px';
-  float.style.top = srcRunTop + 'px';
+  float.style.left = startX + 'px';
+  float.style.top = startY + 'px';
   document.body.appendChild(float);
 
   const name = 'pourAnim_' + Math.floor(Math.random() * 1e9);
-  ensurePourStyle().textContent = pourKeyframes(name, 0, 0, cx, cy, dx, dy, 12);
+  ensurePourStyle().textContent = pourKeyframes(name, 0, 0, cxx, cyy, mvx, mvy, 12);
   float.style.animation = name + ' ' + DUR + 'ms linear forwards';
-
-  const rot = (dx >= 0 ? 1 : -1) * Math.min(9, 4 + Math.abs(dx) / 90);
-  srcEl.style.setProperty('--pour-rot', rot + 'deg');
-  srcEl.classList.add('pouring');
 
   let committed = false;
   const failTimer = setTimeout(() => finish(), 1200);
@@ -4036,6 +4076,8 @@ function selfTest() {
 
   assert(new Set(THEMES.map((_, i) => themeForLevel(i + 1))).size === THEMES.length, 'themes do not cycle through all');
   assert(new Set(Array.from({ length: CFG.LEVEL_COUNT }, (_, i) => shapeForLevel(i + 1))).size === SHAPES.length, 'shapes do not cycle through all');
+  assert(LEVEL_PALETTES.every(p => Array.isArray(p) && p.length === 10 && p.every(c => /^#[0-9a-f]{6}$/i.test(c))), 'level palettes invalid');
+  assert(LEVEL_PALETTES.length >= 1 && currentPalette().length === 10, 'level palette unusable');
   for (let l = 1; l <= 200; l++) {
     assert(THEMES.includes(themeForLevel(l)), 'bad theme at ' + l);
     assert(SHAPES.includes(shapeForLevel(l)), 'bad shape at ' + l);
