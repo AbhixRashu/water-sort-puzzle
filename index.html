@@ -3737,6 +3737,8 @@ function win() {
   const st = s.stats;
   const isDaily = app.level === -1;
   const isBoss = isBossLevel(app.level);
+  let firstWin = false;
+  let tubeBonus = false;
   s.streak = app.streak;
   st.wins += 1;
   st.moves += app.moves;
@@ -3772,8 +3774,9 @@ function win() {
     document.getElementById('btnNext').disabled = false;
     document.getElementById('btnNext').textContent = 'Back to Menu';
   } else {
-    const firstWin = !s.done.includes(app.level);
-    if (firstWin) { s.done.push(app.level); st.levels = s.done.length; }
+    const firstWin2 = !s.done.includes(app.level);
+    if (firstWin2) { s.done.push(app.level); st.levels = s.done.length; }
+    firstWin = firstWin2;
     if (app.level === s.unlocked && app.level < CFG.LEVEL_COUNT) s.unlocked = app.level + 1;
     s.best[app.level] = Math.min(s.best[app.level] || Infinity, app.moves);
     let bonus = firstWin ? EXP_RATES.firstWin : 0;
@@ -3795,6 +3798,10 @@ function win() {
   const lvlRes = gainXp(xpGain);
   const leveled = lvlRes.after > lvlRes.before;
   if (isBoss) { s.boosters.shuffle += 1; s.boosters.extraTube += 1; }
+  if (firstWin && !isDaily && app.level % 10 === 0) {
+    s.boosters.extraTube = (s.boosters.extraTube || 0) + 1;
+    tubeBonus = true;
+  }
   touchDailyStreak();
   Store.save(s);
   checkAchievements();
@@ -3850,6 +3857,13 @@ function win() {
       bossFireworks();
       showBossVictory();
     }
+    if (tubeBonus) setTimeout(() => {
+      showRewardPopup({
+        type: 'tube', icon: '\u2697', title: 'Extra Tube!',
+        desc: 'Free extra tube for beating Level ' + app.level + '!',
+        sound: 'reward', duration: 2200
+      });
+    }, 1200);
   }, 350);
 }
 
